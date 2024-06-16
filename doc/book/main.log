@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.29)  16 JUN 2024 09:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.29)  16 JUN 2024 11:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -462,6 +462,39 @@ File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
 \Gin@req@height=\dimen185
 \Gin@req@width=\dimen186
 )
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2023/07/28 v1.6b Sub-captions (AR)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2023/08/05 v3.6o Customizing captions (AR)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
+\caption@tempdima=\dimen187
+\captionmargin=\dimen188
+\caption@leftmargin=\dimen189
+\caption@rightmargin=\dimen190
+\caption@width=\dimen191
+\caption@indent=\dimen192
+\caption@parindent=\dimen193
+\caption@hangindent=\dimen194
+Package caption Info: memoir document class detected.
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/caption/caption-memoir.sto
+File: caption-memoir.sto 2023/09/08 v2.2c Adaption of the caption package to th
+e memoir document class (AR)
+))
+\c@caption@flags=\count314
+\c@continuedfloat=\count315
+Package caption Info: changepage package is loaded.
+\caption@adjustwidth@hsize=\dimen195
+\caption@adjustwidth@linewidth=\dimen196
+)
+Package caption Info: New subtype `subfigure' on input line 238.
+\c@subfigure=\count316
+Package caption Info: New subtype `subtable' on input line 238.
+\c@subtable=\count317
+)
 
 LaTeX Warning: Unused global option(s):
     [dvipsnames].
@@ -469,33 +502,33 @@ LaTeX Warning: Unused global option(s):
 (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
 
 (/usr/local/texlive/2024basic/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count314
-\scratchdimen=\dimen187
+\scratchcounter=\count318
+\scratchdimen=\dimen197
 \scratchbox=\box57
-\nofMPsegments=\count315
-\nofMParguments=\count316
+\nofMPsegments=\count319
+\nofMParguments=\count320
 \everyMPshowfont=\toks27
-\MPscratchCnt=\count317
-\MPscratchDim=\dimen188
-\MPnumerator=\count318
-\makeMPintoPDFobject=\count319
+\MPscratchCnt=\count321
+\MPscratchDim=\dimen198
+\MPnumerator=\count322
+\makeMPintoPDFobject=\count323
 \everyMPtoPDFconversion=\toks28
 )
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.s
@@ -507,115 +540,126 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
-)) [1
+))
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
+ [1
 
 
 {/usr/local/texlive/2024basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/us
 r/local/texlive/2024basic/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}]
-<../images/board_dims.png, id=8, 554.07pt x 618.6312pt>
-File: ../images/board_dims.png Graphic file (type png)
-<use ../images/board_dims.png>
-Package pdftex.def Info: ../images/board_dims.png  used on input line 28.
-(pdftex.def)             Requested size: 221.62407pt x 247.44809pt.
+<../images/board_dims_a.png, id=8, 554.5518pt x 618.6312pt>
+File: ../images/board_dims_a.png Graphic file (type png)
+<use ../images/board_dims_a.png>
+Package pdftex.def Info: ../images/board_dims_a.png  used on input line 30.
+(pdftex.def)             Requested size: 194.09604pt x 216.52415pt.
+
+Overfull \hbox (2.59604pt too wide) in paragraph at lines 30--31
+ [][] 
+ []
+
 <../images/board_all.png, id=9, 554.07pt x 618.6312pt>
 File: ../images/board_all.png Graphic file (type png)
 <use ../images/board_all.png>
-Package pdftex.def Info: ../images/board_all.png  used on input line 34.
-(pdftex.def)             Requested size: 221.62407pt x 247.44809pt.
+Package pdftex.def Info: ../images/board_all.png  used on input line 36.
+(pdftex.def)             Requested size: 193.9274pt x 216.52415pt.
 
-[2 <../images/board_dims.png (PNG copy)>]
-<../diagrams/diagrams-block_dc.png, id=14, 527.571pt x 569.4876pt>
+Overfull \hbox (2.4274pt too wide) in paragraph at lines 36--37
+ [][] 
+ []
+
+[2 <../images/board_dims_a.png (PNG copy)> <../images/board_all.png (PNG copy)>
+]
+<../diagrams/diagrams-block_dc.png, id=15, 527.571pt x 569.4876pt>
 File: ../diagrams/diagrams-block_dc.png Graphic file (type png)
 <use ../diagrams/diagrams-block_dc.png>
 Package pdftex.def Info: ../diagrams/diagrams-block_dc.png  used on input line 
-42.
+47.
 (pdftex.def)             Requested size: 422.05737pt x 455.5907pt.
 
-Overfull \hbox (39.05737pt too wide) in paragraph at lines 42--43
+Overfull \hbox (39.05737pt too wide) in paragraph at lines 47--48
  [][] 
  []
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../images/schem.png, id=16, 1490.56876pt x 2208.20985pt>
-File: ../images/schem.png Graphic file (type png)
-<use ../images/schem.png>
-Package pdftex.def Info: ../images/schem.png  used on input line 49.
+[3 <../diagrams/diagrams-block_dc.png>]
+<../images/schem_gs.png, id=21, 1490.56876pt x 2208.20985pt>
+File: ../images/schem_gs.png Graphic file (type png)
+<use ../images/schem_gs.png>
+Package pdftex.def Info: ../images/schem_gs.png  used on input line 54.
 (pdftex.def)             Requested size: 417.35641pt x 618.29456pt.
 
-Overfull \hbox (34.35641pt too wide) in paragraph at lines 49--50
+Overfull \hbox (34.35641pt too wide) in paragraph at lines 54--55
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 101.12787pt on input line 51.
+LaTeX Warning: Float too large for page by 91.54454pt on input line 56.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 5
-7.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 6
+2.
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 5
-7.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 6
+2.
 
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-57.
+62.
 
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-57.
+62.
 
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 57.
+(Font)              <12> on input line 62.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 57.
+(Font)              <8> on input line 62.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 57.
+(Font)              <6> on input line 62.
 
-Overfull \hbox (60.49112pt too wide) in paragraph at lines 57--100
+Overfull \hbox (60.49112pt too wide) in paragraph at lines 62--105
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 32.19919pt on input line 102.
+LaTeX Warning: Float too large for page by 27.84938pt on input line 107.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[3 <../images/board_all.png (PNG copy)>] [4 <../diagrams/diagrams-block_dc.png>
-] [5 <../images/schem.png>] [6] (./main.aux)
+[4 <../images/schem_gs.png>] [5] (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 6363 strings out of 475567
- 99436 string characters out of 5777889
+ 7828 strings out of 475567
+ 128169 string characters out of 5777889
  1949187 words of memory out of 5000000
- 28445 multiletter control sequences out of 15000+600000
+ 29898 multiletter control sequences out of 15000+600000
  593129 words of font info for 54 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 85i,11n,93p,250b,259s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 85i,11n,93p,295b,508s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024basic/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></u
-sr/local/texlive/2024basic/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/loc
-al/texlive/2024basic/texmf-dist/fonts/type1/public/lm/lmro12.pfb>
-Output written on main.pdf (6 pages, 1949860 bytes).
+sr/local/texlive/2024basic/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/loc
+al/texlive/2024basic/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/tex
+live/2024basic/texmf-dist/fonts/type1/public/lm/lmro12.pfb>
+Output written on main.pdf (5 pages, 1948866 bytes).
 PDF statistics:
- 46 PDF objects out of 1000 (max. 8388607)
- 25 compressed objects within 1 object stream
+ 48 PDF objects out of 1000 (max. 8388607)
+ 26 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  21 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -5,6 +5,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
 
+\usepackage{subcaption}
 
 %%%%%%%%%% BOOK INFORMATION %%%%%%%%%%
 \newcommand{\authorname}{Michal Chovanec, PhD.}
@@ -23,18 +24,22 @@
 
 
 \newpage
-\begin{figure}[htb]
-    \centering
-    \includegraphics[scale=0.4]{../images/board_dims.png}
-    \caption{mechanical dimensions}
+\begin{figure}[h]
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[scale=0.35]{../images/board_dims_a.png}
+        \caption{mechanical dimensions}
+        \label{fig:mechanical_dimensions}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[scale=0.35]{../images/board_all.png}
+        \caption{overall PCB layout}
+        \label{fig:overall_PCB_layout}
+    \end{subfigure}
+    
+    \caption{Robot PCB}
 \end{figure}
-
-\begin{figure}[htb]
-    \centering
-    \includegraphics[scale=0.4]{../images/board_all.png}
-    \caption{overall PCB layout}
-\end{figure}
-
 
 \newpage
 \begin{figure}[h]
@@ -46,7 +51,7 @@
 \newpage
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.28]{../images/schem.png}
+    \includegraphics[scale=0.28]{../images/schem_gs.png}
     \caption{schematic diagram of DC motor version}
 \end{figure}
 
