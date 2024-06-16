@@ -20,8 +20,8 @@
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
@@ -32,13 +32,13 @@
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
 <layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
 <layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
-<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
-<layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
-<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
-<layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
-<layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
-<layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
-<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="yes"/>
+<layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="yes"/>
+<layer number="42" name="bRestrict" color="1" fill="10" visible="no" active="yes"/>
+<layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="yes"/>
+<layer number="44" name="Drills" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="46" name="Milling" color="3" fill="1" visible="yes" active="yes"/>
 <layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
 <layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
@@ -184,8 +184,8 @@
 <wire x1="0" y1="60" x2="0" y2="21" width="0" layer="20"/>
 <wire x1="0" y1="21" x2="-2" y2="19" width="0" layer="20"/>
 <wire x1="-2" y1="19" x2="-2" y2="9" width="0" layer="20"/>
-<wire x1="-4" y1="40" x2="97" y2="40" width="0.1" layer="48"/>
-<wire x1="19" y1="93" x2="19" y2="-8" width="0.1" layer="48"/>
+<wire x1="-4" y1="40" x2="87" y2="40" width="0.1" layer="48"/>
+<wire x1="19" y1="87.5" x2="19" y2="-7.5" width="0.1" layer="48"/>
 <rectangle x1="8.7808" y1="48.7432" x2="9.7808" y2="49.7432" layer="21"/>
 <rectangle x1="8.7808" y1="33.048" x2="9.7808" y2="34.048" layer="21"/>
 <rectangle x1="35.1712" y1="31.7808" x2="36.1712" y2="32.7808" layer="21"/>
@@ -204,14 +204,20 @@
 <rectangle x1="26" y1="54" x2="27" y2="55" layer="21"/>
 <text x="12.5516" y="44.8056" size="1.27" layer="25">+</text>
 <text x="24.6888" y="33.8328" size="1.27" layer="25">+</text>
-<wire x1="56" y1="80" x2="56" y2="0" width="0.2" layer="48" curve="-80"/>
+<wire x1="56.5" y1="80" x2="56.5" y2="0" width="0.2" layer="48" curve="-80"/>
 <circle x="19" y="40" radius="0.5" width="1" layer="21"/>
 <circle x="19" y="10" radius="0.5" width="1" layer="21"/>
 <circle x="19" y="70" radius="0.5" width="1" layer="21"/>
 <circle x="68" y="40" radius="0.5" width="1" layer="21"/>
-<wire x1="53.5" y1="80" x2="53.5" y2="0" width="0.2" layer="48" curve="-80"/>
+<wire x1="51" y1="80" x2="51" y2="0" width="0.2" layer="48" curve="-80"/>
 <circle x="57" y="76" radius="0.5" width="1" layer="21"/>
 <circle x="59" y="4" radius="0.5" width="1" layer="21"/>
+<dimension x1="-6.5" y1="85" x2="-7" y2="-5" x3="-7" y3="40" textsize="1.778" layer="48" dtype="vertical"/>
+<dimension x1="65" y1="80" x2="63" y2="0" x3="85" y3="40" textsize="1.778" layer="48" dtype="vertical"/>
+<dimension x1="37" y1="71" x2="-2" y2="71" x3="17.5" y3="9" textsize="1.778" layer="48" dtype="vertical"/>
+<dimension x1="80" y1="40.5" x2="0" y2="40.5" x3="40" y3="32" textsize="1.778" layer="48"/>
+<dimension x1="68" y1="40" x2="19" y2="40" x3="43.5" y3="40" textsize="1.778" layer="48"/>
+<dimension x1="-2" y1="68" x2="79.5" y2="68" x3="38.75" y3="68" textsize="1.778" layer="48"/>
 </plain>
 <libraries>
 <library name="rcl" urn="urn:adsk.eagle:library:334">

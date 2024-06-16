@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.29)  15 JUN 2024 21:57
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.29)  16 JUN 2024 09:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -512,96 +512,110 @@ e
 
 {/usr/local/texlive/2024basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/us
 r/local/texlive/2024basic/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}]
-<../images/schem.png, id=8, 1490.56876pt x 2208.20985pt>
-File: ../images/schem.png Graphic file (type png)
-<use ../images/schem.png>
-Package pdftex.def Info: ../images/schem.png  used on input line 28.
-(pdftex.def)             Requested size: 417.35641pt x 618.29456pt.
+<../images/board_dims.png, id=8, 554.07pt x 618.6312pt>
+File: ../images/board_dims.png Graphic file (type png)
+<use ../images/board_dims.png>
+Package pdftex.def Info: ../images/board_dims.png  used on input line 28.
+(pdftex.def)             Requested size: 221.62407pt x 247.44809pt.
+<../images/board_all.png, id=9, 554.07pt x 618.6312pt>
+File: ../images/board_all.png Graphic file (type png)
+<use ../images/board_all.png>
+Package pdftex.def Info: ../images/board_all.png  used on input line 34.
+(pdftex.def)             Requested size: 221.62407pt x 247.44809pt.
 
-Overfull \hbox (34.35641pt too wide) in paragraph at lines 28--29
-[][] 
- []
-
-
-LaTeX Warning: Float too large for page by 101.12787pt on input line 30.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../diagrams/diagrams.png, id=10, 527.571pt x 569.4876pt>
-File: ../diagrams/diagrams.png Graphic file (type png)
-<use ../diagrams/diagrams.png>
-Package pdftex.def Info: ../diagrams/diagrams.png  used on input line 36.
+[2 <../images/board_dims.png (PNG copy)>]
+<../diagrams/diagrams-block_dc.png, id=14, 527.571pt x 569.4876pt>
+File: ../diagrams/diagrams-block_dc.png Graphic file (type png)
+<use ../diagrams/diagrams-block_dc.png>
+Package pdftex.def Info: ../diagrams/diagrams-block_dc.png  used on input line 
+42.
 (pdftex.def)             Requested size: 422.05737pt x 455.5907pt.
 
-Overfull \hbox (39.05737pt too wide) in paragraph at lines 36--37
-[][] 
+Overfull \hbox (39.05737pt too wide) in paragraph at lines 42--43
+ [][] 
  []
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 4
-5.
+<../images/schem.png, id=16, 1490.56876pt x 2208.20985pt>
+File: ../images/schem.png Graphic file (type png)
+<use ../images/schem.png>
+Package pdftex.def Info: ../images/schem.png  used on input line 49.
+(pdftex.def)             Requested size: 417.35641pt x 618.29456pt.
+
+Overfull \hbox (34.35641pt too wide) in paragraph at lines 49--50
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 101.12787pt on input line 51.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 5
+7.
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 4
-5.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 5
+7.
 
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-45.
+57.
 
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-45.
+57.
 
 (/usr/local/texlive/2024basic/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 45.
+(Font)              <12> on input line 57.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 45.
+(Font)              <8> on input line 57.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 45.
+(Font)              <6> on input line 57.
 
-Overfull \hbox (51.04317pt too wide) in paragraph at lines 45--88
+Overfull \hbox (60.49112pt too wide) in paragraph at lines 57--100
  [][] 
  []
 
 
-LaTeX Warning: Float too large for page by 32.19919pt on input line 90.
+LaTeX Warning: Float too large for page by 32.19919pt on input line 102.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[2 <../images/schem.png>] [3 <../diagrams/diagrams.png>] [4] (./main.aux)
+[3 <../images/board_all.png (PNG copy)>] [4 <../diagrams/diagrams-block_dc.png>
+] [5 <../images/schem.png>] [6] (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 6349 strings out of 475567
- 98948 string characters out of 5777889
+ 6363 strings out of 475567
+ 99436 string characters out of 5777889
  1949187 words of memory out of 5000000
- 28431 multiletter control sequences out of 15000+600000
+ 28445 multiletter control sequences out of 15000+600000
  593129 words of font info for 54 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 85i,11n,93p,250b,261s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 85i,11n,93p,250b,259s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024basic/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></u
 sr/local/texlive/2024basic/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/loc
 al/texlive/2024basic/texmf-dist/fonts/type1/public/lm/lmro12.pfb>
-Output written on main.pdf (4 pages, 1570340 bytes).
+Output written on main.pdf (6 pages, 1949860 bytes).
 PDF statistics:
- 38 PDF objects out of 1000 (max. 8388607)
- 21 compressed objects within 1 object stream
+ 46 PDF objects out of 1000 (max. 8388607)
+ 25 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
 
