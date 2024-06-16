@@ -1,6 +1,6 @@
 #include <drivers.h>
 
-#include <motor_control.h>
+#include <bldc_motor_control.h>
 #include <gonio.h>
 #include <fmath.h>
  
@@ -17,7 +17,7 @@
 
  
 //timer 2 interrupt handler, running commutation process, 4kHz
-MotorControl *g_motor_control_ptr;
+BLDCMotorControl *g_motor_control_ptr;
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +34,7 @@ void TIM2_IRQHandler(void)
 #endif
 
 
-void MotorControl::init()
+void BLDCMotorControl::init()
 {
     terminal << "motor_controll init start\n";
 
@@ -122,21 +122,21 @@ void MotorControl::init()
     terminal << "motor_controll init [DONE]\n";
 }
 
-void MotorControl::set_torque(float left_torque, float right_torque)
+void BLDCMotorControl::set_torque(float left_torque, float right_torque)
 {
     this->left_torque  = left_torque;
     this->right_torque = right_torque;
 }
 
 
-void MotorControl::set_velocity(float left_velocity, float right_velocity)
+void BLDCMotorControl::set_velocity(float left_velocity, float right_velocity)
 {
     this->left_req_velocity  = left_velocity;
     this->right_req_velocity = right_velocity;
 }
  
 
-void MotorControl::callback_torque()
+void BLDCMotorControl::callback_torque()
 {
     left_encoder.update(MOTOR_CONTROL_DT);   
     right_encoder.update(MOTOR_CONTROL_DT);   
@@ -158,7 +158,7 @@ void MotorControl::callback_torque()
 }
 
  
-void MotorControl::hold()
+void BLDCMotorControl::hold()
 {
     set_torque_from_rotation(500,  true,   0,  0);
     set_torque_from_rotation(500,  true,   0,  1);
@@ -166,23 +166,23 @@ void MotorControl::hold()
     timer.delay_ms(400); 
 }
 
-int32_t MotorControl::get_left_angle()
+int32_t BLDCMotorControl::get_left_angle()
 {
     return left_encoder.angle;
 }
      
-float MotorControl::get_left_position()
+float BLDCMotorControl::get_left_position()
 {
     return -left_encoder.position*2.0*PI/ENCODER_RESOLUTION;
 }
 
-float MotorControl::get_left_position_fil()
+float BLDCMotorControl::get_left_position_fil()
 {
     return -left_encoder.position_fil*2.0*PI/ENCODER_RESOLUTION;
 }
 
 
-float MotorControl::get_left_velocity()
+float BLDCMotorControl::get_left_velocity()
 {
     return -left_encoder.angular_velocity*2.0*PI/ENCODER_RESOLUTION;
 }
@@ -190,30 +190,30 @@ float MotorControl::get_left_velocity()
  
 
 
-int32_t MotorControl::get_right_angle()
+int32_t BLDCMotorControl::get_right_angle()
 {
     return right_encoder.angle;
 }
 
-float MotorControl::get_right_position()
+float BLDCMotorControl::get_right_position()
 {
     return right_encoder.position*2.0*PI/ENCODER_RESOLUTION;
 } 
 
-float MotorControl::get_right_position_fil()
+float BLDCMotorControl::get_right_position_fil()
 {
     return right_encoder.position_fil*2.0*PI/ENCODER_RESOLUTION;;
 }
 
 
-float MotorControl::get_right_velocity()
+float BLDCMotorControl::get_right_velocity()
 {
     return right_encoder.angular_velocity*2.0*PI/ENCODER_RESOLUTION;
 }
 
 
 
-void MotorControl::set_torque_from_rotation(int32_t torque, bool brake, uint32_t rotor_angle, int motor_id)
+void BLDCMotorControl::set_torque_from_rotation(int32_t torque, bool brake, uint32_t rotor_angle, int motor_id)
 {
     int32_t q, d;
 
@@ -280,7 +280,7 @@ void MotorControl::set_torque_from_rotation(int32_t torque, bool brake, uint32_t
 
 
 
-int32_t MotorControl::clamp(int32_t value, int32_t min, int32_t max)
+int32_t BLDCMotorControl::clamp(int32_t value, int32_t min, int32_t max)
 {
     if (value > max)
     {

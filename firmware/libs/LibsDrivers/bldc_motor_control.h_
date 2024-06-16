@@ -1,5 +1,5 @@
-#ifndef _MOTOR_CONTROL_H_
-#define _MOTOR_CONTROL_H_
+#ifndef _BLDC_MOTOR_CONTROL_H_
+#define _BLDC_MOTOR_CONTROL_H_
  
 #include <pwm.h>
 #include <as5600_t.h>
@@ -18,7 +18,7 @@
 #define MOTOR_POLES             ((uint32_t)14)
 
 
-class MotorControl
+class BLDCMotorControl
 {
     public:
         void init();

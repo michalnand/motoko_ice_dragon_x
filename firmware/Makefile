@@ -1,6 +1,6 @@
-LibsCommonPATH 	= ./LibsCommon
-LibsDevicePATH 	= ./LibsDevice
-LibsDriversPATH = ./LibsDrivers
+LibsCommonPATH 	= ./libs/LibsCommon
+LibsDevicePATH 	= ./libs/LibsDevice
+LibsDriversPATH = ./libs/LibsDrivers
 
 AppPATH 		= ./usr
 
@@ -75,7 +75,8 @@ $(OUTPUT): $(C_OBJS) $(CXX_OBJS)
 
 CLEAN_FILES = $(C_OBJS)
 CLEAN_FILES+= $(CXX_OBJS)
-CLEAN_FILES+= $(OUTPUT)*
+CLEAN_FILES+= $(OUTPUT).*
+
 
 clean:
-	rm $(CLEAN_FILES) -f
+	rm -f $(CLEAN_FILES)
