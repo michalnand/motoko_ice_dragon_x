@@ -9,14 +9,14 @@ MotorControl *g_motor_control_ptr;
 extern "C" {
 #endif
 
-//encoder interrupt handling
+// encoder interrupt handling
 void EXTI0_IRQHandler(void)
 {
     g_motor_control_ptr->left_enc++;
     g_motor_control_ptr->right_enc++;
 }
 
-//timer 2 interrupt handler, running velocity control
+// timer 2 interrupt handler, running velocity control
 void TIM2_IRQHandler(void)
 { 
     g_motor_control_ptr->callback();
@@ -128,27 +128,32 @@ void MotorControl::set_right_velocity(float right_velocity)
     this->right_ol_mode       = false;
 }
 
+// force break to both motors
+void MotorControl::halt()
+{
+    this->set_left_velocity(0);
+    this->set_right_velocity(0);
+}
 
-
-//wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
+// wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_left_position()
 {
     return this->left_position;
 }
 
-//wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
+// wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_left_velocity()
 {
     return this->left_velocity;
 }
 
-//wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
+// wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_right_position()
 {
     return this->right_position;
 }
 
-//wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
+// wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_right_velocity()
 {
     return this->right_velocity;
@@ -158,6 +163,7 @@ float MotorControl::get_right_velocity()
 
 void MotorControl::callback()
 {
+    /*
     float left_velocity  = -left_encoder.angular_velocity*2.0*PI/ENCODER_RESOLUTION;
     float right_velocity = right_encoder.angular_velocity*2.0*PI/ENCODER_RESOLUTION;
 
@@ -170,4 +176,5 @@ void MotorControl::callback()
    
     set_torque_from_rotation(this->left_torque,    false,  left_encoder.angle,   0);
     set_torque_from_rotation(-this->right_torque,  false, right_encoder.angle,  1);
+    */
 }

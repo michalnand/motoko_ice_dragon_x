@@ -3,11 +3,9 @@
 #include <fmath.h>
 #include <shaper.h>
 
-//#include <position_control_lqr.h>
-#include <position_control_lqg.h>
 
-#define LED_GPIO        TGPIOE
-#define LED_PIN         3
+#define LED_GPIO        TGPIOB
+#define LED_PIN         2
    
 
 
@@ -142,8 +140,8 @@ void encoder_sensor_test()
 
       
       terminal << "encoder\n";
-      terminal << "left   : " << motor_control.get_left_angle()   << " " << motor_control.get_left_position()*180.0/PI   << " " << motor_control.get_left_velocity()*60.0/(2.0*PI) << "\n";
-      terminal << "right  : " << motor_control.get_right_angle()  << " " << motor_control.get_right_position()*180.0/PI  << " " << motor_control.get_right_velocity()*60.0/(2.0*PI) << "\n";
+      terminal << "left   : " << motor_control.get_left_position()*(float)(180.0/PI)   << " " << motor_control.get_left_velocity()*(float)(60.0/(2.0*PI)) << "\n";
+      terminal << "right  : " << motor_control.get_right_position()*(float)(180.0/PI)  << " " << motor_control.get_right_velocity()*(float)(60.0/(2.0*PI)) << "\n";
       terminal << "\n\n\n";
 
   }
@@ -201,281 +199,13 @@ void sensors_test()
     terminal << "\n\n\n";
 
     terminal << "encoder\n";
-    terminal << "left   : " << motor_control.get_left_angle()  << " " << motor_control.get_left_position()  << " " << motor_control.get_left_velocity() << "\n";
-    terminal << "right  : " << motor_control.get_right_angle()  << " " << motor_control.get_right_position()  << " " << motor_control.get_right_velocity() << "\n";
+    terminal << "left   : " << motor_control.get_left_position()*(float)(180.0/PI)   << " " << motor_control.get_left_velocity()*(float)(60.0/(2.0*PI)) << "\n";
+    terminal << "right  : " << motor_control.get_right_position()*(float)(180.0/PI)  << " " << motor_control.get_right_velocity()*(float)(60.0/(2.0*PI)) << "\n";  
     terminal << "\n\n\n";
 
     terminal << "\n\n\n\n";
   }
 }
-
-void left_motor_connect_test()
-{
-  uint32_t state = 0;
-
-  Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;        //user led
-
-  Gpio<TGPIOC, 9, GPIO_MODE_OUT> la;
-  Gpio<TGPIOC, 8, GPIO_MODE_OUT> lb;
-  Gpio<TGPIOC, 7, GPIO_MODE_OUT> lc;
-  
-  Gpio<TGPIOA, 8, GPIO_MODE_OUT> l_enable;
-
-  l_enable = 1;
-
-  uint32_t speed = 100;
-   
-  while(1)
-  {
-    if (state == 0)
-    {
-      la = 1;
-      lb = 0;
-      lc = 0;
-    }
-    else if (state == 1)
-    {
-      la = 1;
-      lb = 1;
-      lc = 0;
-    }
-    else if (state == 2)
-    {
-      la = 0;
-      lb = 1;
-      lc = 0;
-    }
-    else if (state == 3)
-    {
-      la = 0;
-      lb = 1;
-      lc = 1;
-    }
-    else if (state == 4)
-    {
-      la = 0;
-      lb = 0;
-      lc = 1;
-    }
-    else if (state == 5)
-    {
-      la = 1;
-      lb = 0;
-      lc = 1;
-    }
-
-    state = (state + 1)%6;
-
-    led = 1; 
-    timer.delay_ms(speed);
-
-    led = 0; 
-    timer.delay_ms(speed);
-
-    if (speed > 2)
-    {
-      speed--; 
-    }
-  }
-}
-
-
-void left_motor_pwm_test()
-{
-  uint32_t state = 0;
-
-  Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;        //user led
-
-  PWMLeft pwm;
-  pwm.init();
-  pwm.set(0, 0, 0);
-
-  uint32_t pwm_value = PWM_PERIOD/2;
-  uint32_t speed = 100;
-
-
-   
-  while(1)
-  {
-    if (state == 0)
-    {
-      pwm.set(pwm_value, 0, 0);
-    }
-    else if (state == 1)
-    {
-      pwm.set(pwm_value, pwm_value, 0);
-    }
-    else if (state == 2)
-    {
-      pwm.set(0, pwm_value, 0);
-    }
-    else if (state == 3)
-    {
-      pwm.set(0, pwm_value, pwm_value);
-    }
-    else if (state == 4)
-    {
-      pwm.set(0, 0, pwm_value);
-    }
-    else if (state == 5)
-    {
-      pwm.set(pwm_value, 0, pwm_value);
-    }
-
-    state = (state + 1)%6;
-
-    led = 1; 
-    timer.delay_ms(speed);
-
-    led = 0; 
-    timer.delay_ms(speed);
-
-    if (speed > 2)
-    {
-      speed--; 
-    }
-  }
-}
-
-
-
-
-//PWMA      : PB8, TIM4_CH3
-//PWMB      : PB7, TIM4_CH2
-//PWMC      : PB6, TIM4_CH1
-//enable    : PB9
-void right_motor_connect_test()
-{
-  uint32_t state = 0;
-
-  Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;        //user led
-
-  Gpio<TGPIOB, 8, GPIO_MODE_OUT> ra;
-  Gpio<TGPIOB, 7, GPIO_MODE_OUT> rb;
-  Gpio<TGPIOB, 6, GPIO_MODE_OUT> rc;
-  
-  Gpio<TGPIOB, 9, GPIO_MODE_OUT> r_enable;
-
-  r_enable = 1;
-
-  uint32_t speed = 100;
-   
-  while(1)
-  {
-    if (state == 0)
-    {
-      ra = 1;
-      rb = 0;
-      rc = 0;
-    }
-    else if (state == 1)
-    {
-      ra = 1;
-      rb = 1;
-      rc = 0;
-    }
-    else if (state == 2)
-    {
-      ra = 0;
-      rb = 1;
-      rc = 0;
-    }
-    else if (state == 3)
-    {
-      ra = 0;
-      rb = 1;
-      rc = 1;
-    }
-    else if (state == 4)
-    {
-      ra = 0;
-      rb = 0;
-      rc = 1;
-    }
-    else if (state == 5)
-    {
-      ra = 1;
-      rb = 0;
-      rc = 1;
-    }
-
-    state = (state + 1)%6;
-
-    led = 1; 
-    timer.delay_ms(speed);
-
-    led = 0; 
-    timer.delay_ms(speed);
-
-    if (speed > 2)
-    { 
-      speed--; 
-    }
-  }
-}
-
-
-
-
-void right_motor_pwm_test()
-{
-  uint32_t state = 0;
-
-  Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;        //user led
-
-  PWMRight pwm;
-  pwm.init();
-  pwm.set(0, 0, 0); 
-
-  uint32_t pwm_value = PWM_PERIOD/2;
-  uint32_t speed = 100;
-
- 
-   
-  while(1)
-  {
-    if (state == 0)
-    {
-      pwm.set(pwm_value, 0, 0);
-    }
-    else if (state == 1)
-    {
-      pwm.set(pwm_value, pwm_value, 0);
-    }
-    else if (state == 2)
-    {
-      pwm.set(0, pwm_value, 0);
-    }
-    else if (state == 3)
-    {
-      pwm.set(0, pwm_value, pwm_value);
-    }
-    else if (state == 4)
-    {
-      pwm.set(0, 0, pwm_value);
-    }
-    else if (state == 5)
-    {
-      pwm.set(pwm_value, 0, pwm_value);
-    }
-
-    state = (state + 1)%6;
-
-    led = 1; 
-    timer.delay_ms(speed);
-
-    led = 0; 
-    timer.delay_ms(speed);
-
-    if (speed > 2)
-    {
-      speed--; 
-    }
-  }
-}
-
-
-
 
 
 void motor_driver_test()
@@ -483,27 +213,28 @@ void motor_driver_test()
     Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;        //user led
 
     //required RPM velocity
-    const float required[] = {0, 10, 50, 200, 1000, 1500, 0, -10, -50, -200, -1000, -1500};
+    const float required[] = {0, 10, 50, 200, 1000, 0, -10, -50, -200, -1000};
     //const float required[] = {0, 1500}; 
 
     while (1)   
     {
       uint32_t time = timer.get_time();
-      uint32_t required_idx = (time/4000)%12;
+      uint32_t required_idx = (time/4000)%10;
 
       //convert rpm to rad/s
       float req = required[required_idx]*2.0*PI/60.0;
         
-      motor_control.set_velocity(req, req);
+      motor_control.set_left_velocity(req);
+      motor_control.set_right_velocity(req);
  
 
       if ((time/50)%10 == 0)
       { 
         led = 1;  
 
-        terminal << "req   = " << req*60.0/(2.0*PI) << "\n";  
-        terminal << "left  = " <<  motor_control.get_left_velocity()*60.0/(2.0*PI) << "\n";
-        terminal << "right = " <<  motor_control.get_right_velocity()*60.0/(2.0*PI) << "\n";
+        terminal << "req   = " <<  req*(float)(60.0/(2.0*PI)) << "\n";  
+        terminal << "left  = " <<  motor_control.get_left_velocity()*(float)(60.0/(2.0*PI))  << "\n";
+        terminal << "right = " <<  motor_control.get_right_velocity()*(float)(60.0/(2.0*PI)) << "\n";
         terminal << "\n\n"; 
         
       }
@@ -514,114 +245,6 @@ void motor_driver_test()
     }
 }
 
-
-
-
-void smooth_motor_driver_test()
-{
-    Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;        //user led
-
-
-    led = 0;
-    timer.delay_ms(500); 
-
-    float speed_max_rpm = 1500.0;
-
-    //required max velocity
-    const float required[] = {1.0, 0.0}; 
-
-    //shaper options
-    float dx_max_list[] = {1.0, 0.1, 0.05, 0.025};
-
-  
-    uint32_t n_steps = 1000;
-    uint32_t dt = 4; //4ms
-    uint32_t shaper_id = 0;
-
-    Shaper shaper;  
-    shaper.init(1.0, -1.0); 
-
-    while (1)    
-    { 
-      float dx_max = dx_max_list[shaper_id];
-
-      shaper.set_limits(dx_max, -dx_max);
- 
-      terminal << "shaper value = " << dx_max << "\n";
-
-      for (unsigned int n = 0; n < n_steps; n++)
-      {
-        uint32_t required_idx = n/(n_steps/2);
-
-        //convert rpm to rad/s
-        float req = required[required_idx]; 
-
-        if (req > 0.0)
-        {
-          led = 1;
-        }
-        else
-        {
-          led = 0;
-        }
-
-        //shape signal
-        float req_shaped = shaper.step(req);
-
-        req_shaped = req_shaped*speed_max_rpm*2.0*PI/60.0;
-
-        motor_control.set_velocity(req_shaped, req_shaped);
- 
-        timer.delay_ms(dt);
-      }
-
-
-      shaper_id = (shaper_id + 1)%4;
-    }
-}
-
-
-
-void turn_test()
-{
-  position_control.init();
-
-  //turn test
-  float req_angle[] = {0.0, 90.0, 0.0, -90.0, 0.0, 90.0, 0.0, -90.0, 0.0, 90.0, 0.0, -90.0};
-
-
-  for (unsigned int n = 0; n < 12; n++)
-  {
-    float dist  = 0;
-    float angle = req_angle[n]*PI/180.0;
-
-    position_control.set(dist, angle);
-
-    timer.delay_ms(300);
-  } 
-
-  position_control.set(0, 0);
-}
-
-void forward_test()
-{
-  position_control.init();
-
-  //forward test
-  float req_distance[] = {0.0, 100.0, 0.0, 150.0, 0.0, 200.0, 0.0, 250.0, 0.0, 500.0};
-
-  for (unsigned int n = 0; n < 10; n++) 
-  {
-    float dist  = req_distance[n];
-    float angle = 0.0;
-
-    position_control.set(dist, angle);
-
-    timer.delay_ms(800);
-  } 
-
-  position_control.set(0, 0);
-}
 
 
 
@@ -654,7 +277,7 @@ void mcu_usage()
 
 
 
-
+/*
 void noise_measurement()
 {
   uint32_t n_max = 1000;
@@ -718,99 +341,5 @@ void noise_measurement()
   terminal << "noise std\n";
   terminal << var_distance << " " << var_angle << " " << var_velocity << " " << var_angular_velocity << "\n";
   terminal << "\n\n";
-
-
 }
-
-
-
-
-/*
-void gyro_turn_test()
-{
-  timer.delay_ms(1000);
-
-  float angles[] = {0, 45, 90, 0, -45, -90};
-
-  Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;
-
-  led = 1;
-
-  uint32_t steps = 0;
-  int32_t dt = 4;
-
-  LQRServo lqr;
-
-  float speed_max = 1500.0*2.0*PI/60.0;
-
-  lqr.init(2.00146, 52.10817, 316.22777, speed_max, dt/1000.0);
- 
-  
-  while(1)
-  {
-    uint32_t idx = (steps/500)%6; 
-
-    float angle         = gyro_sensor.angle;
-    float angular_rate  = gyro_sensor.angular_rate_filtered;
-
-    float xr = angles[idx]*PI/180.0; 
-     
- 
-    float u = lqr.step(xr, angle, angular_rate);
-
-    motor_control.set_velocity(-u, u); 
-    timer.delay_ms(dt);
-    
-    steps++;
-  }
-}
-
-
-
-
-void line_follow_test()
-{
-  timer.delay_ms(1000);
-
-  Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;
-
-  led = 1;
-
-  int32_t dt = 4;
-
-  float forward = 0.0;
-
-  LQRServo lqr;
-
-  float turn_speed_max     = 1500.0*2.0*PI/60.0;
-  float forward_speed_max  = 200.0*2.0*PI/60.0;
-  //lqr.init(2.00146, 52.10817, 316.22777, turn_speed_max, dt/1000.0);
-  
-  lqr.init(0.5, 80.0, 316.0, turn_speed_max, dt/1000.0);
-  
-   
-  while(1)
-  {
-
-    float angle         = -line_sensor.angle;
-    float angular_rate  = -line_sensor.angular_rate;
-     
-    float turn       = lqr.step(0.0, angle, angular_rate);
-    
-
-    if (line_sensor.line_lost_type == LINE_LOST_NONE)
-    { 
-      float k = 0.9;
-      forward = k*forward + (1.0 - k)*forward_speed_max;
-    }
-    else 
-    {
-      forward = 0.0;
-    }
-
-    motor_control.set_velocity(-turn + forward, turn + forward); 
-    timer.delay_ms(dt);
-  }
-}
-
 */

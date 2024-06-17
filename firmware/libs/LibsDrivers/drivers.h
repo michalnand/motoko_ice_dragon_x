@@ -15,7 +15,7 @@
 #include <line_sensor.h>
 #include <gyro.h> 
 
-#include <bldc_motor_control.h>
+#include <motor_control.h>
 
 extern  Timer                       timer;
 extern  Terminal                    terminal;
@@ -26,7 +26,7 @@ extern  IRSensor     ir_sensor;
 extern  LineSensor   line_sensor;
 extern  Gyro         gyro_sensor;
 
-extern  BLDCMotorControl motor_control;
+extern  MotorControl motor_control;
 
 void drivers_init();
 

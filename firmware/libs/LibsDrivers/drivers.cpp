@@ -9,7 +9,7 @@ IRSensor     ir_sensor;
 LineSensor   line_sensor;
 Gyro         gyro_sensor;   
 
-BLDCMotorControl motor_control;
+MotorControl motor_control;
  
 void drivers_init()
 {
