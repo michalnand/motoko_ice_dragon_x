@@ -17,7 +17,7 @@ void motors_test()
   left_pwm.init();
 
   terminal << "left motor FORWARD speed up\n";
-  for (int32_t i = 0; i < PWM_PERIOD; i+= 10)
+  for (int32_t i = 0; i < (int32_t)PWM_PERIOD; i+= 10)
   {
     left_pwm.set(i);
     timer.delay_ms(5);  
@@ -30,7 +30,7 @@ void motors_test()
   timer.delay_ms(1000);  
 
   terminal << "left motor BACKWARD speed up\n";
-  for (int32_t i = 0; i < PWM_PERIOD; i+= 10)
+  for (int32_t i = 0; i < (int32_t)PWM_PERIOD; i+= 10)
   {
     left_pwm.set(-i);
     timer.delay_ms(5);  
@@ -51,7 +51,7 @@ void motors_test()
   right_pwm.init();
 
   terminal << "right motor FORWARD speed up\n";
-  for (int32_t i = 0; i < PWM_PERIOD; i+= 10)
+  for (int32_t i = 0; i < (int32_t)PWM_PERIOD; i+= 10)
   {
     right_pwm.set(i);
     timer.delay_ms(5);  
@@ -64,7 +64,7 @@ void motors_test()
   timer.delay_ms(1000);  
 
   terminal << "right motor BACKWARD speed up\n";
-  for (int32_t i = 0; i < PWM_PERIOD; i+= 10)
+  for (int32_t i = 0; i < (int32_t)PWM_PERIOD; i+= 10)
   {
     right_pwm.set(-i);
     timer.delay_ms(5);   

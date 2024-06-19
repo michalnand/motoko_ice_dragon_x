@@ -5,51 +5,7 @@
 #include <identification.h>
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-volatile int32_t g_left_encoder, g_right_encoder;
-
-
-// encoder interrupt handling
-void EXTI15_10_IRQHandler(void)
-{
-  // right encoder
-  if(EXTI_GetITStatus(EXTI_Line10) != RESET)
-  {
-    if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) == GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_11))
-    {
-      g_left_encoder++;  
-    }
-    else
-    {
-      g_left_encoder--;
-    }   
-
-    EXTI_ClearITPendingBit(EXTI_Line10);
-  }
-
-
-  if(EXTI_GetITStatus(EXTI_Line12) != RESET)
-  {
-    if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_12) == GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_5))
-    {
-      g_right_encoder++;  
-    }
-    else
-    {
-      g_right_encoder--;
-    }   
-
-    EXTI_ClearITPendingBit(EXTI_Line12);
-  }  
-}
-
-
-#ifdef __cplusplus
-}
-#endif
 
 
 int main(void)      
@@ -70,9 +26,12 @@ int main(void)
 
   Gpio<TGPIOB, 10, GPIO_MODE_IN_PULLUP> key;   //user button
 
-  timer.delay_ms(10);
+  timer.delay_ms(200);
+
+  Gpio<TGPIOC, 4, GPIO_MODE_OUT> line_led;   //line iluminatio leds
+  line_led = 1; 
   
-  /*
+  
   //wait for buttom press
   while ((int)key != 0)
   { 
@@ -98,55 +57,14 @@ int main(void)
   led = 1; 
 
   timer.delay_ms(500);
-  */
+  
   
   //motors_test();
-
-  //encoder init
-  Gpio<TGPIOC, 10, GPIO_MODE_IN_PULLUP> enc_left_a; 
-  Gpio<TGPIOC, 11, GPIO_MODE_IN_PULLUP> enc_left_b; 
-
-  Gpio<TGPIOC, 12, GPIO_MODE_IN_PULLUP> enc_right_a; 
-  Gpio<TGPIOB, 5, GPIO_MODE_IN_PULLUP> enc_right_b; 
-
-  EXTI_InitTypeDef   EXTI_InitStructure;
-  NVIC_InitTypeDef   NVIC_InitStructure;
+  motor_identification();
 
 
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
   
-  // EXTI15_10_IRQn Line to PC10 pin 
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource10);
 
-  // Configure EXTI15_10_IRQn line  
-  EXTI_InitStructure.EXTI_Line    = EXTI_Line10;  
-  EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
-  EXTI_Init(&EXTI_InitStructure);   
-
-
-  // EXTI15_10_IRQn Line to PC12 pin 
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource12);
-
-  // Configure EXTI15_10_IRQn line  
-  EXTI_InitStructure.EXTI_Line    = EXTI_Line12;  
-  EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
-  EXTI_Init(&EXTI_InitStructure);        
-
-  // Enable and set EXTI15_10_IRQn Interrupt           
-  NVIC_InitStructure.NVIC_IRQChannel          = EXTI15_10_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority    = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 1;
-  NVIC_InitStructure.NVIC_IRQChannelCmd       = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
-
-
-  g_left_encoder = 0;
-  g_right_encoder = 0;
   
   while (1)   
   {
@@ -155,8 +73,8 @@ int main(void)
     led = 0; 
     timer.delay_ms(50);
 
-    //terminal << "encoder = " << g_left_encoder << " " << (int)enc_left_a << " " << (int)enc_left_b << "\n";
-    terminal << "encoder = " << g_left_encoder << " " << g_right_encoder << "\n";
+    //terminal << "encoder  = " << motor_control.get_left_position() << " " << motor_control.get_right_position() << "\n";
+    //terminal << "velocity = " << motor_control.get_left_velocity() << " " << motor_control.get_right_velocity() << "\n";
   }
 
 

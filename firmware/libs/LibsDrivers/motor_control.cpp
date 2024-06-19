@@ -9,37 +9,80 @@ MotorControl *g_motor_control_ptr;
 extern "C" {
 #endif
 
-uint64_t left_time_now = 0, left_time_prev = 0;
-uint64_t right_time_now = 0, right_time_prev = 0;
-/*
+volatile int32_t  g_left_encoder, g_right_encoder;
+volatile uint64_t g_left_time_now, g_left_time_prev;
+volatile uint64_t g_right_time_now, g_right_time_prev;
+volatile int32_t  g_left_velocity, g_right_velocity;
+
 // encoder interrupt handling
-void EXTI0_IRQHandler(void)
+void EXTI15_10_IRQHandler(void)
 {
-    left_time_prev = left_time_now;
-    left_time_now  = timer.get_ns_time();
+  // left encoder
+  if(EXTI_GetITStatus(EXTI_Line10) != RESET)
+  {
+    g_left_time_prev = g_left_time_now;
+    g_left_time_now  = timer.get_ns_time();
+    g_left_velocity  = 1000000000/(g_left_time_now - g_left_time_prev);
 
-    right_time_prev = right_time_now;
-    right_time_now  = timer.get_ns_time();
+    
 
-    g_motor_control_ptr->left_enc++;
-    g_motor_control_ptr->right_enc++;
+    if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) == GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_11))
+    {
+      g_left_encoder++;  
+    }
+    else
+    {
+      g_left_encoder--;
+      g_left_velocity = -g_left_velocity;
+    }   
+
+    
+
+    EXTI_ClearITPendingBit(EXTI_Line10);
+  }
+
+  // right encoder
+  if(EXTI_GetITStatus(EXTI_Line12) != RESET)
+  {
+    g_right_time_prev = g_right_time_now;
+    g_right_time_now  = timer.get_ns_time();
+    g_right_velocity  = 1000000000/(g_right_time_now - g_right_time_prev);
+
+    if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_12) == GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_5))
+    {
+      g_right_encoder++;  
+    }
+    else
+    {
+      g_right_encoder--;
+      g_right_velocity = -g_right_velocity;
+    }   
+
+    EXTI_ClearITPendingBit(EXTI_Line12);
+  }  
 }
-*/
- 
+
+
+
 // timer 2 interrupt handler, running velocity control
 void TIM2_IRQHandler(void)
 { 
     g_motor_control_ptr->callback();
     TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);  
 } 
- 
+
+
 #ifdef __cplusplus
 }
 #endif
 
+
 //init motor control process
 void MotorControl::init()
 {
+    g_motor_control_ptr = this;
+
+
     this->left_ol_mode  = true;
     this->right_ol_mode = true;
 
@@ -47,15 +90,6 @@ void MotorControl::init()
     this->right_torque        = 0;
     this->left_req_velocity   = 0;
     this->right_req_velocity  = 0;
-
-    this->left_position  = 0;
-    this->left_velocity  = 0;
-    this->right_position = 0;
-    this->right_velocity = 0;
-
-    this->left_enc  = 0; 
-    this->right_enc = 0;
-
 
     left_pwm.init();
     right_pwm.init();
@@ -76,37 +110,17 @@ void MotorControl::init()
     left_controller.init(a, b, k, ki, f, MOTOR_CONTROL_MAX_VELOCITY);
     right_controller.init(a, b, k, ki, f, MOTOR_CONTROL_MAX_VELOCITY);
 
+    //init encoders
+    encoder_init();
 
-
-    
-    //init timer 2 interrupt for periodic callback calling, 4kHz
-    TIM_TimeBaseInitTypeDef     TIM_TimeBaseStructure;
-    NVIC_InitTypeDef            NVIC_InitStructure;
-
-    
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-
-
-    TIM_TimeBaseStructure.TIM_Prescaler         = 0;
-    TIM_TimeBaseStructure.TIM_CounterMode       = TIM_CounterMode_Up;
-    TIM_TimeBaseStructure.TIM_Period            = timer_period(MOTOR_CONTROL_DT);
-    TIM_TimeBaseStructure.TIM_ClockDivision     = 0; 
-    TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;   
-
-    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
-    TIM_ITConfig(TIM2, TIM_IT_CC1, ENABLE);
-    TIM_Cmd(TIM2, ENABLE);   
-
-    NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority    = 1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 0;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
+    //init timer
+    timer_init();
 }
+
 
 // turn OFF closed loop control, and set torque directly
 // range : -1, 1, for min and max torque
-void  MotorControl::set_left_torque(float left_torque)
+void MotorControl::set_left_torque(float left_torque)
 {
     this->left_ol_mode = true;
     this->left_torque  = left_torque;
@@ -147,44 +161,159 @@ void MotorControl::halt()
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_left_position()
 {
-    return this->left_position;
+    return (2.0f*PI*g_left_encoder)/ENCODER_RESOLUTION;
 }
 
 // wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_left_velocity()
 {
-    return this->left_velocity;
+    return (4.0f*PI*g_left_velocity)/ENCODER_RESOLUTION;
 }
 
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_right_position()
 {
-    return this->right_position;
+    return (2.0f*PI*g_right_encoder)/ENCODER_RESOLUTION;
 }
 
 // wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_right_velocity()
 {
-    return this->right_velocity;
-}
+    return (4.0f*PI*g_right_velocity)/ENCODER_RESOLUTION;
+}        
+ 
 
 
 
 void MotorControl::callback()
 {
-    
-    /*
-    float left_velocity  = -left_encoder.angular_velocity*2.0*PI/ENCODER_RESOLUTION;
-    float right_velocity = right_encoder.angular_velocity*2.0*PI/ENCODER_RESOLUTION;
-
-    this->left_torque  = MOTOR_CONTROL_MAX*left_controller.step(left_req_velocity, left_velocity);
-    this->right_torque = MOTOR_CONTROL_MAX*right_controller.step(right_req_velocity, right_velocity);
- 
-    this->left_torque  = clamp(this->left_torque,  -MOTOR_CONTROL_MAX, MOTOR_CONTROL_MAX);
-    this->right_torque = clamp(this->right_torque, -MOTOR_CONTROL_MAX, MOTOR_CONTROL_MAX);
+    float left_torque = 0;
+    float right_torque = 0;
 
    
-    set_torque_from_rotation(this->left_torque,    false,  left_encoder.angle,   0);
-    set_torque_from_rotation(-this->right_torque,  false, right_encoder.angle,  1);
-    */
+
+    if (this->left_ol_mode)
+    {
+        left_torque = this->left_torque;
+    }
+    else
+    {
+        //TODO add velocity controller step here
+        left_torque = 0;
+    }
+
+    if (this->right_ol_mode)
+    {
+        right_torque = this->right_torque;
+    }
+    else
+    {
+        //TODO add velocity controller step here
+        right_torque = 0;
+    }   
+
+
+    if (left_torque == 0)
+    {
+        g_left_velocity = (15*g_left_velocity)/16;
+    }
+
+    if (right_torque == 0)
+    {
+        g_right_velocity = (15*g_right_velocity)/16;
+    }   
+
+    left_pwm.set(left_torque*(int32_t)PWM_PERIOD);
+    right_pwm.set(right_torque*(int32_t)PWM_PERIOD);
 }
+
+
+
+
+
+
+
+void MotorControl::encoder_init()
+{
+    //init encoder variables  
+    g_left_encoder    = 0;
+    g_right_encoder   = 0;
+    g_left_time_now   = 0;
+    g_left_time_prev  = 0;
+    g_right_time_now  = 0;
+    g_right_time_prev = 0;
+    g_left_velocity   = 0;
+    g_right_velocity  = 0;
+
+
+    //encoder init
+    Gpio<TGPIOC, 10, GPIO_MODE_IN_PULLUP> enc_left_a; 
+    Gpio<TGPIOC, 11, GPIO_MODE_IN_PULLUP> enc_left_b; 
+
+    Gpio<TGPIOC, 12, GPIO_MODE_IN_PULLUP> enc_right_a; 
+    Gpio<TGPIOB, 5, GPIO_MODE_IN_PULLUP>  enc_right_b; 
+
+    EXTI_InitTypeDef   EXTI_InitStructure;
+    NVIC_InitTypeDef   NVIC_InitStructure;
+
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    
+    // EXTI15_10_IRQn Line to PC10 pin 
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource10);
+
+    // Configure EXTI15_10_IRQn line  
+    EXTI_InitStructure.EXTI_Line    = EXTI_Line10;  
+    EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
+    EXTI_Init(&EXTI_InitStructure);   
+
+
+    // EXTI15_10_IRQn Line to PC12 pin 
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource12);
+
+    // Configure EXTI15_10_IRQn line  
+    EXTI_InitStructure.EXTI_Line    = EXTI_Line12;  
+    EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+    EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
+    EXTI_Init(&EXTI_InitStructure);        
+
+    // Enable and set EXTI15_10_IRQn Interrupt           
+    NVIC_InitStructure.NVIC_IRQChannel          = EXTI15_10_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority    = 0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 1;
+    NVIC_InitStructure.NVIC_IRQChannelCmd       = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+}
+
+
+
+void MotorControl::timer_init()
+{
+    //init timer 2 interrupt for periodic callback calling, 4kHz
+    TIM_TimeBaseInitTypeDef     TIM_TimeBaseStructure;
+    NVIC_InitTypeDef            NVIC_InitStructure;
+
+    
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+
+    TIM_TimeBaseStructure.TIM_Prescaler         = 0;
+    TIM_TimeBaseStructure.TIM_CounterMode       = TIM_CounterMode_Up;
+    TIM_TimeBaseStructure.TIM_Period            = timer_period(MOTOR_CONTROL_DT);
+    TIM_TimeBaseStructure.TIM_ClockDivision     = 0; 
+    TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;   
+
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+    TIM_ITConfig(TIM2, TIM_IT_CC1, ENABLE);
+    TIM_Cmd(TIM2, ENABLE);   
+
+    NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority    = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+}
+

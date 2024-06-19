@@ -23,7 +23,7 @@ void drivers_init()
     //adc.init();
     //line_sensor.init();
     //gyro_sensor.init(i2c);    
-    //motor_control.init();
+    motor_control.init();
 
     timer.delay_ms(100);
 }

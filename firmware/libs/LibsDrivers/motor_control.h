@@ -9,8 +9,9 @@
 #define MOTOR_CONTROL_DT    ((uint32_t)250)
 
 //encoder pulses per rotation
-#define ENCODER_RESOLUTION  ((int32_t)180)
+#define ENCODER_RESOLUTION   ((int32_t)180)
 
+    
 #define MOTOR_CONTROL_MAX_TORQUE     ((float)1.0)
 #define MOTOR_CONTROL_MAX_VELOCITY   ((float)1000.0*2.0*PI/60.0)
 
@@ -54,17 +55,15 @@ class MotorControl
         void callback();
 
     private:
-        
-        
-        bool left_ol_mode, right_ol_mode;
+        void timer_init();
+        void encoder_init();
+
+
+    private:
+        bool  left_ol_mode, right_ol_mode;
         float left_torque, right_torque;
         float left_req_velocity, right_req_velocity;
 
-        float left_position, left_velocity;
-        float right_position, right_velocity;
-
-        
-        
   
         //motor PWM control
         PWMLeft     left_pwm;
@@ -73,9 +72,6 @@ class MotorControl
         //single input, single output motor speed controller
         LQGSingle left_controller;
         LQGSingle right_controller;
-
-    public:
-        int64_t left_enc, right_enc;
 };
 
 
