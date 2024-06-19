@@ -17,12 +17,13 @@ void drivers_init()
  
     timer.init();
     terminal.init();
-    i2c.init();
-    ir_sensor.init(); 
-    adc.init();
-    line_sensor.init();
-    gyro_sensor.init(i2c);    
-    motor_control.init();
+    
+    //i2c.init();
+    //ir_sensor.init(); 
+    //adc.init();
+    //line_sensor.init();
+    //gyro_sensor.init(i2c);    
+    //motor_control.init();
 
     timer.delay_ms(100);
 }

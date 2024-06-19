@@ -54,6 +54,8 @@ class MotorControl
         void callback();
 
     private:
+        
+        
         bool left_ol_mode, right_ol_mode;
         float left_torque, right_torque;
         float left_req_velocity, right_req_velocity;

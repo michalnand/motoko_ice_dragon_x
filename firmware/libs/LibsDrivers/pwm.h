@@ -6,35 +6,19 @@
 #define PWM_PERIOD              ((uint32_t)(216000000/2)/PWM_FREQUENCY - 1)
 
 
-class PWM
-{ 
-    public:
-        virtual void init()
-        {
 
-        }
-
-        virtual void set(uint32_t a_pwm, uint32_t b_pwm, uint32_t c_pwm)
-        {
-            (void)a_pwm;
-            (void)b_pwm;
-            (void)c_pwm;
-        }
-};
-
-
-class PWMLeft: public PWM
+class PWMLeft 
 {   
     public:
         void init();
-        void set(uint32_t a_pwm, uint32_t b_pwm, uint32_t c_pwm);
+        void set(int32_t pwm);
 };
 
-class PWMRight: public PWM
+class PWMRight
 {   
     public:
         void init();
-        void set(uint32_t a_pwm, uint32_t b_pwm, uint32_t c_pwm);
+        void set(int32_t pwm);
 };
 
 #endif

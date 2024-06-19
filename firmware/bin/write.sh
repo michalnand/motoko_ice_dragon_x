@@ -10,8 +10,8 @@
 #serial DTR to MCU RESET.
 #serial RTS to MCU BOOT0 (or BOOT0 to 3.3V).
 #MCU BOOT1 to GND and press reset
-python3 stm32loader.py -e -w -v -b 115200 -p /dev/tty.usbserial-AM01VGIA  build.bin
-
+#python3 stm32loader.py -e -w -v -b 115200 -p /dev/tty.usbserial-AM01VGIA  build.bin
+python3 stm32loader.py -e -w -v -b 115200 -p /dev/tty.usbserial-0001  build.bin
 
 
 #DFU USB bootloader option 

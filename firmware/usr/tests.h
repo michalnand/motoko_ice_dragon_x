@@ -1,6 +1,9 @@
 #ifndef _TESTS_H_
 #define _TESTS_H_
 
+
+void motors_test();
+
 void timer_test();
 
 void ir_sensor_test();

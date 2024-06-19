@@ -50,9 +50,18 @@ uint32_t Timer::get_time()
     return result;
 }
 
-void Timer::reset()
+// returns nanoseconds resolution time
+uint64_t Timer::get_ns_time()
 {
     __disable_irq();
-    g_time = 0;
-    __enable_irq();
+    //holds coarse resolution
+    uint64_t coarse_result = (uint64_t)1000000*(uint64_t)g_time;
+    //holds fine resolution
+    uint64_t fine_result   = SysTick->LOAD - SysTick->VAL;
+    __enable_irq(); 
+
+    //convert raw counter value into ns
+    fine_result = (fine_result*(uint64_t)1000000000)/SystemCoreClock;
+
+    return coarse_result + fine_result;
 }

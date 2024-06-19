@@ -9,13 +9,23 @@ MotorControl *g_motor_control_ptr;
 extern "C" {
 #endif
 
+uint64_t left_time_now = 0, left_time_prev = 0;
+uint64_t right_time_now = 0, right_time_prev = 0;
+/*
 // encoder interrupt handling
 void EXTI0_IRQHandler(void)
 {
+    left_time_prev = left_time_now;
+    left_time_now  = timer.get_ns_time();
+
+    right_time_prev = right_time_now;
+    right_time_now  = timer.get_ns_time();
+
     g_motor_control_ptr->left_enc++;
     g_motor_control_ptr->right_enc++;
 }
-
+*/
+ 
 // timer 2 interrupt handler, running velocity control
 void TIM2_IRQHandler(void)
 { 
@@ -30,7 +40,7 @@ void TIM2_IRQHandler(void)
 //init motor control process
 void MotorControl::init()
 {
-    this->left_ol_mode = true;
+    this->left_ol_mode  = true;
     this->right_ol_mode = true;
 
     this->left_torque         = 0;
@@ -45,7 +55,6 @@ void MotorControl::init()
 
     this->left_enc  = 0; 
     this->right_enc = 0;
-
 
 
     left_pwm.init();
@@ -70,13 +79,13 @@ void MotorControl::init()
 
 
     
-
     //init timer 2 interrupt for periodic callback calling, 4kHz
     TIM_TimeBaseInitTypeDef     TIM_TimeBaseStructure;
     NVIC_InitTypeDef            NVIC_InitStructure;
 
     
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
 
     TIM_TimeBaseStructure.TIM_Prescaler         = 0;
     TIM_TimeBaseStructure.TIM_CounterMode       = TIM_CounterMode_Up;
@@ -163,6 +172,7 @@ float MotorControl::get_right_velocity()
 
 void MotorControl::callback()
 {
+    
     /*
     float left_velocity  = -left_encoder.angular_velocity*2.0*PI/ENCODER_RESOLUTION;
     float right_velocity = right_encoder.angular_velocity*2.0*PI/ENCODER_RESOLUTION;

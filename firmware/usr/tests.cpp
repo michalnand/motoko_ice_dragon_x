@@ -9,12 +9,79 @@
    
 
 
+void motors_test()
+{
+  terminal << "\n\n\nleft motor test\n";
+  
+  PWMLeft     left_pwm;
+  left_pwm.init();
+
+  terminal << "left motor FORWARD speed up\n";
+  for (int32_t i = 0; i < PWM_PERIOD; i+= 10)
+  {
+    left_pwm.set(i);
+    timer.delay_ms(5);  
+  }
+
+  timer.delay_ms(1000);
+  
+  terminal << "left motor STOP\n";
+  left_pwm.set(0);
+  timer.delay_ms(1000);  
+
+  terminal << "left motor BACKWARD speed up\n";
+  for (int32_t i = 0; i < PWM_PERIOD; i+= 10)
+  {
+    left_pwm.set(-i);
+    timer.delay_ms(5);  
+  }
+
+  timer.delay_ms(1000);
+  
+  terminal << "left motor STOP\n";
+  left_pwm.set(0);
+  timer.delay_ms(1000);  
+  
+
+
+  terminal << "\n\n\nright motor test\n";
+
+  PWMRight     right_pwm;
+
+  right_pwm.init();
+
+  terminal << "right motor FORWARD speed up\n";
+  for (int32_t i = 0; i < PWM_PERIOD; i+= 10)
+  {
+    right_pwm.set(i);
+    timer.delay_ms(5);  
+  }
+
+  timer.delay_ms(1000);
+  
+  terminal << "right motor STOP\n";
+  right_pwm.set(0);
+  timer.delay_ms(1000);  
+
+  terminal << "right motor BACKWARD speed up\n";
+  for (int32_t i = 0; i < PWM_PERIOD; i+= 10)
+  {
+    right_pwm.set(-i);
+    timer.delay_ms(5);   
+  }
+
+  timer.delay_ms(1000);
+  
+  terminal << "right motor STOP\n";
+  right_pwm.set(0);
+  timer.delay_ms(1000); 
+}
+
 
 void timer_test()
 {
   Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;        //user led
   
-  timer.reset();
 
   while(1)
   {
