@@ -5,13 +5,16 @@
 #include <pid.h>
 
 
-#define LED_GPIO        TGPIOE
+#define LED_GPIO        TGPIOB
 #define LED_PIN         2
 
 
 
 void motor_identification()
 {
+    Gpio<LED_GPIO, LED_PIN, GPIO_MODE_OUT> led;
+    led = 1;  
+
     //stop motor
     motor_control.halt();
     timer.delay_ms(200); 

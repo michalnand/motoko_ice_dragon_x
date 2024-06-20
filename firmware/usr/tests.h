@@ -3,11 +3,10 @@
 
 
 void motors_test();
-
-void timer_test();
+void gyro_sensor_test();
+void gyro_stabilisation_test();
 
 void ir_sensor_test();
-void gyro_sensor_test();
 void line_sensor_test();
 void encoder_sensor_test();
 

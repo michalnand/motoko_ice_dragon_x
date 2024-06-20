@@ -60,11 +60,8 @@ int main(void)
   
   
   //motors_test();
-  motor_identification();
-
-
-  
-
+  //motor_identification();
+  gyro_stabilisation_test();
   
   while (1)   
   {

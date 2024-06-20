@@ -69,31 +69,9 @@
 
 
 #define     G_HM_MODE           ((unsigned char)0x80)
-
-Gyro *g_gyro_ptr;
  
 
 
-
-
-
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-void TIM6_DAC_IRQHandler(void)
-{ 
-    g_gyro_ptr->callback();
-    TIM_ClearITPendingBit(TIM6, TIM_IT_CC1);  
-} 
-
- 
-#ifdef __cplusplus
-}
-#endif
 
 
 
@@ -101,11 +79,8 @@ int Gyro::init(I2C_Interface &i2c_interface)
 {
     terminal << "gyro_sensor init start\n";
 
-    g_gyro_ptr              = this;
-
     this->i2c               = &i2c_interface;
     this->odr               = 250;
-    this->measurement_id    = 0;
 
     //software reset
     i2c->write_reg(LSM6DSM_ADDRESS, CTRL3_C,  (1<<0));
@@ -140,66 +115,13 @@ int Gyro::init(I2C_Interface &i2c_interface)
 
     offset_z        = offset_z/calibration_iterations;
 
-    angular_rate            = 0;
-    angular_rate_filtered   = 0;
-    angle                   = 0; 
-
-    for (int32_t i = 0; i < 3; i++)
-    {
-        angular_rate_old[i] = 0.0;
-    }
-    
-
-    /*
-    TIM_TimeBaseInitTypeDef     TIM_TimeBaseStructure;
-    NVIC_InitTypeDef            NVIC_InitStructure;
-
-    //init timer 6 interrupt for callback calling, 500Hz
-
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
-
-    TIM_TimeBaseStructure.TIM_Prescaler         = 0;
-    TIM_TimeBaseStructure.TIM_CounterMode       = TIM_CounterMode_Up;
-    TIM_TimeBaseStructure.TIM_Period            = timer_period(1000000/this->odr);
-    TIM_TimeBaseStructure.TIM_ClockDivision     = 0; 
-    TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;   
-
-    TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStructure);
-    TIM_ITConfig(TIM6, TIM_IT_CC1, ENABLE);
-    TIM_Cmd(TIM6, ENABLE); 
-
-      
-    NVIC_InitStructure.NVIC_IRQChannel = TIM6_DAC_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority    = 4;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 0;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure); 
-    */
-
     terminal << "gyro_sensor init [DONE]\n";
     return 0;
 }
 
 
-void Gyro::callback()
-{
-    int32_t raw = read() - offset_z; 
 
-    //convert raw reading into dps
-    //convert dps to radians
-    angular_rate =  (GYRO_CALIB*raw*GYRO_DPS*2.0*PI)/(32768.0*360.0);
-
-    angular_rate_filtered = (7.0*angular_rate_filtered + angular_rate)/8.0;
-   
-    //integrate angle  
-    //angle = angle + angular_rate*(1.0/(float)odr);
- 
-    angle = angle + integrate_step(angular_rate, angular_rate_old)*(1.0/(float)odr);
-
-    measurement_id+= 1;
-}
-
-int32_t Gyro::read()
+int32_t Gyro::read_raw()
 {
     i2c->start();
     i2c->write(LSM6DSM_ADDRESS);
@@ -218,9 +140,11 @@ int32_t Gyro::read()
     return z;
 }
 
-void Gyro::reset_angle()
+float Gyro::read()
 {
-    __disable_irq();
-    angle = 0;
-    __enable_irq();
+    int32_t raw = read_raw() - offset_z; 
+
+    //convert raw reading into dps
+    //convert dps to radians
+    return (GYRO_CALIB*raw*GYRO_DPS*2.0*PI)/(32768.0*360.0);
 }
