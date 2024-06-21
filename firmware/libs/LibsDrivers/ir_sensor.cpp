@@ -59,7 +59,8 @@ void IRSensor::init()
 void IRSensor::callback()
 {
     measurement_id++;
-
+    
+    
     if (state == 0) 
     {
         for (unsigned int i = 0; i < IR_SENSORS_COUNT; i++)
@@ -80,18 +81,18 @@ void IRSensor::callback()
         
         //turn off IR led for next step
         ir_led  = 0;
-        state   = 3;
+        state   = 2;    
     }   
     //wait state
     else     
     {
-        state++;
-        if (state >= 4)
+        state++;    
+        if (state >= 5)
         {
             state = 0;  
         }
     }
-  
+    
 
     //if dif is small obstacle is close
     //bigger value, bigger distance

@@ -62,7 +62,8 @@ int main(void)
   //motors_test();
   //motor_identification();
   gyro_stabilisation_test();
-  
+  //ir_sensor_test();
+   
   while (1)   
   {
     led = 1; 
