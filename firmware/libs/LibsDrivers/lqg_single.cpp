@@ -51,12 +51,17 @@ float LQGSingle::step(float xr, float x)
     float e         = x - x_hat;
     x_hat           = a*x_hat + b*u + f*e;
 
-    return u;
+    return u;   
 }
 
 float LQGSingle::get_x_hat()
 {
     return x_hat;
+}
+
+void LQGSingle::reset()
+{
+    this->integral_action = 0;
 }
 
 float LQGSingle::_clip(float v, float min_v, float max_v)

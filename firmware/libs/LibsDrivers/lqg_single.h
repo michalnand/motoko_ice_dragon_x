@@ -20,6 +20,7 @@ class LQGSingle
 
         float get_x_hat();
 
+        void reset();
     
     private:
         float _clip(float v, float min_v, float max_v);

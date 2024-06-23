@@ -53,6 +53,7 @@ CHIP_IDS = {
     0x419: "STM3242xxx/43xxx",
     0x422: "STM32F30x",
     0x451: "STM32F76x",
+    0x452: "STM32F72x",
 
     # see ST AN4872
     # requires parity None
@@ -151,6 +152,7 @@ class Stm32Bootloader:
                 # set a timeout value, None for waiting forever
                 timeout=5,
             )
+
         except serial.serialutil.SerialException as e:
             sys.stderr.write(str(e) + "\n")
             sys.stderr.write(
@@ -437,6 +439,7 @@ class Stm32Bootloader:
             raise CommandException("NACK " + info)
 
         if ack != self.Reply.ACK:
+            print("Unknown response. " + info + ": " + hex(ack) + " expecting : " + hex(self.Reply.ACK))
             raise CommandException("Unknown response. " + info + ": " + hex(ack))
 
         return 1
@@ -547,12 +550,16 @@ class Stm32Loader:
             'port': self.configuration['port'],
             'baud': self.configuration['baud']
         })
+
+        
         try:
+            #self.bootloader.get_version()
             self.bootloader.reset_from_system_memory()
         except Exception:
             print("Can't init. Ensure that BOOT0 is enabled and reset device")
             self.bootloader.reset_from_flash()
             sys.exit(1)
+        
 
     def perform_commands(self):
         binary_data = None

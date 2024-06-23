@@ -13,6 +13,7 @@ volatile int32_t  g_left_encoder, g_right_encoder;
 volatile uint64_t g_left_time_now, g_left_time_prev;
 volatile uint64_t g_right_time_now, g_right_time_prev;
 volatile int32_t  g_left_velocity, g_right_velocity;
+volatile uint32_t g_left_no_pulse, g_right_no_pulse;
 
 // encoder interrupt handling
 void EXTI15_10_IRQHandler(void)
@@ -36,7 +37,7 @@ void EXTI15_10_IRQHandler(void)
       g_left_velocity = -g_left_velocity;
     }   
 
-    
+    g_left_no_pulse = 0;
 
     EXTI_ClearITPendingBit(EXTI_Line10);
   }
@@ -56,7 +57,9 @@ void EXTI15_10_IRQHandler(void)
     {
       g_right_encoder--;
       g_right_velocity = -g_right_velocity;
-    }   
+    }  
+
+    g_right_no_pulse = 0; 
 
     EXTI_ClearITPendingBit(EXTI_Line12);
   }  
@@ -91,21 +94,36 @@ void MotorControl::init()
     this->left_req_velocity   = 0;
     this->right_req_velocity  = 0;
 
+    g_left_no_pulse = 0;
+    g_right_no_pulse = 0;
+
     left_pwm.init();
     right_pwm.init();
 
     //optimal control init 
     
     //discrete dynamics model
-    float a = 0.95484104;
-    float b = 7.08995665;
+    float a = 0.9750025f;
+    float b = 2.02024798f;
 
-    //LQR gain, q = 1.0, r = 1*10**7
-    float k  =  0.00514003;
-    float ki =  0.00032194;
+    /*
+    //LQR gain
+    float k  =  0.00120839f;
+    float ki =  3.16613528e-05f;
 
     //Kalman gain  
-    float f  =  0.00818888;
+    float f  =  0.01090771f;
+    */
+
+    //LQR gain
+    float k  =  0.00352159;
+    float ki =  0.00010036;
+
+    //Kalman gain  
+    float f  =  0.01090771;
+
+
+
 
     left_controller.init(a, b, k, ki, f, MOTOR_CONTROL_MAX_VELOCITY);
     right_controller.init(a, b, k, ki, f, MOTOR_CONTROL_MAX_VELOCITY);
@@ -164,10 +182,10 @@ float MotorControl::get_left_position()
     return (2.0f*PI*g_left_encoder)/ENCODER_RESOLUTION;
 }
 
-// wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
+// wheel angular velocity in rad/s, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_left_velocity()
 {
-    return (4.0f*PI*g_left_velocity)/ENCODER_RESOLUTION;
+    return (2.0f*PI*g_left_velocity)/ENCODER_RESOLUTION;
 }
 
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
@@ -176,10 +194,10 @@ float MotorControl::get_right_position()
     return (2.0f*PI*g_right_encoder)/ENCODER_RESOLUTION;
 }
 
-// wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
+// wheel angular velocity in rad/s, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_right_velocity()
 {
-    return (4.0f*PI*g_right_velocity)/ENCODER_RESOLUTION;
+    return (2.0f*PI*g_right_velocity)/ENCODER_RESOLUTION;
 }        
  
 
@@ -187,44 +205,53 @@ float MotorControl::get_right_velocity()
 
 void MotorControl::callback()
 {
-    float left_torque = 0;
+    float left_torque  = 0;
     float right_torque = 0;
 
    
-
     if (this->left_ol_mode)
     {
         left_torque = this->left_torque;
+        left_controller.reset();
     }
     else
     {
-        //TODO add velocity controller step here
-        left_torque = 0;
+        left_torque = left_controller.step(this->left_req_velocity, this->get_left_velocity());
     }
 
     if (this->right_ol_mode)
     {
         right_torque = this->right_torque;
+        right_controller.reset();
     }
     else
     {
-        //TODO add velocity controller step here
-        right_torque = 0;
-    }   
+        right_torque = right_controller.step(this->right_req_velocity, this->get_right_velocity());
+    }  
 
-
-    if (left_torque == 0)
-    {
-        g_left_velocity = (15*g_left_velocity)/16;
-    }
-
-    if (right_torque == 0)
-    {
-        g_right_velocity = (15*g_right_velocity)/16;
-    }   
-
+    
     left_pwm.set(left_torque*(int32_t)PWM_PERIOD);
     right_pwm.set(right_torque*(int32_t)PWM_PERIOD);
+
+    if (g_left_no_pulse != 0)
+    {
+        g_left_velocity = (g_left_velocity*15)/16;
+    }
+
+    if (g_right_no_pulse != 0)  
+    {
+        g_right_velocity = (g_right_velocity*15)/16;
+    }
+
+    if (g_left_no_pulse < 10000)
+    {
+        g_left_no_pulse++;
+    }
+
+    if (g_right_no_pulse < 10000)
+    {
+        g_right_no_pulse++;
+    }
 }
 
 
@@ -265,7 +292,7 @@ void MotorControl::encoder_init()
     // Configure EXTI15_10_IRQn line  
     EXTI_InitStructure.EXTI_Line    = EXTI_Line10;  
     EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
     EXTI_Init(&EXTI_InitStructure);   
 
@@ -282,8 +309,8 @@ void MotorControl::encoder_init()
 
     // Enable and set EXTI15_10_IRQn Interrupt           
     NVIC_InitStructure.NVIC_IRQChannel          = EXTI15_10_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority    = 0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 1;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority    = 2;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd       = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 }
@@ -297,7 +324,7 @@ void MotorControl::timer_init()
     NVIC_InitTypeDef            NVIC_InitStructure;
 
     
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);    
 
 
     TIM_TimeBaseStructure.TIM_Prescaler         = 0;

@@ -31,7 +31,7 @@ int main(void)
   Gpio<TGPIOC, 4, GPIO_MODE_OUT> line_led;   //line iluminatio leds
   line_led = 1; 
   
-  
+
   //wait for buttom press
   while ((int)key != 0)
   { 
@@ -56,23 +56,26 @@ int main(void)
 
   led = 1; 
 
-  timer.delay_ms(500);
+  timer.delay_ms(500); 
+ 
+
+  //motor_control.set_right_velocity(100*2.0*PI/60.0);
+  //motor_control.set_left_velocity(100*2.0*PI/60.0);
   
-  
-  //motors_test();
+  //motors_test(); 
   //motor_identification();
   gyro_stabilisation_test();
   //ir_sensor_test();
    
-  while (1)   
+  while (1)    
   {
     led = 1; 
     timer.delay_ms(50);
     led = 0; 
-    timer.delay_ms(50);
+    timer.delay_ms(150);
 
     //terminal << "encoder  = " << motor_control.get_left_position() << " " << motor_control.get_right_position() << "\n";
-    //terminal << "velocity = " << motor_control.get_left_velocity() << " " << motor_control.get_right_velocity() << "\n";
+    terminal << "velocity = " << motor_control.get_left_velocity()*(60.0f/(2.0f*PI)) << " " << motor_control.get_right_velocity()*(60.0f/(2.0f*PI)) << "\n";
   }
 
 

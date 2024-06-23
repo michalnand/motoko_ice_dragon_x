@@ -115,10 +115,10 @@ void gyro_stabilisation_test()
   uint32_t steps = 0;
   float angle = 0.0;
 
-  PID pid;
-  pid.init(0.5, 0.001, 4.0, 1.0);
+  PID pid;  
+  pid.init(10.0, 0.001, 50.0, 2.0*PI*1000.0/60.0);
 
-  while (1)
+  while (1)    
   {
     float angular_rate = gyro_sensor.read();
     angle = angle + angular_rate*4.0/1000.0;
@@ -126,8 +126,8 @@ void gyro_stabilisation_test()
 
     float u = pid.step(0.0, angle);
 
-    motor_control.set_left_torque(-u);
-    motor_control.set_right_torque(u);
+    motor_control.set_left_velocity(-u);
+    motor_control.set_right_velocity(u);
 
 
     if ((steps%100) == 0)
