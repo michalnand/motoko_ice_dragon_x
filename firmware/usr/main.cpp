@@ -3,7 +3,7 @@
 #include <drivers.h>
 #include <tests.h>
 #include <identification.h>
-
+#include <uid.h>
 
 
 
@@ -59,13 +59,15 @@ int main(void)
   timer.delay_ms(500); 
  
 
-  //motor_control.set_right_velocity(100*2.0*PI/60.0);
-  //motor_control.set_left_velocity(100*2.0*PI/60.0);
+  motor_control.set_right_velocity(50*2.0*PI/60.0);
+  motor_control.set_left_velocity(50*2.0*PI/60.0);
   
-  //motors_test(); 
+  //motors_test();  
+  encoder_sensor_test();
   //motor_identification();
-  gyro_stabilisation_test();
+  //gyro_stabilisation_test();
   //ir_sensor_test();
+  line_sensor_test();
    
   while (1)    
   {
@@ -75,7 +77,13 @@ int main(void)
     timer.delay_ms(150);
 
     //terminal << "encoder  = " << motor_control.get_left_position() << " " << motor_control.get_right_position() << "\n";
-    terminal << "velocity = " << motor_control.get_left_velocity()*(60.0f/(2.0f*PI)) << " " << motor_control.get_right_velocity()*(60.0f/(2.0f*PI)) << "\n";
+    terminal << "velocity = ";
+    terminal << motor_control.get_left_velocity()*(60.0f/(2.0f*PI)) << " ";
+    terminal << motor_control.get_left_velocity_fil()*(60.0f/(2.0f*PI)) << " ";
+    terminal << motor_control.get_right_velocity()*(60.0f/(2.0f*PI)) << " ";
+    terminal << motor_control.get_right_velocity_fil()*(60.0f/(2.0f*PI)) << " ";
+    terminal << "\n";
+    
   }
 
 

@@ -35,7 +35,7 @@ void ADC_IRQHandler(void)
     //ADC_RegularChannelConfig(ADC1, g_adc_ptr->adc_channels[g_adc_ptr->adc_current_idx], 1, ADC_SampleTime_480Cycles); 
 
     ADC_SoftwareStartConv(ADC1);
-}
+} 
  
 #ifdef __cplusplus
 }

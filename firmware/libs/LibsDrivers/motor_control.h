@@ -44,11 +44,18 @@ class MotorControl
         // wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
         float get_left_velocity();
 
+        //return kalman filtered velocity
+        float get_left_velocity_fil();
+
+
         // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
         float get_right_position();
 
         // wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
         float get_right_velocity();
+
+        //return kalman filtered velocity
+        float get_right_velocity_fil();
 
     public:
         // called by timer interrupt, for closed loop control handling

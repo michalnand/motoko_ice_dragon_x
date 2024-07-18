@@ -167,6 +167,7 @@ class Stm32Bootloader:
 
     def reset_from_system_memory(self):
         self._enable_boot0(True)
+        time.sleep(0.2)
         self._reset()
         self.serial.write(bytearray([self.Command.SYNCHRONIZE]))
         return self._wait_for_ack("Syncro")
@@ -396,7 +397,7 @@ class Stm32Bootloader:
 
     def _reset(self):
         self._enable_reset(True)
-        time.sleep(0.1)
+        time.sleep(0.2)
         self._enable_reset(False)
         time.sleep(0.5)
 

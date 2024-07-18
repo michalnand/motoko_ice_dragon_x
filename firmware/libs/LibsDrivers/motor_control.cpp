@@ -188,6 +188,12 @@ float MotorControl::get_left_velocity()
     return (2.0f*PI*g_left_velocity)/ENCODER_RESOLUTION;
 }
 
+float MotorControl::get_left_velocity_fil()
+{
+    return left_controller.get_x_hat();
+}
+
+
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_right_position()
 {
@@ -200,6 +206,10 @@ float MotorControl::get_right_velocity()
     return (2.0f*PI*g_right_velocity)/ENCODER_RESOLUTION;
 }        
  
+float MotorControl::get_right_velocity_fil()
+{
+    return right_controller.get_x_hat();
+}
 
 
 
@@ -233,15 +243,17 @@ void MotorControl::callback()
     left_pwm.set(left_torque*(int32_t)PWM_PERIOD);
     right_pwm.set(right_torque*(int32_t)PWM_PERIOD);
 
+    
     if (g_left_no_pulse != 0)
     {
-        g_left_velocity = (g_left_velocity*15)/16;
+        g_left_velocity = (g_left_velocity*31)/32;
     }
 
     if (g_right_no_pulse != 0)  
     {
-        g_right_velocity = (g_right_velocity*15)/16;
-    }
+        g_right_velocity = (g_right_velocity*31)/32;
+    } 
+    
 
     if (g_left_no_pulse < 10000)
     {
