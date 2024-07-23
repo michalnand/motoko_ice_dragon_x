@@ -1,10 +1,9 @@
 import numpy
 from robot_env import *
-
+import LibsControl
 
 
 def get_required(target_x, target_y, robot_x, robot_y, robot_theta):
-
     d_distance = (target_x - robot_x)**2 + (target_y - robot_y)**2
     d_distance = d_distance**0.5
 
@@ -20,70 +19,65 @@ def get_required(target_x, target_y, robot_x, robot_y, robot_theta):
 
     return d_distance, d_theta
 
+if __name__ == "__main__":
 
-
-dt = 1.0/250.0
-
-q = numpy.diag([ 1.0, 1.0, 0.0, 0.0] )
-r = numpy.diag( [10000000.0, 1000.0])  
-
-
-robot_dynamics  = RobotDynamicsModel(dt)
-trajectory      = Trajectory()
-robot_env       = RobotEnv(robot_dynamics, trajectory)
-
-mat_a, mat_b, _ = LibsControl.c2d(robot_env.dynamics.a, robot_env.dynamics.b, robot_env.dynamics.c, dt)
-
-
-#solve LQG controller 
-controller = LibsControl.LQRDiscrete(mat_a, mat_b, q, r, 10**10, 0.1)
-
-print("controller")
-print("k  = \n", controller.k, "\n")
-print("ki = \n", controller.ki, "\n")
-print("\n\n")
-
-
-
-
-n_max = int(2.0/dt)
-
-#required output, 1 meter, 100degrees
-xr = numpy.array([[1000.0, 100.0*numpy.pi/180.0, 0.0, 0.0]]).T
-
-#initial integral action
-integral_action = numpy.zeros((robot_env.dynamics.b.shape[1], 1))
-
-#result log
-t_result = [] 
-u_result = []
-x_result = []
-
-
-robot_env.reset()
-x, _ = robot_env.get_state()
-
-while True:
-    #compute controller output
-    u, integral_action = controller.forward(xr, x, integral_action)
-
-    #compute dynamical system output
-    x, _ = robot_env.step(u)
+    dt    = 1.0/256.0
     
-    #t_result.append(n*dt)
-    #u_result.append(u[:, 0].copy())
-    #x_result.append(x[:, 0].copy())
+    robot       = DifferentialRobot(dt)
+    trajectory  = Trajectory()
+    robot_env   = RobotEnv(robot, trajectory)
 
-    robot_env.render()
+    
+    # sythetise discrete controller
+    q = [0.0, 1.0, 0.0, 10.0]
+    q = numpy.diag(q)
 
-t_result = numpy.array(t_result) 
-u_result = numpy.array(u_result) 
-x_result = numpy.array(x_result) 
+    
+    r = [10.0, 10.0] 
+    r =  numpy.diag(r)
 
-# radian angle to degrees
-x_result[:, 1]*= 180.0/numpy.pi 
-# radian angle to degrees
-x_result[:, 3]*= 180.0/numpy.pi 
+    mat_a, mat_b, _ = LibsControl.c2d(robot.mat_a, robot.mat_b, None, dt)
 
-LibsControl.plot_closed_loop_response(t_result, u_result, x_result, x_hat = None, file_name = "lqr_controller_output.png", u_labels = ["control forward", "control turn"], x_labels = ["distance [mm]", "angle [deg]", "distance velocity [mm/s]", "angular velocity [deg/s]"])
+    di_max = numpy.array([[15, 100]])
+   
+    lqri     = LibsControl.LQRDiscrete(mat_a, mat_b, q, r, 10**10, di_max)
 
+    integral_action = numpy.zeros((2, 1))
+
+    #print solved controller matrices
+    print("controller\n\n")
+    print("k=\n", numpy.round(lqri.k, 5), "\n")
+    print("ki=\n", numpy.round(lqri.ki, 5), "\n")
+    print("\n\n")
+
+    x, robot_state, target_state = robot_env.reset()
+
+    steps = 0
+
+      
+
+    while(True):
+        target_x     = target_state[0][0]
+        target_y     = target_state[1][0]
+        target_idx   = target_state[3][0]
+        robot_x      = robot_state[0][0]
+        robot_y      = robot_state[1][0]
+        robot_theta  = robot_state[2][0]
+        
+        d_distance, d_theta = get_required(target_x, target_y, robot_x, robot_y, robot_theta)
+      
+        d_distance = 1.5*d_distance
+       
+        xr = numpy.array([[0.0, x[1, 0] + d_theta, 0.0,  x[3, 0] + d_distance]]).T
+
+        u, integral_action = lqri.forward(xr, x, integral_action)
+                 
+        x, robot_state, target_state = robot_env.step(u)
+
+        if steps%300 == 0:
+            robot_env.render()
+
+        steps+= 1
+
+        if target_idx == 0:
+            break

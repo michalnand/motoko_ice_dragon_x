@@ -27,3 +27,6 @@ __pycache__/
 #auxliary files
 *.bkp
 *.aux
+
+
+*.mp4

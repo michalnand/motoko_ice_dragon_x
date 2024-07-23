@@ -8,11 +8,8 @@ class Render:
               
         self.window_size        = window_size
         self.max_position_range = max_position_range
-
-        self.video_writer = None
-       
     
-    def render(self, trajectory, robot, target_state):
+    def render(self, trajectory, robot = None):
 
         padding    = 100.0
 
@@ -63,25 +60,19 @@ class Render:
                 
                 x0, y0 = self._scale_position(x, y)
                 cv2.circle(result_image, (x0, y0), 2, (0.0, 0.9, 0.0), -1)
-        
-        # plot target point
-        x0 = target_state[0][0]
-        y0 = target_state[1][0]
+
+        _ ,_, line_state = robot.get_state()
+        min_idx = line_state[3][0]
+        x0 = trajectory.points[min_idx][0]
+        y0 = trajectory.points[min_idx][1]
         x0, y0 = self._scale_position(x0, y0)
         cv2.circle(result_image, (x0, y0), 10, (1, 0, 0), -1)
-        
+      
 
         cv2.imshow("visualisation", result_image)
         cv2.waitKey(1)
 
-        '''
-        if self.video_writer is None:
-            fourcc = cv2.VideoWriter_fourcc(*'XVID') 
-            self.video_writer = cv2.VideoWriter("video.mp4", fourcc, 50.0, (self.window_width, self.window_height)) 
-        else:
-            result_image = numpy.array(255*result_image, dtype=numpy.uint8)
-            self.video_writer.write(result_image) 
-        '''
+
      
     def _scale_position(self, x, y):
         x_out = self._scale(x, self.min_x, self.max_x, 0, self.window_width)
@@ -100,32 +91,19 @@ class Render:
     
 
     def _plot_robot(self, result_image, robot):
+
+        dynamics_state, position_state, _ = robot.get_state()
         
-        dynamics_state, position_state = robot.get_state()
+        x0    = position_state[0][0] - robot.width/2
+        y0    = position_state[1][0] - robot.height/2
+        theta = position_state[2][0]    
 
-        x0  = position_state[0][0] - robot.width/2
-        y0  = position_state[1][0] - robot.height/2
-        x1  = position_state[0][0] + robot.width/2
-        y1  = position_state[1][0] + robot.height/2
 
-        theta = -position_state[2][0]*180.0/numpy.pi
+        x1    = position_state[0][0] + robot.width/2
+        y1    = position_state[1][0] + robot.height/2
 
         x0, y0 = self._scale_position(x0, y0)
         x1, y1 = self._scale_position(x1, y1)
+        
 
-        center_x = (x0 + x1) // 2
-        center_y = (y0 + y1) // 2   
-        width = abs(x1 - x0)
-        height = abs(y1 - y0)
-
-        rect = ((center_x, center_y), (width, height), theta)
-
-        # Get the 4 vertices of the rotated rectangle
-        box = cv2.boxPoints(rect)
-        box = numpy.int0(box)  # Convert to integer
-
-        # Draw the filled rotated rectangle
-        result_image = cv2.fillPoly(result_image, [box], (0, 0, 1))  # Fill color is green
-
-        return result_image
-
+        result_image = cv2.rectangle(result_image, [x0, y0], [x1, y1], (0, 0, 1), -1) 

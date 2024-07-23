@@ -63,11 +63,13 @@ int main(void)
   motor_control.set_left_velocity(50*2.0*PI/60.0);
   
   //motors_test();  
-  encoder_sensor_test();
+  //encoder_sensor_test();
   //motor_identification();
-  //gyro_stabilisation_test();
+  gyro_stabilisation_test();
+  //encoder_sensor_test();
+  //gyro_sensor_test(); 
   //ir_sensor_test();
-  line_sensor_test();
+  //line_sensor_test();
    
   while (1)    
   {
