@@ -37,7 +37,7 @@
 class LineSensor
 {
     protected:
-      Gpio<TGPIOC, 4, GPIO_MODE_OUT> sensor_led;        //sensor white led
+        Gpio<TGPIOC, 4, GPIO_MODE_OUT> sensor_led;        //sensor white led
 
     public:
         Array<int, LINE_SENSOR_COUNT> adc_result;

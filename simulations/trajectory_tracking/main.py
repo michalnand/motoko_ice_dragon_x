@@ -29,17 +29,16 @@ if __name__ == "__main__":
 
     
     # sythetise discrete controller
-    q = [0.0, 1.0, 0.0, 10.0]
+    q = [0.0, 10.0, 0.0, 1.0]
     q = numpy.diag(q)
 
     
-    r = [10.0, 10.0] 
+    r = [0.0001, 0.01] 
     r =  numpy.diag(r)
 
     mat_a, mat_b, _ = LibsControl.c2d(robot.mat_a, robot.mat_b, None, dt)
-
-    di_max = numpy.array([[15, 100]])
-   
+    
+    di_max = numpy.array([1000, 10])
     lqri     = LibsControl.LQRDiscrete(mat_a, mat_b, q, r, 10**10, di_max)
 
     integral_action = numpy.zeros((2, 1))
@@ -52,32 +51,41 @@ if __name__ == "__main__":
 
     x, robot_state, target_state = robot_env.reset()
 
+    starting_idx = target_state[2][0]
+
     steps = 0
 
-      
+    min_idx = 0
 
     while(True):
         target_x     = target_state[0][0]
         target_y     = target_state[1][0]
-        target_idx   = target_state[3][0]
         robot_x      = robot_state[0][0]
         robot_y      = robot_state[1][0]
         robot_theta  = robot_state[2][0]
         
         d_distance, d_theta = get_required(target_x, target_y, robot_x, robot_y, robot_theta)
       
-        d_distance = 1.5*d_distance
+        d_distance = 2.5*d_distance
        
         xr = numpy.array([[0.0, x[1, 0] + d_theta, 0.0,  x[3, 0] + d_distance]]).T
 
         u, integral_action = lqri.forward(xr, x, integral_action)
                  
         x, robot_state, target_state = robot_env.step(u)
+        
 
-        if steps%300 == 0:
+        if steps%80 == 0:
             robot_env.render()
+            print("v = ", x[2][0], x[3][0], target_state[2][0])
 
         steps+= 1
 
-        if target_idx == 0:
+        
+        if steps > 1000 and robot_env.is_close_to_start():
             break
+        
+
+    print("total distance : ", x[3][0])
+    print("total time     : ", steps*dt)
+    print("average speed  : ", x[3][0]/(steps*dt))

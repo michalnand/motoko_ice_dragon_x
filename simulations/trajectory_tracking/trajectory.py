@@ -3,7 +3,7 @@ import numpy
 
 class Trajectory:
     def __init__(self):
-        f_name = "paths/map_01.txt"        
+        f_name = "paths/map_02.txt"        
 
         # load data
         result_tmp = []
@@ -24,7 +24,8 @@ class Trajectory:
 
             dx = point_next[0] - point[0]
             dy = point_next[1] - point[1]
-          
+
+            
             eps = 0.001
             if abs(dx) < eps or abs(dy) < eps:
                 x = point[0] + 0.02*dx
@@ -39,6 +40,7 @@ class Trajectory:
                 y = point[1] + 0.98*dy
                 result.append([x, y])
             
+
         # convert to mm
         self.key_points = 10.0*numpy.array(result, dtype=numpy.float32)
 
@@ -54,10 +56,11 @@ class Trajectory:
 
         self.points = []
 
+        
         n = 0
         while n < n_key_points:
             
-            polynome_order = 3
+            polynome_order = 4
 
             xp = numpy.zeros(polynome_order)
             yp = numpy.zeros(polynome_order)
@@ -89,7 +92,57 @@ class Trajectory:
 
                 self.points.append([x, y])
 
-            n+= 1
+            n+=1
+        
+        '''
+        n = 0
+        while n < n_key_points:
+            
+            polynome_order = 3
+
+            xp = numpy.zeros(polynome_order)
+            yp = numpy.zeros(polynome_order)
+            for i in range(polynome_order):
+                xp[i] = self.key_points[(n+i)%n_key_points, 0]
+                yp[i] = self.key_points[(n+i)%n_key_points, 1]
+
+            xc, yc, r = self._find_circle(xp[0], yp[0], xp[1], yp[1], xp[2], yp[2])
+
+            dx = xp[0] - xp[1]
+            dy = yp[0] - yp[1]
+
+          
+            # straight line segment
+            #if abs(dx) < 10**-3 or abs(dy) < 10**-3:
+            if r > 10**6:
+                
+                d_max = 200
+                for i in range(int(d_max)):
+                    t = i/d_max
+
+                    x, y = self._line_fit(xp[0], yp[0], xp[1], yp[1], t)
+                
+                    self.points.append([x, y])
+
+                n+=1
+            else:   
+            # circle segment
+                angle_start = self._find_angle(xp[0] - xc, yp[0] - yc)
+                angle_end   = self._find_angle(xp[2] - xc, yp[2] - yc)
+
+               
+                d_max = 200
+                for i in range(int(d_max)):
+                    t = i/d_max
+                    t = (1.0 - t)*angle_start + t*angle_end
+
+                    x, y = self._circle_fit(xc, yc, r, t)
+                
+                    self.points.append([x, y])
+
+                n+=2
+
+            '''
 
         self.points = numpy.array(self.points)
     
@@ -124,10 +177,44 @@ class Trajectory:
         
         return xc, yc, r
     
+    def _line_fit(self, x0, y0, x1, y1, t):
+        x = t*x0 + (1.0 - t)*x1
+        y = t*y0 + (1.0 - t)*y1
+
+        return x, y
+
+
+    def _circle_fit(self, xc, yc, r, t):
+        x = xc + r*numpy.cos(t)
+        y = yc + r*numpy.sin(t)
+
+        return x, y
+    
+    
     def _find_angle(self, x, y):
         
         theta = numpy.arctan2(y, x)
+
+        return theta
         if theta < 0.0:
             theta += 2.0*numpy.pi
 
         return theta
+    
+    def _signed_angle(self, x0, y0, x1, y1, x, y):
+        # Define vectors
+        v1 = numpy.array([x1 - x0, y1 - y0])
+        v2 = numpy.array([x - x0, y - y0])
+        
+        # Normalize vectors
+        v1_normalized = v1 / numpy.linalg.norm(v1)
+        v2_normalized = v2 / numpy.linalg.norm(v2)
+        
+        # Compute dot product and cross product
+        dot_product = numpy.dot(v1_normalized, v2_normalized)
+        cross_product = numpy.cross(v1_normalized, v2_normalized)
+        
+        # Compute the angle using arctan2
+        angle = numpy.arctan2(cross_product, dot_product)
+        
+        return angle

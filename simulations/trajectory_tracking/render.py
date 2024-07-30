@@ -12,7 +12,7 @@ class Render:
         self.video_writer = None
        
     
-    def render(self, trajectory, robot, target_state):
+    def render(self, trajectory, robot, target_state, robot_path = None):
 
         padding    = 100.0
 
@@ -69,6 +69,18 @@ class Render:
         y0 = target_state[1][0]
         x0, y0 = self._scale_position(x0, y0)
         cv2.circle(result_image, (x0, y0), 10, (1, 0, 0), -1)
+
+        if robot_path is not None:
+            for n in range(len(robot_path) - 1):
+                x0 = robot_path[n][0]
+                y0 = robot_path[n][1]
+                x0, y0 = self._scale_position(x0, y0)
+
+                x1 = robot_path[n+1][0]
+                y1 = robot_path[n+1][1]
+                x1, y1 = self._scale_position(x1, y1)
+
+                cv2.line(result_image, (x0, y0), (x1, y1), (0, 0, 1), 2)
         
 
         cv2.imshow("visualisation", result_image)

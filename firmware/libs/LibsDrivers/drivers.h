@@ -16,6 +16,7 @@
 #include <gyro.h> 
 
 #include <motor_control.h>
+#include <button.h>
 
 extern  Timer                       timer;
 extern  Terminal                    terminal;

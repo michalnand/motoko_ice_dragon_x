@@ -19,42 +19,13 @@ int main(void)
 
   terminal << "\n\n\n"; 
   terminal << "machine ready\n";
-  
 
-  Gpio<TGPIOB, 2, GPIO_MODE_OUT> led;   //user led
-  led = 1;  
-
-  Gpio<TGPIOB, 10, GPIO_MODE_IN_PULLUP> key;   //user button
-
-  timer.delay_ms(200);
-
-  Gpio<TGPIOC, 4, GPIO_MODE_OUT> line_led;   //line iluminatio leds
+  Gpio<TGPIOC, 4, GPIO_MODE_OUT> line_led;   //line ilumination leds
   line_led = 1; 
   
 
-  //wait for buttom press
-  while ((int)key != 0)
-  { 
-    led = 1; 
-    timer.delay_ms(100);
-
-    led = 0; 
-    timer.delay_ms(200);
-  }
+  button();
   
-  led = 1; 
-
-  //wait for button release
-  while ((int)key == 0)   
-  { 
-    led = 1; 
-    timer.delay_ms(50);
-
-    led = 0; 
-    timer.delay_ms(50);
-  } 
-
-  led = 1; 
 
   timer.delay_ms(500); 
  
@@ -62,10 +33,10 @@ int main(void)
   motor_control.set_right_velocity(50*2.0*PI/60.0);
   motor_control.set_left_velocity(50*2.0*PI/60.0);
   
-  //motors_test();  
+  motors_test();  
   //encoder_sensor_test();
   //motor_identification();
-  gyro_stabilisation_test();
+  //gyro_stabilisation_test();
   //encoder_sensor_test();
   //gyro_sensor_test(); 
   //ir_sensor_test();
@@ -73,9 +44,6 @@ int main(void)
    
   while (1)    
   {
-    led = 1; 
-    timer.delay_ms(50);
-    led = 0; 
     timer.delay_ms(150);
 
     //terminal << "encoder  = " << motor_control.get_left_position() << " " << motor_control.get_right_position() << "\n";
@@ -124,20 +92,5 @@ int main(void)
   
   
 
-  while (1)   
-  {
-    led = 1; 
-    timer.delay_ms(100);
-
-    led = 0; 
-    timer.delay_ms(100);
-
-    led = 1; 
-    timer.delay_ms(200);
-
-    led = 0; 
-    timer.delay_ms(400);
-  }
- 
   return 0;
 } 
