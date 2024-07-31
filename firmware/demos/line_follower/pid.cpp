@@ -14,7 +14,7 @@ PID::PID(float kp, float ki, float kd, float antiwindup)
 void PID::init(float kp, float ki, float kd, float antiwindup)
 {   
     this->k0 = kp + ki + kd;
-    this->k1 = - kp -2.0*kd;
+    this->k1 = -kp -2.0*kd;
     this->k2 = kd;
 
     this->u = 0;

@@ -28,7 +28,7 @@ int main()
         {
             terminal << ir_sensor.get()[i] << " ";
         }
-        terminal << "\n\n";
+        terminal << "\n\n"; 
 
         // convert gyro angle from radians to degrees and print
         terminal << "gyro sensor\n";
@@ -44,7 +44,7 @@ int main()
         terminal << "\n\n";
 
         led = 0;
-        timer.delay_ms(200);
+        timer.delay_ms(100);
     }
 
     return 0;

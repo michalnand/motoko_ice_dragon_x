@@ -284,7 +284,7 @@ void MotorControl::encoder_init()
     g_left_velocity   = 0;
     g_right_velocity  = 0;
 
-
+    
     //encoder init
     Gpio<TGPIOC, 10, GPIO_MODE_IN_PULLUP> enc_left_a; 
     Gpio<TGPIOC, 11, GPIO_MODE_IN_PULLUP> enc_left_b; 
@@ -306,7 +306,7 @@ void MotorControl::encoder_init()
     EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
     EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
-    EXTI_Init(&EXTI_InitStructure);   
+    EXTI_Init(&EXTI_InitStructure);     
 
 
     // EXTI15_10_IRQn Line to PC12 pin 
@@ -325,6 +325,7 @@ void MotorControl::encoder_init()
     NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd       = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
+    
 }
 
 
