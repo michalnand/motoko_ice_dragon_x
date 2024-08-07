@@ -4,7 +4,7 @@
 
 
 class LQRSingle
-{   
+{    
     public:
         LQRSingle();
         
@@ -17,6 +17,8 @@ class LQRSingle
         //xr : required value
         //x  : actual value
         float step(float xr, float x); 
+
+        void reset();
     
     private:
         float _clip(float v, float min_v, float max_v);

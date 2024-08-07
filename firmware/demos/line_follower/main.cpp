@@ -15,12 +15,6 @@ int main()
     float max_speed     = 0.4;
 
     // controller parameters
-    /*
-    float kp = 0.25; 
-    float ki = 0.0001;         
-    float kd = 0.5;   
-    */      
-
     float kp = 0.5;         
     float ki = 0.01;                
     float kd = 2.5;          
@@ -38,9 +32,10 @@ int main()
         // observed value
         float x  = line_sensor.left_position;
         
-        // controller computes error internaly
+        // controller step
         float turn = controller.step(xr, x);          
 
+        // from turn and max speed compute remanining speed
         float curr_speed = clip(max_speed - abs(turn), 0.0, max_speed);
 
         float u_right = curr_speed + turn;

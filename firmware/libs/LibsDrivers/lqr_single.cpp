@@ -43,6 +43,11 @@ float LQRSingle::step(float xr, float x)
     return u;
 }
 
+void LQRSingle::reset()
+{
+    this->integral_action = 0;
+}
+
 float LQRSingle::_clip(float v, float min_v, float max_v)
 {
     if (v < min_v)

@@ -2,7 +2,11 @@
 #define _MOTOR_CONTROL_H_
  
 #include <pwm.h>
+
 #include <lqg_single.h>
+#include <lqr_single.h>
+#include <pid.h>
+
 #include <fmath.h>
 
 //dt step in microseconds, 4kHz, 250uS
@@ -79,7 +83,10 @@ class MotorControl
         //single input, single output motor speed controller
         LQGSingle left_controller;
         LQGSingle right_controller;
+        
+        //LQRSingle left_controller;  
+        //LQRSingle right_controller;
 };
 
 
-#endif
+#endif  

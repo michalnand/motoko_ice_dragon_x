@@ -52,3 +52,7 @@ float PID::step(float xr, float x)
     return this->u;
 } 
 
+void PID::reset()
+{
+    this->u = 0;
+}

@@ -13,6 +13,7 @@ class PID
         
         void init(float kp, float ki, float kd, float antiwindup);
         float step(float xr, float x);
+        void reset();
       
     private:
         float k0, k1, k2;

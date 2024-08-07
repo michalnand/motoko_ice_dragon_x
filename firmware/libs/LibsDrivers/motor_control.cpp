@@ -106,29 +106,19 @@ void MotorControl::init()
     float a = 0.9750025f;
     float b = 2.02024798f;
 
-    /*
     //LQR gain
-    float k  =  0.00120839f;
-    float ki =  3.16613528e-05f;
+    float k  =  0.00932932;
+    float ki =  0.00031919;
 
     //Kalman gain  
-    float f  =  0.01090771f;
-    */
+    float f  =  0.01258845;
 
-    //LQR gain
-    float k  =  0.00352159;
-    float ki =  0.00010036;
+    left_controller.init(a, b, k, ki, f, 1.0);
+    right_controller.init(a, b, k, ki, f, 1.0);
 
-    //Kalman gain  
-    float f  =  0.01090771;
+  
 
-
-
-
-    left_controller.init(a, b, k, ki, f, MOTOR_CONTROL_MAX_VELOCITY);
-    right_controller.init(a, b, k, ki, f, MOTOR_CONTROL_MAX_VELOCITY);
-
-    //init encoders
+    //init encoders     
     encoder_init();
 
     //init timer
@@ -190,7 +180,8 @@ float MotorControl::get_left_velocity()
 
 float MotorControl::get_left_velocity_fil()
 {
-    return left_controller.get_x_hat();
+    return get_left_velocity();
+    //return left_controller.get_x_hat();
 }
 
 
@@ -205,10 +196,11 @@ float MotorControl::get_right_velocity()
 {
     return (2.0f*PI*g_right_velocity)/ENCODER_RESOLUTION;
 }        
- 
+    
 float MotorControl::get_right_velocity_fil()
 {
-    return right_controller.get_x_hat();
+    return get_right_velocity();
+    //return right_controller.get_x_hat();
 }
 
 
@@ -222,7 +214,7 @@ void MotorControl::callback()
     if (this->left_ol_mode)
     {
         left_torque = this->left_torque;
-        left_controller.reset();
+        left_controller.reset();    
     }
     else
     {
