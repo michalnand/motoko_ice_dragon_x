@@ -111,12 +111,12 @@ void MotorControl::init()
     float ki =  0.00031919;
 
     //Kalman gain  
-    float f  =  0.01258845;
+    float f  =  0.16154247;
+
 
     left_controller.init(a, b, k, ki, f, 1.0);
     right_controller.init(a, b, k, ki, f, 1.0);
 
-  
 
     //init encoders     
     encoder_init();
@@ -166,6 +166,19 @@ void MotorControl::halt()
     this->set_right_velocity(0);
 }
 
+float MotorControl::get_left_u()
+{
+    return left_controller.u;
+}
+
+
+float MotorControl::get_right_u()
+{
+    return right_controller.u;
+}
+
+
+
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_left_position()
 {
@@ -180,8 +193,8 @@ float MotorControl::get_left_velocity()
 
 float MotorControl::get_left_velocity_fil()
 {
-    return get_left_velocity();
-    //return left_controller.get_x_hat();
+    //return get_left_velocity();
+    return left_controller.get_x_hat();
 }
 
 
@@ -199,8 +212,8 @@ float MotorControl::get_right_velocity()
     
 float MotorControl::get_right_velocity_fil()
 {
-    return get_right_velocity();
-    //return right_controller.get_x_hat();
+    //return get_right_velocity();
+    return right_controller.get_x_hat();
 }
 
 

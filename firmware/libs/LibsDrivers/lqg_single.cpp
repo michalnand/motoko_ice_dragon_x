@@ -21,6 +21,8 @@ void LQGSingle::init(float a, float b, float k, float ki, float f, float antiwin
 
     this->x_hat = 0.0;
 
+    this->u = 0.0;
+
     this->integral_action = 0.0;
 
     this->antiwindup = antiwindup;
@@ -35,8 +37,10 @@ float LQGSingle::step(float xr, float x)
     //error = xr - x
     //integral_action+= ki@error * dt
     float error = xr - x;   
+
     float integral_action_new = this->integral_action + ki*error;
 
+ 
 
     //LQR controller with integral action
     //u = -k@x + ki@error_sum
@@ -46,11 +50,13 @@ float LQGSingle::step(float xr, float x)
     float u = _clip(u_new, -antiwindup, antiwindup);
 
     this->integral_action = integral_action_new - (u_new - u);
-    
-    // kalman observer, prediction and correction
-    float e         = x - x_hat;
-    x_hat           = a*x_hat + b*u + f*e;
 
+    // kalman observer, prediction and correction
+    float e = x - x_hat;        
+    x_hat   = a*x_hat + b*u + f*e;
+
+
+    this->u = u;
     return u;   
 }
 

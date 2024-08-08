@@ -40,6 +40,10 @@ class MotorControl
         // force break to both motors
         void halt();
 
+        float get_left_u();
+        float get_right_u();
+
+
     // encoder reading
     public: 
         // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward

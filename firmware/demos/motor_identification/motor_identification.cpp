@@ -22,7 +22,7 @@ void motor_identification()
     //1, estimate motor constant k, on different input values
 
     float u_values[10] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-
+    
     float k_mean     = 0.0;
     float x_var_mean = 0.0;
 

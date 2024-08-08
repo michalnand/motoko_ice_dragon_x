@@ -37,6 +37,9 @@ class LQGSingle
 
         float integral_action;
         float antiwindup;
+
+    public:
+        float u;
 };
 
 #endif
