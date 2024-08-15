@@ -17,9 +17,9 @@ void motor_identification()
     motor_control.halt();
     timer.delay_ms(200); 
 
-    uint32_t n_steps = 500;
 
     //1, estimate motor constant k, on different input values
+    uint32_t n_steps = 500;
 
     float u_values[10] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
     
@@ -64,7 +64,6 @@ void motor_identification()
         terminal << "x_var  = " << x_var << "\n";
         terminal << "\n\n";
     }   
-
 
     //print summary results
     k_mean     = k_mean/10.0;

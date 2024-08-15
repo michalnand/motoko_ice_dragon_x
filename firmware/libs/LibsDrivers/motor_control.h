@@ -13,7 +13,10 @@
 #define MOTOR_CONTROL_DT    ((uint32_t)250)
 
 //encoder pulses per rotation
-#define ENCODER_RESOLUTION   ((int32_t)180)
+#define GEAR_RATIO_30        ((float)(31.0*33.0*35.0*34.0)/(16.0*14.0*13.0*14.0))
+
+#define PULSES_PER_ROTATION  ((float)12.0)
+#define ENCODER_RESOLUTION   ((float)PULSES_PER_ROTATION*GEAR_RATIO_30)
 
     
 #define MOTOR_CONTROL_MAX_TORQUE     ((float)1.0)
@@ -46,6 +49,9 @@ class MotorControl
 
     // encoder reading
     public: 
+        // raw left encoder steps reading
+        int32_t get_left_encoder();
+
         // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
         float get_left_position();
 
@@ -55,6 +61,9 @@ class MotorControl
         //return kalman filtered velocity
         float get_left_velocity_fil();
 
+
+        // raw right encoder steps reading
+        int32_t get_right_encoder();
 
         // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
         float get_right_position();

@@ -15,54 +15,102 @@ volatile uint64_t g_right_time_now, g_right_time_prev;
 volatile int32_t  g_left_velocity, g_right_velocity;
 volatile uint32_t g_left_no_pulse, g_right_no_pulse;
 
+
+void encoders_int_callback()
+{
+    // left encoder
+    if ( (EXTI_GetITStatus(EXTI_Line10) != RESET) || (EXTI_GetITStatus(EXTI_Line11) != RESET) )
+    {
+        g_left_no_pulse  = 0;
+        g_left_time_prev = g_left_time_now;
+        g_left_time_now  = timer.get_ns_time();
+        g_left_velocity  = 1000000000/(g_left_time_now - g_left_time_prev);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line10) != RESET)
+    {
+        if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) == GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_11))
+        {
+            g_left_encoder++;  
+        }
+        else
+        {
+            g_left_encoder--;
+            g_left_velocity = -g_left_velocity;
+        }   
+
+        EXTI_ClearITPendingBit(EXTI_Line10);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line11) != RESET)
+    {
+        if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) != GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_11))
+        {
+            g_left_encoder++;  
+        }
+        else
+        {
+            g_left_encoder--;
+            g_left_velocity = -g_left_velocity;
+        }   
+
+        EXTI_ClearITPendingBit(EXTI_Line11);
+    }
+
+
+
+    // right encoder
+    if ( (EXTI_GetITStatus(EXTI_Line12) != RESET) || (EXTI_GetITStatus(EXTI_Line5) != RESET) )
+    {
+        g_right_no_pulse = 0; 
+
+        g_right_time_prev = g_right_time_now;
+        g_right_time_now  = timer.get_ns_time();
+        g_right_velocity  = 1000000000/(g_right_time_now - g_right_time_prev);
+    }
+  
+    if (EXTI_GetITStatus(EXTI_Line12) != RESET)
+    {
+        if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_12) == GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_5))
+        {
+            g_right_encoder++;  
+        }
+        else
+        {
+            g_right_encoder--;
+            g_right_velocity = -g_right_velocity;
+        }  
+
+        EXTI_ClearITPendingBit(EXTI_Line12);
+    } 
+
+
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET)
+    {
+        if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_12) != GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_5))
+        {
+            g_right_encoder++;  
+        }   
+        else
+        {
+            g_right_encoder--;
+            g_right_velocity = -g_right_velocity;
+        }  
+
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }   
+}
+
+// encoder interrupt handling
+void EXTI9_5_IRQHandler(void)
+{
+    encoders_int_callback();
+}
+
 // encoder interrupt handling
 void EXTI15_10_IRQHandler(void)
 {
-  // left encoder
-  if(EXTI_GetITStatus(EXTI_Line10) != RESET)
-  {
-    g_left_time_prev = g_left_time_now;
-    g_left_time_now  = timer.get_ns_time();
-    g_left_velocity  = 1000000000/(g_left_time_now - g_left_time_prev);
-
-    
-
-    if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) == GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_11))
-    {
-      g_left_encoder++;  
-    }
-    else
-    {
-      g_left_encoder--;
-      g_left_velocity = -g_left_velocity;
-    }   
-
-    g_left_no_pulse = 0;
-
-    EXTI_ClearITPendingBit(EXTI_Line10);
-  }
-
-  // right encoder
-  if(EXTI_GetITStatus(EXTI_Line12) != RESET)
-  {
-    g_right_time_prev = g_right_time_now;
-    g_right_time_now  = timer.get_ns_time();
-    g_right_velocity  = 1000000000/(g_right_time_now - g_right_time_prev);
-
-    if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_12) == GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_5))
-    {
-      g_right_encoder++;  
-    }
-    else
-    {
-      g_right_encoder--;
-      g_right_velocity = -g_right_velocity;
-    }  
-
-    g_right_no_pulse = 0; 
-
-    EXTI_ClearITPendingBit(EXTI_Line12);
-  }  
+    encoders_int_callback();
 }
 
 
@@ -103,15 +151,15 @@ void MotorControl::init()
     //optimal control init 
     
     //discrete dynamics model
-    float a = 0.9750025f;
-    float b = 2.02024798f;
+    float a = 0.97024164f;
+    float b = 4.13891203f;
 
     //LQR gain
-    float k  =  0.00932932;
-    float ki =  0.00031919;
+    float k  =  0.0072442;
+    float ki =  0.00032093;
 
     //Kalman gain  
-    float f  =  0.16154247;
+    float f  =  0.03677105;
 
 
     left_controller.init(a, b, k, ki, f, 1.0);
@@ -179,6 +227,12 @@ float MotorControl::get_right_u()
 
 
 
+// read raw left encoder value
+int32_t MotorControl::get_left_encoder()
+{
+    return g_left_encoder;
+}
+
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_left_position()
 {
@@ -197,6 +251,13 @@ float MotorControl::get_left_velocity_fil()
     return left_controller.get_x_hat();
 }
 
+
+
+// read raw right encoder value
+int32_t MotorControl::get_right_encoder()
+{
+    return g_right_encoder;
+}
 
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_right_position()
@@ -303,16 +364,34 @@ void MotorControl::encoder_init()
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
     
+
+    // left encoder pins PC10, PC11
+
     // EXTI15_10_IRQn Line to PC10 pin 
     SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource10);
+    
 
     // Configure EXTI15_10_IRQn line  
     EXTI_InitStructure.EXTI_Line    = EXTI_Line10;  
     EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
     EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
-    EXTI_Init(&EXTI_InitStructure);     
+    EXTI_Init(&EXTI_InitStructure);  
 
+    
+    // EXTI15_10_IRQn Line to PC11 pin 
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource11);
+
+    // Configure EXTI15_10_IRQn line    
+    EXTI_InitStructure.EXTI_Line    = EXTI_Line11;  
+    EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+    EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
+    EXTI_Init(&EXTI_InitStructure);        
+   
+    
+    
+    // right encoder pins PC12, PB5
 
     // EXTI15_10_IRQn Line to PC12 pin 
     SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource12);
@@ -322,10 +401,31 @@ void MotorControl::encoder_init()
     EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
     EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
-    EXTI_Init(&EXTI_InitStructure);        
+    EXTI_Init(&EXTI_InitStructure);    
+
+
+    // EXTI9_5_IRQn Line to PB5 pin 
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource5);
+
+    // Configure EXTI9_5_IRQn line  
+    EXTI_InitStructure.EXTI_Line    = EXTI_Line5;  
+    EXTI_InitStructure.EXTI_Mode    = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+    EXTI_InitStructure.EXTI_LineCmd = ENABLE;     
+    EXTI_Init(&EXTI_InitStructure);    
+
+
+
 
     // Enable and set EXTI15_10_IRQn Interrupt           
     NVIC_InitStructure.NVIC_IRQChannel          = EXTI15_10_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority    = 2;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd       = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    // Enable and set EXTI9_5_IRQn Interrupt           
+    NVIC_InitStructure.NVIC_IRQChannel          = EXTI9_5_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority    = 2;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority           = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd       = ENABLE;

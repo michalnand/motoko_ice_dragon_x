@@ -39,7 +39,7 @@ int main()
         terminal << "encoder sensor\n";
         terminal << "right " << motor_control.get_right_position()*(float)(180.0/PI) << "\n";
         terminal << "left  " << motor_control.get_left_position()*(float)(180.0/PI) << "\n";
-        terminal << "\n\n";
+        terminal << "\n\n"; 
 
         terminal << "\n\n";
 
