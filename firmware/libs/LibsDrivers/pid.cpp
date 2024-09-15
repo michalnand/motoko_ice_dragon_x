@@ -56,3 +56,8 @@ void PID::reset()
 {
     this->u = 0;
 }
+
+float PID::get_x_hat()
+{
+    return (e0 + e1 + e2)/3.0;
+}

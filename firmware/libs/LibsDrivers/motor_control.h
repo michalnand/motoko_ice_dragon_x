@@ -94,11 +94,12 @@ class MotorControl
         PWMRight    right_pwm;
 
         //single input, single output motor speed controller
-        LQGSingle left_controller;
-        LQGSingle right_controller;
+        PID left_controller;
+        PID right_controller;
+        //LQGSingle left_controller;
+        //LQGSingle right_controller;
         
-        //LQRSingle left_controller;  
-        //LQRSingle right_controller;
+       
 };
 
 

@@ -148,6 +148,24 @@ void MotorControl::init()
     left_pwm.init();
     right_pwm.init();
 
+
+
+    //PID controller init
+
+    float kp  = 0.01;
+    float ki  = 0.0003;
+    float kd  = 0.0;
+    
+    left_controller.init(kp, ki, kd, 1.0);
+    right_controller.init(kp, ki, kd, 1.0);
+
+
+
+
+
+
+
+    /*
     //optimal control init 
     
     //discrete dynamics model
@@ -164,7 +182,7 @@ void MotorControl::init()
 
     left_controller.init(a, b, k, ki, f, 1.0);
     right_controller.init(a, b, k, ki, f, 1.0);
-
+    */
 
     //init encoders     
     encoder_init();
@@ -361,7 +379,7 @@ void MotorControl::encoder_init()
     EXTI_InitTypeDef   EXTI_InitStructure;
     NVIC_InitTypeDef   NVIC_InitStructure;
 
-
+    // clock enable
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
     
 
