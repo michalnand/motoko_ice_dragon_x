@@ -15,7 +15,7 @@
 #include <line_sensor.h>
 #include <gyro.h> 
 
-#include <motor_control.h>
+#include <motor_control_bldc.h>
 #include <button.h>
 
 extern  Timer                       timer;

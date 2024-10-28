@@ -27,15 +27,12 @@
 
 #define ENCODER_RESOLUTION  ((int32_t)4096)
 
-template <unsigned char port_name, unsigned char sda_pin, unsigned char scl_pin, unsigned int bus_speed = 20>
+template <unsigned char port_name, unsigned char sda_pin, unsigned char scl_pin, unsigned int bus_speed>
 class AS5600T
 {
     public:
         int32_t angle; 
-
         int32_t position;
-        int32_t angular_velocity;
-        int32_t position_fil;
 
     private:
         int32_t position_prev;
@@ -70,34 +67,30 @@ class AS5600T
             //power on
             //hysteresis 1 LSB 
             //slow filter only, 8x 
-            //i2c_write_reg(I2C_ADDRESS, CONF_L_ADR, (1<<2));
-            //i2c_write_reg(I2C_ADDRESS, CONF_H_ADR, (1<<0)); 
+            i2c_write_reg(I2C_ADDRESS, CONF_L_ADR, (1<<2));
+            i2c_write_reg(I2C_ADDRESS, CONF_H_ADR, (1<<0)); 
 
 
             //hysteresis 2 LSB 
             //slow filter only, 8x 
-            i2c_write_reg(I2C_ADDRESS, CONF_L_ADR, (1<<3));
-            i2c_write_reg(I2C_ADDRESS, CONF_H_ADR, (1<<0)); 
+            //i2c_write_reg(I2C_ADDRESS, CONF_L_ADR, (1<<3));
+            //i2c_write_reg(I2C_ADDRESS, CONF_H_ADR, (1<<0)); 
             
  
             this->position          = 0;
             this->position_prev     = 0;
-            this->angular_velocity  = 0;
             this->prev_value        = 0;
-
-            this->position_fil      = 0;
 
             //set zero angle
             set_zero();
             set_zero();
 
             this->read_angle();
-            this->update(1000);
+            this->update();
 
 
             this->position          = this->angle;
             this->position_prev     = this->angle;
-            this->angular_velocity  = 0;
             this->prev_value        = 0;
             
             return 0;
@@ -110,40 +103,34 @@ class AS5600T
         }
 
 
-        void update(int32_t dt_us)
+        void update()
         {
             int16_t value = i2c_read_reg_16bit(I2C_ADDRESS, ANGLE_H_ADR)&0x0fff;
 
             this->angle = value;
          
-            this->position_prev = this->position; 
-        
+            
             //  whole rotation CW?
-            //  less than half a circle
-            if ((this->prev_value > 2048) && ( value < (this->prev_value - 2048)))
+            //  less than half a circle 
+            if ((this->prev_value > (ENCODER_RESOLUTION/2)) && ( value < (this->prev_value - (ENCODER_RESOLUTION/2))))
             {
-                this->position = this->position + 4096 - this->prev_value + value;
+                this->position = this->position + ENCODER_RESOLUTION - this->prev_value + value;
             } 
         
             //  whole rotation CCW?
             //  less than half a circle
-            else if ((value > 2048) && ( this->prev_value < (value - 2048)))
+            else if ((value > (ENCODER_RESOLUTION/2)) && ( this->prev_value < (value - (ENCODER_RESOLUTION/2))))
             {
-                this->position = this->position - 4096 - this->prev_value + value;
+                this->position = this->position - ENCODER_RESOLUTION - this->prev_value + value;
             }
             else 
             {
                 this->position = this->position - this->prev_value + value;
             }
 
-
-            int32_t tmp = ((this->position - this->position_prev)*1000000)/dt_us;
-            
-            //complementary LP filter
-            this->position_fil     = (7*this->position_fil + 1*this->position)/8;  
-            this->angular_velocity = (7*this->angular_velocity + 1*tmp)/8;      
-                
-            this->prev_value       = value;
+          
+            this->position_prev    = this->position; 
+            this->prev_value       = value;  
         }
  
 

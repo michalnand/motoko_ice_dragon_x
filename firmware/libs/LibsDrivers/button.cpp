@@ -2,17 +2,26 @@
 
 int button()
 {
+  /*
   //user led
   Gpio<TGPIOB, 2, GPIO_MODE_OUT> led;   
   led = 1;  
 
   //user button
-  Gpio<TGPIOB, 10, GPIO_MODE_IN_PULLUP> key;   
+  Gpio<TGPIOB, 10, GPIO_MODE_IN_PULLUP> key;  
+  */ 
 
-  timer.delay_ms(200);
+  //user led
+  Gpio<TGPIOE, 3, GPIO_MODE_OUT> led;   
+  led = 1;  
+
+  //user button
+  Gpio<TGPIOE, 4, GPIO_MODE_IN_PULLUP> key;  
+
+  timer.delay_ms(200);  
 
   //wait for buttom press, slow blinking
-  while ((int)key != 0)
+  while ((int)key != 0) 
   { 
     led = 1; 
     timer.delay_ms(100);

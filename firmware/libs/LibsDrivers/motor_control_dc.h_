@@ -9,19 +9,6 @@
 
 #include <fmath.h>
 
-//dt step in microseconds, 4kHz, 250uS
-#define MOTOR_CONTROL_DT    ((uint32_t)250)
-
-//encoder pulses per rotation
-#define GEAR_RATIO_30        ((float)(31.0*33.0*35.0*34.0)/(16.0*14.0*13.0*14.0))
-
-#define PULSES_PER_ROTATION  ((float)12.0)
-#define ENCODER_RESOLUTION   ((float)PULSES_PER_ROTATION*GEAR_RATIO_30)
-
-    
-#define MOTOR_CONTROL_MAX_TORQUE     ((float)1.0)
-#define MOTOR_CONTROL_MAX_VELOCITY   ((float)1000.0*2.0*PI/60.0)
-
 class MotorControl      
 {   
     public:

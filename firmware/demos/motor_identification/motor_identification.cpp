@@ -31,7 +31,7 @@ void motor_identification()
         //run motor with desired input and wait for steady state
         float u_in = u_values[j];
 
-        motor_control.set_right_torque(u_in*MOTOR_CONTROL_MAX_TORQUE); 
+        motor_control.set_right_torque(u_in); 
         timer.delay_ms(500);    
 
         //estimate average velocity
@@ -55,11 +55,14 @@ void motor_identification()
         x_var = x_var/n_steps;  
 
         float k = x_mean/u_in;
-        k_mean+= x_mean/u_in;   
-        x_var_mean+= x_var;
+        k_mean+= x_mean/u_in;    
+        x_var_mean+= x_var; 
+
+        int32_t rpm  = (x_mean*60.0)/(2.0*PI);
 
         terminal << "u_in   = " << u_in << "\n";
         terminal << "k      = " << k << "\n";
+        terminal << "rpm    = " << rpm << "\n";
         terminal << "x_mean = " << x_mean << "\n";
         terminal << "x_var  = " << x_var << "\n";
         terminal << "\n\n";
@@ -83,12 +86,12 @@ void motor_identification()
     float u_in = 0.25;
     uint32_t periods = 0; 
 
-    n_steps = 2000;
+    n_steps = 3000;
 
     for (unsigned int i = 0; i < n_steps; i++)
     {
-        motor_control.set_right_torque(u_in*MOTOR_CONTROL_MAX_TORQUE);
-        float x = motor_control.get_right_velocity()*60.0/(2.0*PI);
+        motor_control.set_right_torque(u_in);
+        float x = motor_control.get_right_velocity(); //*60.0/(2.0*PI);
 
         if (u_in > 0.0) 
         {
@@ -110,7 +113,7 @@ void motor_identification()
         timer.delay_ms(1);
     }
     
-    motor_control.halt(); 
+    motor_control.set_right_torque(0);
     timer.delay_ms(200);     
     
     float t_period = (2*n_steps/periods)/PI;

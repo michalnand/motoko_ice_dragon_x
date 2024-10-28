@@ -21,4 +21,18 @@ class PWMRight
         void set(int32_t pwm);
 };
 
+class PWMLeftThreePhase
+{   
+    public:
+        void init();
+        void set(int32_t pwm_a, int32_t pwm_b, int32_t pwm_c);
+};
+
+class PWMRightThreePhase
+{
+    public:
+        void init();
+        void set(int32_t pwm_a, int32_t pwm_b, int32_t pwm_c);
+};
+
 #endif
