@@ -15,32 +15,58 @@ int main()
 
 
     float velocity_min = 0.0;
-    float velocity_max = 1000.0;
+    float velocity_max = 1500.0;
 
-    while (true)
+    unsigned int n_steps;
+    while (true)    
     {
-        unsigned int n_steps = 100;
+        n_steps = 2000;    
 
         for (unsigned int i = 0; i < n_steps; i++)
         {
-            float k = i/(n_steps-1);
+            float k = (1.0*i)/(n_steps-1);        
             float v = (1.0 - k)*velocity_min + k*velocity_max;
-            motor_control.set_left_velocity(v*(2.0*PI/60.0));
+            motor_control.set_right_velocity(v*(2.0*PI/60.0));
             timer.delay_ms(1);
-        }
+        }        
 
-        timer.delay_ms(1000);
+        timer.delay_ms(2000);
 
 
         for (unsigned int i = 0; i < n_steps; i++)
         {
-            float k = i/(n_steps-1);
+            float k = (1.0*i)/(n_steps-1);
             float v = (1.0 - k)*velocity_max + k*velocity_min;
-            motor_control.set_left_velocity(v*(2.0*PI/60.0));
+            motor_control.set_right_velocity(v*(2.0*PI/60.0));
             timer.delay_ms(1);
         }
 
-        timer.delay_ms(1000);
+        timer.delay_ms(800);
+
+
+
+        n_steps = 100;    
+
+        for (unsigned int i = 0; i < n_steps; i++)
+        {
+            float k = (1.0*i)/(n_steps-1);        
+            float v = (1.0 - k)*velocity_min + k*velocity_max;
+            motor_control.set_right_velocity(v*(2.0*PI/60.0));
+            timer.delay_ms(1);
+        }        
+
+        timer.delay_ms(2000);
+
+
+        for (unsigned int i = 0; i < n_steps; i++)
+        {
+            float k = (1.0*i)/(n_steps-1);
+            float v = (1.0 - k)*velocity_max + k*velocity_min;
+            motor_control.set_right_velocity(v*(2.0*PI/60.0));
+            timer.delay_ms(1);
+        }
+
+        timer.delay_ms(800);
     }
 
     motor_control.set_right_velocity(300*(2.0*PI/60.0));
