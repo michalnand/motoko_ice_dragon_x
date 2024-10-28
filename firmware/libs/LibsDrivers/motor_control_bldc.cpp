@@ -128,8 +128,15 @@ void MotorControl::init()
     left_pwm.init();
     right_pwm.init();
 
-    float k0 = 0.34324684; //0.146;
-    float k1 = 28.65207578; //4.6199;
+  
+    //float k0 = 0.13834194; 
+    //float k1 = 4.11593085;
+
+    float k0 = 0.37552931; 
+    float k1 = 35.03939676;
+
+    
+
 
     left_kf.init(k0, k1,  MOTOR_CONTROL_DT/1000000.0);
     right_kf.init(k0, k1, MOTOR_CONTROL_DT/1000000.0);
@@ -155,8 +162,9 @@ void MotorControl::init()
     //optimal control init 
 
     //LQR gain
-    float k  =  0.00706602;
-    float ki =  0.00032235;
+    float k  =  0.0097251;
+    float ki =  0.00032155;
+
 
 
     left_controller.init(k, ki, 1.0);
