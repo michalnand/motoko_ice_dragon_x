@@ -157,20 +157,15 @@ void MotorControl::init()
 
     timer.delay_ms(100);
 
-
-    
     //optimal control init 
 
     //LQR gain
     float k  =  0.0097251;
     float ki =  0.00032155;
 
-
-
     left_controller.init(k, ki, 1.0);
     right_controller.init(k, ki, 1.0);
 
-   
     //init timer
     timer_init();
 }
@@ -241,19 +236,19 @@ int32_t MotorControl::get_left_encoder()
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_left_position()
 {
-    return left_kf.position_hat;
+    return -left_kf.position_hat;
 }
 
 // wheel angular velocity in rad/s, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_left_velocity()
 {
-    return left_kf.velocity_hat;
+    return -left_kf.velocity_hat;
 }
 
 float MotorControl::get_left_velocity_fil()
 {
     //return get_left_velocity();
-    return left_kf.velocity_hat;
+    return -left_kf.velocity_hat;
 }
 
 
@@ -331,7 +326,7 @@ void MotorControl::callback()
     int32_t right_torque_ = -clamp((int32_t)(right_torque*MOTOR_CONTROL_MAX), -MOTOR_CONTROL_MAX, MOTOR_CONTROL_MAX);
 
     // send torques to motors
-    set_torque_from_rotation(left_torque_, false, left_encoder.angle, 0);
+    set_torque_from_rotation(left_torque_,  false, left_encoder.angle, 0);
     set_torque_from_rotation(right_torque_, false, right_encoder.angle, 1);
 }
 

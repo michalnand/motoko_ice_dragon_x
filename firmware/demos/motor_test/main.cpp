@@ -10,13 +10,34 @@ int main()
     // wait for key press
     int key_result = button();
 
-    //float velocities[] = {100, 200, 300, 500};
-    float velocities[] = {0, 400};
+    /*
+    
+    motor_control.set_left_velocity(1*(2.0*PI)/60.0);
+    motor_control.set_right_velocity(1*(2.0*PI)/60.0);
 
-    uint32_t steps = 0;
+
+    while (true)
+    {
+        // convert wheel angle from radians to degrees and print
+        terminal << "encoder sensor\n";
+        terminal << "right " << motor_control.get_right_encoder() << " " << motor_control.get_right_position()*(float)(180.0/PI) << " " << motor_control.get_right_velocity()*(float)(180.0/PI) << "\n";
+        terminal << "left  " << motor_control.get_left_encoder() << " " <<  motor_control.get_left_position()*(float)(180.0/PI) << " " << motor_control.get_left_velocity()*(float)(180.0/PI) << "\n";
+        terminal << "\n\n";
+
+        terminal << "\n\n";
+
+        timer.delay_ms(200);
+    }
+    */
+
+
+
+    float velocities[] = {0, 50, 100, 400, 1000};   
+
+    uint32_t steps = 0;        
     while (true)    
     {
-        uint32_t idx = (steps/50)%2;    
+        uint32_t idx = (steps/50)%5;    
 
         float req_velocity = velocities[idx];
 
@@ -74,48 +95,6 @@ int main()
 
         steps++;
     }
-    /*
-    while (true) 
-    {
-        for (unsigned int n = 0; n < 4; n++)
-        {
-            float req_velocity = velocities[n];
-
-            motor_control.set_left_velocity(req_velocity*PI/180.0);
-            motor_control.set_right_velocity(req_velocity*PI/180.0);
-
-            timer.delay_ms(1500);
-
-            float left_velocity      = 0.0;
-            float left_velocity_hat  = 0.0;
-            float right_velocity     = 0.0;
-            float right_velocity_hat = 0.0;
-
-
-            for (unsigned int n = 0; n < 64; n++)
-            {
-                left_velocity+= motor_control.get_left_velocity()*180.0/PI;
-                left_velocity_hat+= motor_control.get_left_velocity_fil()*180.0/PI;
-                right_velocity+= motor_control.get_right_velocity()*180.0/PI;
-                right_velocity_hat+= motor_control.get_right_velocity_fil()*180.0/PI;
-
-                timer.delay_ms(10); 
-            }
-
-            left_velocity       = left_velocity/64.0;
-            left_velocity_hat   = left_velocity_hat/64.0;
-            right_velocity      = right_velocity/64.0;
-            right_velocity_hat  = right_velocity_hat/64.0;
-
-            terminal << "required velocity " << req_velocity << " rpm\n";
-            terminal << "left velocity     " << left_velocity << " " << left_velocity_hat << " rpm\n";
-            terminal << "right velocity    " << right_velocity << " " << right_velocity_hat << " rpm\n";
-            terminal << "\n\n";     
-
-            timer.delay_ms(100); 
-        }
-    }
-    */
 
     return 0;
 }

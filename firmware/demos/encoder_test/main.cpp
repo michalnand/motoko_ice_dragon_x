@@ -19,8 +19,8 @@ int main()
 
         // convert wheel angle from radians to degrees and print
         terminal << "encoder sensor\n";
-        terminal << "right " << motor_control.get_right_encoder() << " " << motor_control.get_right_position()*(float)(180.0/PI) << "\n";
-        terminal << "left  " << motor_control.get_left_encoder() << " " <<motor_control.get_left_position()*(float)(180.0/PI) << "\n";
+        terminal << "right " << motor_control.get_right_encoder() << " " << motor_control.get_right_position()*(float)(180.0/PI) << " " << motor_control.get_right_velocity()*(float)(180.0/PI) << "\n";
+        terminal << "left  " << motor_control.get_left_encoder() << " " <<  motor_control.get_left_position()*(float)(180.0/PI) << " " << motor_control.get_left_velocity()*(float)(180.0/PI) << "\n";
         terminal << "\n\n";
 
         terminal << "\n\n";
