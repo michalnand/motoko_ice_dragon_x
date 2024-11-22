@@ -27,7 +27,7 @@
 
 #define ENCODER_RESOLUTION  ((int32_t)4096)
 
-template <unsigned char port_name, unsigned char sda_pin, unsigned char scl_pin, unsigned int bus_speed>
+template <unsigned char sda_pin, unsigned char scl_pin, unsigned int bus_speed, unsigned char sda_port_name, unsigned char scl_port_name>
 class AS5600T
 {
     public:
@@ -362,8 +362,8 @@ class AS5600T
 
 
     private:
-        Gpio<port_name, sda_pin, GPIO_MODE_IN_FLOATING>     sda;
-        Gpio<port_name, scl_pin, GPIO_MODE_IN_FLOATING>     scl;
+        Gpio<sda_port_name, sda_pin, GPIO_MODE_IN_FLOATING>     sda;
+        Gpio<scl_port_name, scl_pin, GPIO_MODE_IN_FLOATING>     scl;
 };
 
 

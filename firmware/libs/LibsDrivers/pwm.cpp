@@ -205,17 +205,18 @@ void PWMRight::set(int32_t pwm)
 void PWMLeftThreePhase::init()
 {
     //left motor PWM controll pins 
-    //PWMA      : PC9, TIM3_CH4
-    //PWMB      : PC8, TIM3_CH3
-    //PWMC      : PC7, TIM3_CH2
-    //enable    : PA8 
+    //PWMA      : PC6, TIM3_CH1
+    //PWMB      : PC7, TIM3_CH2
+    //PWMC      : PC8, TIM3_CH3
+    //enable    : PC9 
 
     GPIO_InitTypeDef GPIO_InitStruct;
 
     RCC_APB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); 
 
+    
     //init pins
-    GPIO_InitStruct.GPIO_Pin    = GPIO_Pin_9 | GPIO_Pin_8 | GPIO_Pin_7;
+    GPIO_InitStruct.GPIO_Pin    = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
     GPIO_InitStruct.GPIO_OType  = GPIO_OType_PP;
     GPIO_InitStruct.GPIO_PuPd   = GPIO_PuPd_NOPULL;
     GPIO_InitStruct.GPIO_Mode   = GPIO_Mode_AF;
@@ -223,9 +224,9 @@ void PWMLeftThreePhase::init()
     GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     //alternating functions for pins 
-    GPIO_PinAFConfig(GPIOC, GPIO_PinSource9, GPIO_AF2);
-    GPIO_PinAFConfig(GPIOC, GPIO_PinSource8, GPIO_AF2);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF2);
     GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF2);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource8, GPIO_AF2);
  
 
     //init timer 3
@@ -259,35 +260,36 @@ void PWMLeftThreePhase::init()
     TIM_OCStruct.TIM_OutputState    = TIM_OutputState_Enable;
     TIM_OCStruct.TIM_OCPolarity     = TIM_OCPolarity_Low;
 
-    //HSA pwm, PC9, TIM3_CH4
+    //HSA pwm, PC6, TIM3_CH1
     TIM_OCStruct.TIM_Pulse = 0;
-    TIM_OC4Init(TIM3, &TIM_OCStruct);
-    TIM_OC4PreloadConfig(TIM3, TIM_OCPreload_Enable);
+    TIM_OC1Init(TIM3, &TIM_OCStruct);
+    TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
-    //HSB pwm, PC8, TIM3_CH3
-    TIM_OCStruct.TIM_Pulse = 0;
-    TIM_OC3Init(TIM3, &TIM_OCStruct);
-    TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
-
-    //HSC pwm, PC7, TIM3_CH2
+    //HSB pwm, PC7, TIM3_CH2
     TIM_OCStruct.TIM_Pulse = 0;
     TIM_OC2Init(TIM3, &TIM_OCStruct);
     TIM_OC2PreloadConfig(TIM3, TIM_OCPreload_Enable);
+
+    //HSC pwm, PC8, TIM3_CH3
+    TIM_OCStruct.TIM_Pulse = 0;
+    TIM_OC3Init(TIM3, &TIM_OCStruct);
+    TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
 
     //stop motor    
     this->set(0, 0, 0);
 
     //set enable to high, for all phases
-    Gpio<TGPIOA, 8, GPIO_MODE_OUT> enable;
+    Gpio<TGPIOC, 9, GPIO_MODE_OUT> enable;
     enable = 1;
 }
 
+
 void PWMLeftThreePhase::set(int32_t pwm_a, int32_t pwm_b, int32_t pwm_c)
 {
-    TIM3->CCR4 = pwm_a;
-    TIM3->CCR3 = pwm_b;
-    TIM3->CCR2 = pwm_c;
+    TIM3->CCR1 = pwm_a;
+    TIM3->CCR2 = pwm_b;
+    TIM3->CCR3 = pwm_c;
 }
 
 
@@ -295,9 +297,9 @@ void PWMLeftThreePhase::set(int32_t pwm_a, int32_t pwm_b, int32_t pwm_c)
 void PWMRightThreePhase::init()
 {
     //right motor PWM controll pins 
-    //PWMA      : PB8, TIM4_CH3
+    //PWMA      : PB6, TIM4_CH1
     //PWMB      : PB7, TIM4_CH2
-    //PWMC      : PB6, TIM4_CH1
+    //PWMC      : PB8, TIM4_CH3
     //enable    : PB9
 
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -305,7 +307,7 @@ void PWMRightThreePhase::init()
     RCC_APB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); 
 
     //init pins
-    GPIO_InitStruct.GPIO_Pin    = GPIO_Pin_8 | GPIO_Pin_7 | GPIO_Pin_6;
+    GPIO_InitStruct.GPIO_Pin    = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
     GPIO_InitStruct.GPIO_OType  = GPIO_OType_PP;
     GPIO_InitStruct.GPIO_PuPd   = GPIO_PuPd_NOPULL;
     GPIO_InitStruct.GPIO_Mode   = GPIO_Mode_AF;
@@ -313,9 +315,9 @@ void PWMRightThreePhase::init()
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     //alternating functions for pins 
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, GPIO_AF2);
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF2);
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF2);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF2);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, GPIO_AF2);
  
 
     //init timer 4
@@ -349,17 +351,17 @@ void PWMRightThreePhase::init()
     TIM_OCStruct.TIM_OutputState    = TIM_OutputState_Enable;
     TIM_OCStruct.TIM_OCPolarity     = TIM_OCPolarity_Low;
 
-    //HSA pwm, PC9, TIM4_CH4
+    //HSA pwm, PB6, TIM4_CH1
     TIM_OCStruct.TIM_Pulse = 0;
     TIM_OC3Init(TIM4, &TIM_OCStruct);
     TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);
 
-    //HSB pwm, PC8, TIM4_CH3
+    //HSB pwm, PB7, TIM4_CH2
     TIM_OCStruct.TIM_Pulse = 0;
     TIM_OC2Init(TIM4, &TIM_OCStruct);
     TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);
 
-    //HSC pwm, PC7, TIM4_CH2
+    //HSC pwm, PB8, TIM4_CH3
     TIM_OCStruct.TIM_Pulse = 0;
     TIM_OC1Init(TIM4, &TIM_OCStruct);
     TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
@@ -374,7 +376,7 @@ void PWMRightThreePhase::init()
 
 void PWMRightThreePhase::set(int32_t pwm_a, int32_t pwm_b, int32_t pwm_c)
 {
-    TIM4->CCR3 = pwm_a;
+    TIM4->CCR1 = pwm_a;
     TIM4->CCR2 = pwm_b;
-    TIM4->CCR1 = pwm_c;
+    TIM4->CCR3 = pwm_c;
 }

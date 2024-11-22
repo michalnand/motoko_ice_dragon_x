@@ -11,7 +11,7 @@
     
 
 #define MOTOR_CONTROL_MAX       ((int32_t)1024) 
-#define MOTOR_POLES             ((int32_t)14)
+#define MOTOR_POLES             ((int32_t)14)       
 
 #define SQRT3       ((int32_t)1773)      // sqrt(3)     = 1773/1024
 #define SQRT3INV    ((int32_t)591)       // 1/sqrt(3)   = 591/1024
@@ -102,7 +102,7 @@ void MotorControl::set_torque_from_rotation(int32_t torque, bool brake, uint32_t
     if (motor_id == 0)
     {
         left_pwm.set(b_pwm, a_pwm, c_pwm);
-    }
+    }   
     else    
     {
         right_pwm.set(a_pwm, b_pwm, c_pwm);
@@ -160,8 +160,11 @@ void MotorControl::init()
     //optimal control init 
 
     //LQR gain
-    float k  =  0.0097251;
-    float ki =  0.00032155;
+    //float k  =  0.0097251;
+    //float ki =  0.00032155;
+
+    float k  =  0.0001;
+    float ki =  0.00005;  
 
     left_controller.init(k, ki, 1.0);
     right_controller.init(k, ki, 1.0);
@@ -313,12 +316,14 @@ void MotorControl::callback()
 
     // cogging torque compensation 
     uint32_t theta;
-    float k = 0.01;  
+    float k = 0.01;     
     
     theta = (2*12*right_encoder.angle*MOTOR_POLES*SINE_TABLE_SIZE)/(2*ENCODER_RESOLUTION);
+    //theta = (2*9*right_encoder.angle*MOTOR_POLES*SINE_TABLE_SIZE)/(2*ENCODER_RESOLUTION);
     right_torque+= -(k*sin_tab(theta))/SINE_TABLE_MAX; 
 
     theta = (2*12*left_encoder.angle*MOTOR_POLES*SINE_TABLE_SIZE)/(2*ENCODER_RESOLUTION);
+    //theta = (2*9*left_encoder.angle*MOTOR_POLES*SINE_TABLE_SIZE)/(2*ENCODER_RESOLUTION);
     left_torque+= -(k*sin_tab(theta))/SINE_TABLE_MAX;   
 
     // scale -1...1 range into -MOTOR_CONTROL_MAX ... MOTOR_CONTROL_MAX
