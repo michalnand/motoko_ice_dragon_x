@@ -3,18 +3,19 @@ import cv2
 
 
 class Render:
-    def __init__(self, window_size, max_position_range = 1.0): 
+    def __init__(self, window_size, max_position_range = 1.0, video_file_name = None): 
 
               
         self.window_size        = window_size
         self.max_position_range = max_position_range
 
         self.video_writer = None
+        self.video_file_name = video_file_name
        
     
     def render(self, trajectory, robot, target_state, robot_path = None):
 
-        padding    = 100.0
+        padding    = 0.1
 
         self.min_x = trajectory.min_x - padding
         self.max_x = trajectory.max_x + padding
@@ -37,7 +38,7 @@ class Render:
 
                 cv2.circle(result_image, (x0, y0), 2, (0.9, 0.9, 0.9), -1)
             
-
+        
         # plot line key points
         n_keypoints = trajectory.key_points.shape[0]
         for n in range(n_keypoints):
@@ -58,17 +59,22 @@ class Render:
 
         
         # plot grid, 100mm
-        for y in range(0, round(self.max_y), 100):
-            for x in range(0, round(self.max_x), 100):
-                
-                x0, y0 = self._scale_position(x, y)
+        for y in range(0, round(self.max_y*1000), 100):
+            for x in range(0, round(self.max_x*1000), 100):
+                x0, y0 = self._scale_position(x/1000, y/1000)
                 cv2.circle(result_image, (x0, y0), 2, (0.0, 0.9, 0.0), -1)
         
         # plot target point
         x0 = target_state[0][0]
-        y0 = target_state[1][0]
+        y0 = target_state[0][1]
         x0, y0 = self._scale_position(x0, y0)
         cv2.circle(result_image, (x0, y0), 10, (1, 0, 0), -1)
+
+        for h in range(0, target_state.shape[0], 4):
+            x0 = target_state[h][0]
+            y0 = target_state[h][1]
+            x0, y0 = self._scale_position(x0, y0)
+            cv2.circle(result_image, (x0, y0), 2, (1, 0, 0), -1)
 
         if robot_path is not None:
             for n in range(len(robot_path) - 1):
@@ -86,14 +92,14 @@ class Render:
         cv2.imshow("visualisation", result_image)
         cv2.waitKey(1)
 
-        '''
-        if self.video_writer is None:
-            fourcc = cv2.VideoWriter_fourcc(*'XVID') 
-            self.video_writer = cv2.VideoWriter("video.mp4", fourcc, 50.0, (self.window_width, self.window_height)) 
-        else:
-            result_image = numpy.array(255*result_image, dtype=numpy.uint8)
-            self.video_writer.write(result_image) 
-        '''
+        if self.video_file_name is not None:
+            if self.video_writer is None:
+                fourcc = cv2.VideoWriter_fourcc(*'H264') 
+                self.video_writer = cv2.VideoWriter(self.video_file_name, fourcc, 50.0, (self.window_width, self.window_height)) 
+            else:
+                result_image = numpy.array(255*result_image, dtype=numpy.uint8)
+                self.video_writer.write(result_image) 
+            
      
     def _scale_position(self, x, y):
         x_out = self._scale(x, self.min_x, self.max_x, 0, self.window_width)

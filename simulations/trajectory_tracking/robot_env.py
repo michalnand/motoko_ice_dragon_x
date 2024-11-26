@@ -7,11 +7,13 @@ from render             import *
 import time
 
 class RobotEnv:
-    def __init__(self, robot : DifferentialRobot, trajectory : Trajectory):
+    def __init__(self, robot : DifferentialRobot, trajectory : Trajectory, horizon : int = 256, video_file_name = None):
         self.robot          = robot
         self.trajectory     = trajectory
-        self.renderer       = Render(700)
+        self.renderer       = Render(700, video_file_name=video_file_name)
+        self.horizon        = horizon
 
+        
         self.reset()
 
 
@@ -33,6 +35,8 @@ class RobotEnv:
 
         self.robot_path = []
 
+        self.target_state   = numpy.zeros((self.horizon, 2))
+
         return self.step(numpy.zeros([2, 1]))   
 
 
@@ -41,9 +45,9 @@ class RobotEnv:
 
 
     def step(self, u):
-        reach_threshold = 15.0
+        reach_threshold = 15.0*0.001
 
-        self.robot.forward( u)
+        self.robot.forward(u)
 
         # compute robot sensor position
         sensor_x = self.robot.x_pos + self.robot.sensors_distance*numpy.cos(self.robot.theta)
@@ -55,8 +59,10 @@ class RobotEnv:
         
         if dr < reach_threshold or ds < reach_threshold:
             self.target_x, self.target_y, self.min_idx = self._line_nearest(sensor_x, sensor_y)
-            
-        self.target_state   = numpy.array([[self.target_x], [self.target_y], [ds], [self.min_idx]])
+
+            for h in range(self.horizon):
+                idx = (self.min_idx + h)%self.trajectory.points.shape[0]
+                self.target_state[h] = self.trajectory.points[idx]
 
         if len(self.robot_path) > 10000:
             self.robot_path.pop(0)
@@ -68,7 +74,7 @@ class RobotEnv:
         return self.robot.x, self.robot.robot_state, self.target_state
 
 
-    def is_close_to_start(self, threshold = 10.0):
+    def is_close_to_start(self, threshold = 0.01):
         start_x = self.trajectory.points[0][0]
         start_y = self.trajectory.points[0][1]
         d = self._distance(start_x, start_y, self.robot.x_pos, self.robot.y_pos)

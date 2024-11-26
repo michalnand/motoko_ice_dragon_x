@@ -26,7 +26,7 @@ class Trajectory:
             dy = point_next[1] - point[1]
 
             
-            eps = 0.001
+            eps =  0.001
             if abs(dx) < eps or abs(dy) < eps:
                 x = point[0] + 0.02*dx
                 y = point[1] + 0.02*dy
@@ -41,16 +41,8 @@ class Trajectory:
                 result.append([x, y])
             
 
-        # convert to mm
-        self.key_points = 10.0*numpy.array(result, dtype=numpy.float32)
-
-        # scaling information
-        self.min_x = numpy.min(self.key_points[:, 0])
-        self.max_x = numpy.max(self.key_points[:, 0])
-
-        self.min_y = numpy.min(self.key_points[:, 1])
-        self.max_y = numpy.max(self.key_points[:, 1])
-
+        self.key_points = numpy.array(result, dtype=numpy.float32)
+      
         
         n_key_points = self.key_points.shape[0]
 
@@ -94,60 +86,21 @@ class Trajectory:
 
             n+=1
         
-        '''
-        n = 0
-        while n < n_key_points:
-            
-            polynome_order = 3
-
-            xp = numpy.zeros(polynome_order)
-            yp = numpy.zeros(polynome_order)
-            for i in range(polynome_order):
-                xp[i] = self.key_points[(n+i)%n_key_points, 0]
-                yp[i] = self.key_points[(n+i)%n_key_points, 1]
-
-            xc, yc, r = self._find_circle(xp[0], yp[0], xp[1], yp[1], xp[2], yp[2])
-
-            dx = xp[0] - xp[1]
-            dy = yp[0] - yp[1]
-
-          
-            # straight line segment
-            #if abs(dx) < 10**-3 or abs(dy) < 10**-3:
-            if r > 10**6:
-                
-                d_max = 200
-                for i in range(int(d_max)):
-                    t = i/d_max
-
-                    x, y = self._line_fit(xp[0], yp[0], xp[1], yp[1], t)
-                
-                    self.points.append([x, y])
-
-                n+=1
-            else:   
-            # circle segment
-                angle_start = self._find_angle(xp[0] - xc, yp[0] - yc)
-                angle_end   = self._find_angle(xp[2] - xc, yp[2] - yc)
-
-               
-                d_max = 200
-                for i in range(int(d_max)):
-                    t = i/d_max
-                    t = (1.0 - t)*angle_start + t*angle_end
-
-                    x, y = self._circle_fit(xc, yc, r, t)
-                
-                    self.points.append([x, y])
-
-                n+=2
-
-            '''
-
+       
         self.points = numpy.array(self.points)
-    
 
+        # convert from cm to m
+        self.key_points = 0.01*numpy.array(self.key_points, dtype=numpy.float32)
+        self.points     = 0.01*numpy.array(self.points, dtype=numpy.float32)
 
+        # scaling information
+        self.min_x = numpy.min(self.key_points[:, 0])
+        self.max_x = numpy.max(self.key_points[:, 0])
+
+        self.min_y = numpy.min(self.key_points[:, 1])
+        self.max_y = numpy.max(self.key_points[:, 1])
+
+      
     def _find_circle(self, x0, y0, x1, y1, x2, y2):
         # Form the matrices to solve the linear system
         A = numpy.array([
