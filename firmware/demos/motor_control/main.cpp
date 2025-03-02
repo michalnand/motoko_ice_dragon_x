@@ -32,12 +32,12 @@ int main()
 
 
 
-    float velocities[] = {0, 50, 100, 400, 1000};   
+    float velocities[] = {0, 50, 100, 400, 1000, 2000};   
 
     uint32_t steps = 0;        
     while (true)    
     {
-        uint32_t idx = (steps/50)%5;    
+        uint32_t idx = (steps/50)%6;    
 
         float req_velocity = velocities[idx];
 

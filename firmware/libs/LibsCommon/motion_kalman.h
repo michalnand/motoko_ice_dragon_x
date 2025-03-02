@@ -6,10 +6,11 @@ class MotionKalman
 {
     public:
         void init(float k0, float k1, float dt);
-        void step(float position_measurement);
+        void step(float x);
 
     private:
         float k0, k1, dt;
+        float x0, x1;
 
     public:
         float position_hat, velocity_hat;
@@ -17,5 +18,4 @@ class MotionKalman
 
 
 #endif
-
 

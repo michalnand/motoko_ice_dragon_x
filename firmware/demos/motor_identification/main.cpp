@@ -16,9 +16,6 @@ int main()
 
     while (true)      
     {
-        float position = motor_control.get_right_position()*180.0/PI;
-        float rpm      = motor_control.get_right_velocity()*60/(2.0*PI);    
-        terminal << position << " " << rpm << " " << "\n";
         timer.delay_ms(500);
     }
 

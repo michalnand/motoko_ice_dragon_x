@@ -128,19 +128,16 @@ void MotorControl::init()
     left_pwm.init();
     right_pwm.init();
 
-  
-    //float k0 = 0.13834194; 
-    //float k1 = 4.11593085;
+   
+    float k0 = 0.25;
+    float k1 = 0.05;
 
-    float k0 = 0.37552931; 
-    float k1 = 35.03939676;
+    left_kf.init(k0, k1,  0.000001*MOTOR_CONTROL_DT);
+    right_kf.init(k0, k1, 0.000001*MOTOR_CONTROL_DT);
 
     
 
-
-    left_kf.init(k0, k1,  MOTOR_CONTROL_DT/1000000.0);
-    right_kf.init(k0, k1, MOTOR_CONTROL_DT/1000000.0);
-
+  
     // set motors to zero position
     set_torque_from_rotation(500, true, 0, 0);
     set_torque_from_rotation(500, true, 0, 1);
@@ -148,7 +145,7 @@ void MotorControl::init()
     timer.delay_ms(200);
 
     // calibrate encoders   
-    left_encoder.init();
+    left_encoder.init(); 
     right_encoder.init();
 
     // release motors
@@ -160,15 +157,20 @@ void MotorControl::init()
     //optimal control init 
 
     //LQR gain
-    //float k  =  0.0097251;
-    //float ki =  0.00032155;
+    // Q = 1, R = 10**8
+    float k   = 0.00416284;
+    float ki  = 0.00010114;
 
-    float k  =  0.0001;
-    float ki =  0.00005;  
+    // Q = 1, R = 10**7
+    //float k   = 0.00884392;
+    //float ki  = 0.00032381;
+
+ 
 
     left_controller.init(k, ki, 1.0);
     right_controller.init(k, ki, 1.0);
 
+    
     //init timer
     timer_init();
 }
@@ -239,6 +241,7 @@ int32_t MotorControl::get_left_encoder()
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_left_position()
 {
+    //return -left_kf.position_hat;
     return -left_kf.position_hat;
 }
 

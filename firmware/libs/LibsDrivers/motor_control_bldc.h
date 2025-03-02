@@ -85,7 +85,6 @@ class MotorControl
         MotionKalman left_kf;   
         MotionKalman right_kf;
 
-  
         //motor PWM control
         PWMLeftThreePhase     left_pwm;
         PWMRightThreePhase    right_pwm;
