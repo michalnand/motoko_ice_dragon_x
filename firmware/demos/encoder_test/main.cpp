@@ -15,7 +15,7 @@ int main()
 
     while (true)
     {
-        led = 1;
+        led = 1; 
 
         // convert wheel angle from radians to degrees and print
         terminal << "encoder sensor\n";

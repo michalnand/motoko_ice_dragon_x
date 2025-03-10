@@ -40,7 +40,7 @@ float LQRSingle::step(float xr, float x)
 
     this->integral_action = integral_action_new - (u_new - u);
     
-    return u;
+    return u;   
 }
 
 void LQRSingle::reset()

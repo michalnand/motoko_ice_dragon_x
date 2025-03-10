@@ -4,6 +4,7 @@
         "__locale": "cpp",
         "istream": "cpp",
         "ostream": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "concepts": "cpp"
     }
 }

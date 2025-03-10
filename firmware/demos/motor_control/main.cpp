@@ -10,31 +10,59 @@ int main()
     // wait for key press
     int key_result = button();
 
-    /*
-    
-    motor_control.set_left_velocity(1*(2.0*PI)/60.0);
-    motor_control.set_right_velocity(1*(2.0*PI)/60.0);
+
+    float speed_max = 2000;
+    float speed     = 0;
+
+    while (true)    
+    {   
+        motor_control.set_left_velocity(60*(2.0*PI)/60.0);
+        motor_control.set_right_velocity(60*(2.0*PI)/60.0);
+        timer.delay_ms(5000);   
+
+        motor_control.set_left_velocity(0*(2.0*PI)/60.0);
+        motor_control.set_right_velocity(0*(2.0*PI)/60.0);
+        timer.delay_ms(500);
+
+        for (float speed = 0; speed < speed_max; speed+=1.0)
+        {
+            motor_control.set_left_velocity(speed*(2.0*PI)/60.0);
+            motor_control.set_right_velocity(speed*(2.0*PI)/60.0);
+            timer.delay_ms(1);
+        }   
+
+        timer.delay_ms(1000);
+
+        motor_control.set_left_velocity(0*(2.0*PI)/60.0);
+        motor_control.set_right_velocity(0*(2.0*PI)/60.0);
+
+        timer.delay_ms(500);    
 
 
-    while (true)
-    {
-        // convert wheel angle from radians to degrees and print
-        terminal << "encoder sensor\n";
-        terminal << "right " << motor_control.get_right_encoder() << " " << motor_control.get_right_position()*(float)(180.0/PI) << " " << motor_control.get_right_velocity()*(float)(180.0/PI) << "\n";
-        terminal << "left  " << motor_control.get_left_encoder() << " " <<  motor_control.get_left_position()*(float)(180.0/PI) << " " << motor_control.get_left_velocity()*(float)(180.0/PI) << "\n";
-        terminal << "\n\n";
 
-        terminal << "\n\n";
+        for (float speed = 0; speed < speed_max; speed+=10)
+        {
+            motor_control.set_left_velocity(speed*(2.0*PI)/60.0);
+            motor_control.set_right_velocity(speed*(2.0*PI)/60.0);
+            timer.delay_ms(1);
+        }
 
-        timer.delay_ms(200);
+        timer.delay_ms(1000);
+
+        motor_control.set_left_velocity(0*(2.0*PI)/60.0);
+        motor_control.set_right_velocity(0*(2.0*PI)/60.0);
+
+        timer.delay_ms(500);
     }
-    */
+
+      
+   
 
 
+    /*
+    float velocities[] = {0, 10, 50, 100, 400, 1000};   
 
-    float velocities[] = {0, 50, 100, 400, 1000, 2000};   
-
-    uint32_t steps = 0;        
+    uint32_t steps = 0;           
     while (true)    
     {
         uint32_t idx = (steps/50)%6;    
@@ -95,6 +123,7 @@ int main()
 
         steps++;
     }
+    */
 
     return 0;
 }

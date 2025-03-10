@@ -1,11 +1,13 @@
 #include "clock.h"
 
 extern uint32_t SystemCoreClock;
+uint32_t APB1Clock;
 
 
 void SetSysClock216(uint32_t hse_freq)
 {
   SystemCoreClock = 216000000;
+  APB1Clock       = 108000000;//108000000;
 
   RCC_HSEConfig(RCC_HSE_ON);
 
@@ -56,6 +58,7 @@ void SetSysClock216(uint32_t hse_freq)
 void SetSysClock312(uint32_t hse_freq)
 {
   SystemCoreClock = 320000000;
+  APB1Clock       = 108000000;
   
   RCC_HSEConfig(RCC_HSE_ON);
 
@@ -113,4 +116,8 @@ void SetSysClock(uint32_t mode)
 
   //SystemCoreClockUpdate();
 }
+
+
+
+
 

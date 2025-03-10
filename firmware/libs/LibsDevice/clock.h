@@ -8,13 +8,14 @@
 #define SysClok216_24HSE   ((uint32_t)2)
 #define SysClok312_24HSE   ((uint32_t)3)
  
+extern uint32_t APB1Clock;
 
 void SetSysClock(uint32_t mode = SysClok216_8HSE);
 
 
 inline uint32_t timer_period(uint32_t dt_us)
 {
-    return ((SystemCoreClock/1000)*dt_us)/1000 + 1;
+    return ((APB1Clock/1000000)*dt_us) + 1;
 }
 
 #endif

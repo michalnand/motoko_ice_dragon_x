@@ -6,15 +6,30 @@ class MotionKalman
 {
     public:
         void init(float k0, float k1, float dt);
-        void step(float x);
+        void step(float position_measurement);
 
     private:
         float k0, k1, dt;
-        float x0, x1;
 
     public:
         float position_hat, velocity_hat;
 };
+
+
+class MotionFilterEMA
+{
+    public:
+        void init(float k0, float k1, float k2, float dt);
+        void step(float position_measurement);
+
+    private:
+        float k0, k1, k2;
+        float dt;
+
+    public:
+        float position_hat, velocity_hat, position_hat_smooth;
+};
+
 
 
 #endif

@@ -5,10 +5,15 @@
 
 #include <motion_kalman.h>
 #include <lqr_single.h>
+#include <lqg_single.h>
 
 #include <fmath.h>
 
 #include <as5600_t.h>
+
+//dt step in microseconds, 4kHz, 250uS
+#define MOTOR_CONTROL_DT    ((uint32_t)250)
+
 
 class MotorControl     
 {   
@@ -28,6 +33,7 @@ class MotorControl
         void set_left_velocity(float left_velocity);
         void set_right_velocity(float right_velocity);
 
+
         // force break to both motors
         void halt();
 
@@ -44,10 +50,10 @@ class MotorControl
         float get_left_position();
 
         // wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
-        float get_left_velocity();
+        float get_left_velocity();  
 
         //return kalman filtered velocity
-        float get_left_velocity_fil();
+        float get_left_position_smooth();
 
 
         // raw right encoder steps reading
@@ -60,7 +66,7 @@ class MotorControl
         float get_right_velocity();
 
         //return kalman filtered velocity
-        float get_right_velocity_fil();
+        float get_right_position_smooth();
 
     public:
         // called by timer interrupt, for closed loop control handling
@@ -82,16 +88,25 @@ class MotorControl
         AS5600T<11, 10, 2, TGPIOC, TGPIOC> left_encoder;
         AS5600T<5, 12, 2,  TGPIOB, TGPIOC> right_encoder;
 
-        MotionKalman left_kf;   
-        MotionKalman right_kf;
+        //MotionKalman left_kf;   
+        //MotionKalman right_kf;    
 
+        MotionFilterEMA left_kf;    
+        MotionFilterEMA right_kf;
+        
         //motor PWM control
         PWMLeftThreePhase     left_pwm;
         PWMRightThreePhase    right_pwm;
 
         //single input, single output motor speed controller
-        LQRSingle left_controller;
-        LQRSingle right_controller;   
+        //LQRSingle left_controller;
+        //LQRSingle right_controller;   
+
+        LQGSingle left_controller;
+        LQGSingle right_controller;   
+
+    public:
+        uint32_t steps;
 };
 
 
