@@ -72,7 +72,7 @@ void MotorControl::init()
     
     float k0 = 0.3;
     float k1 = 0.3;  
-    float k2 = 0.05;        
+    float k2 = 0.2;        
 
     left_kf.init(k0, k1, k2,  0.000001*MOTOR_CONTROL_DT);
     right_kf.init(k0, k1, k2, 0.000001*MOTOR_CONTROL_DT);
