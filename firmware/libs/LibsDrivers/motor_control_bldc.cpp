@@ -71,8 +71,8 @@ void MotorControl::init()
 
     
     float k0 = 0.3;
-    float k1 = 0.3;  
-    float k2 = 0.2;        
+    float k1 = 1.0;  
+    float k2 = 1.0;        
 
     left_kf.init(k0, k1, k2,  0.000001*MOTOR_CONTROL_DT);
     right_kf.init(k0, k1, k2, 0.000001*MOTOR_CONTROL_DT);
@@ -105,14 +105,22 @@ void MotorControl::init()
     right_controller.init(k, ki, 1.0);
     */
 
+    /*
     // Q = 1, R = 4*(10**7)
-
     float a =  0.98230088;
     float b =  5.91150442;
 
     float k  = 0.00492188;
     float ki = 0.00015583;
     float f  = 0.03502382;
+    */
+
+    float a =  0.98147325;
+    float b =  5.60662146;
+
+    float k  =  0.00491353;
+    float ki =  0.00015595;
+    float f  =  0.14402203;
 
     left_controller.init(a, b, k, ki, f, 1.0);
     right_controller.init(a, b, k, ki, f, 1.0);

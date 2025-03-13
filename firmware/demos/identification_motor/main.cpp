@@ -11,15 +11,14 @@ int main()
     // wait for key press
     int key_result = button();
 
-
-    motor_control.set_left_torque(0.2); 
     timer.delay_ms(500);      
 
+    /*
     float k      = 0.05;
     float x_mean = 0.0;
     float x_var  = 0.0; 
 
-    while (true)        
+    while (true)         
     {
         float x = motor_control.get_left_velocity();
 
@@ -32,7 +31,7 @@ int main()
 
         timer.delay_ms(20);
     }
-    
+    */
 
     motor_identification();
 

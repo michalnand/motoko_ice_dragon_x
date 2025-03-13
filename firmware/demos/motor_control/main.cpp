@@ -14,7 +14,7 @@ int main()
     float speed_max = 2000;
     float speed     = 0;
 
-    while (true)    
+    while (true)        
     {   
         motor_control.set_left_velocity(60*(2.0*PI)/60.0);
         motor_control.set_right_velocity(60*(2.0*PI)/60.0);
