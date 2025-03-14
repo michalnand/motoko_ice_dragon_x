@@ -69,8 +69,8 @@ int main()
         float angle_req     = req_angle[idx]*PI/180.0;
 
         // estimate current state 
-        float right_position = motor_control.get_right_position_smooth();
-        float left_position  = motor_control.get_left_position_smooth();
+        float right_position = motor_control.get_right_position();
+        float left_position  = motor_control.get_left_position();
 
         distance_prev = distance;   
         distance      = 0.25*(right_position + left_position)*WHEEL_DIAMETER;

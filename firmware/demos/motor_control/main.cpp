@@ -16,6 +16,10 @@ int main()
 
     while (true)        
     {   
+        motor_control.set_left_velocity(10*(2.0*PI)/60.0);
+        motor_control.set_right_velocity(10*(2.0*PI)/60.0);
+        timer.delay_ms(5000);   
+
         motor_control.set_left_velocity(60*(2.0*PI)/60.0);
         motor_control.set_right_velocity(60*(2.0*PI)/60.0);
         timer.delay_ms(5000);   

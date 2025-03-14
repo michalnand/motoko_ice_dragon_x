@@ -33,21 +33,65 @@ void PositionControl::init()
     g_position_control_ptr = this;
 
     steps = 0;
-
-
+    
+    /*
     float k[] = {
-		0.00572061, 0.0, 0.046557743, 0.0, 
-		0.0, 0.8032104, 0.0, 0.40694702 };
+        0.005961399, 0.0, 0.059124652, 0.0, 
+        0.0, 1.0792116, 0.0, 7.8914046 };
 
     float ki[] = {
-		9.798994e-05, 0.0, 0.0, 0.0, 
-		0.0, 0.042236537, 0.0, 0.0 };
+            9.801003e-05, 0.0, 0.0, 0.0, 
+            0.0, 0.04217059, 0.0, 0.0 };
+    */
+
+    float k[] = {
+		0.005961399, 0.0, 0.059124652, 0.0, 
+		0.0, 1.0792116, 0.0, 7.8914046 };
+
+    float ki[] = {
+		9.801003e-05, 0.0, 0.0, 0.0, 
+		0.0, 0.04217059, 0.0, 0.0 };
+
+    controller.init(k, ki, 1.0);
+    
 
 
-    lqr.init(k, ki, 1.0);         
 
-    //turn_pid.init(50, 2.0, 4.0,    2000*(2.0*PI)/60.0, 500*(2.0*PI)/60.0);
-    //forward_pid.init(10, 2.0, 4.0, 2000*(2.0*PI)/60.0, 1*(2.0*PI)/60.0);   
+    /*
+    float a[] = {
+		1.0, 0.0, 1.0, 0.0, 
+		0.0, 1.0, 0.0, 1.0, 
+		0.0, 0.0, 0.9189645, 0.0, 
+		0.0, 0.0, 0.0, 0.92 };
+
+    float b[] = {
+            0.0, 0.0, 
+            0.0, 0.0, 
+            0.679863, 0.0, 
+            0.0, 0.014874454 };
+
+    float c[] = {
+            1.0, 0.0, 0.0, 0.0, 
+            0.0, 1.0, 0.0, 0.0, 
+            0.0, 0.0, 1.0, 0.0, 
+            0.0, 0.0, 0.0, 1.0 };
+
+    float k[] = {
+            0.005961399, 0.0, 0.059124652, 0.0, 
+            0.0, 1.0792116, 0.0, 7.8914046 };
+
+    float ki[] = {
+            9.801003e-05, 0.0, 0.0, 0.0, 
+            0.0, 0.04217059, 0.0, 0.0 };
+
+    float f[] = {
+            0.3603361, 0.0, 0.13288806, 0.0, 
+            0.0, 0.36056542, 0.0, 0.1332538, 
+            0.06644403, 0.0, 0.13166018, 0.0, 
+            0.0, 0.0666269, 0.0, 0.13192691 };
+
+    controller.init(a, b, k, ki, f, 1.0);
+    */
 
     this->distance_prev = 0.0;
     this->distance      = 0.0;
@@ -60,10 +104,10 @@ void PositionControl::init()
 
 void PositionControl::set_single_point(float distance, float angle)
 {
-    lqr.xr[0] = distance;
-    lqr.xr[1] = angle;
-    lqr.xr[2] = 0;
-    lqr.xr[3] = 0;
+    controller.xr[0] = distance;
+    controller.xr[1] = angle;
+    controller.xr[2] = 0;
+    controller.xr[3] = 0;
 }
 
 
@@ -83,19 +127,19 @@ void PositionControl::callback()
 
     
     // update current state 
-    lqr.x[0] = this->distance;
-    lqr.x[1] = this->angle;     
-    lqr.x[2] = (this->distance  - this->distance_prev);
-    lqr.x[3] = (this->angle     - this->angle_prev);
+    controller.x[0] = this->distance;
+    controller.x[1] = this->angle;     
+    controller.x[2] = (this->distance  - this->distance_prev);
+    controller.x[3] = (this->angle     - this->angle_prev);
 
 
 
     // compute controller output
-    lqr.step();    
-    
+    controller.step();    
+
     // send to motors
-    float u_forward  = lqr.u[0];
-    float u_turn     = lqr.u[1];    
+    float u_forward  = controller.u[0];
+    float u_turn     = controller.u[1];    
 
     float u_right = u_forward + u_turn;
     float u_left  = u_forward - u_turn;
@@ -111,22 +155,22 @@ void PositionControl::callback()
 
 float PositionControl::get_distance()
 {
-    return lqr.x[0];
+    return controller.x[0];
 }
 
 float PositionControl::get_angle()
 {
-    return lqr.x[1];
+    return controller.x[1];
 }
 
 float PositionControl::get_velocity()
 {
-    return lqr.x[2];
+    return controller.x[2];
 }
 
 float PositionControl::get_angular_velocity()
 {
-    return lqr.x[3];
+    return controller.x[3];
 }
 
 

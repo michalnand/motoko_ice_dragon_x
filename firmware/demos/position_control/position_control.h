@@ -2,8 +2,9 @@
 #define _POSITION_CONTROL_H_
 
 #include <stdint.h>
-#include "lqr.h"
 
+#include "lqr.h"
+#include "lqg.h"
 
 // 4000us period = 250Hz loop
 #define POSITION_CONTROL_DT     ((uint32_t)4000)
@@ -32,7 +33,8 @@ class PositionControl
         void timer_init();
     
     private:
-        LQR<4, 2> lqr;
+        LQR<4, 2> controller;   
+        //LQG<4, 2> controller;   
 
     public:
         float distance_prev;
