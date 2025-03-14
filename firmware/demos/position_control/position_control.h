@@ -17,7 +17,7 @@ class PositionControl
 {
     public:
         void init();
-        void set_single_point(float distance, float angle);
+        void set_desired(float distance, float angle);
 
         float get_distance();
         float get_angle();

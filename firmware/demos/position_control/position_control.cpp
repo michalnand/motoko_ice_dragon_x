@@ -102,7 +102,7 @@ void PositionControl::init()
     timer_init();        
 }
 
-void PositionControl::set_single_point(float distance, float angle)
+void PositionControl::set_desired(float distance, float angle)
 {
     controller.xr[0] = distance;
     controller.xr[1] = angle;

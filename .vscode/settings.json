@@ -5,6 +5,12 @@
         "istream": "cpp",
         "ostream": "cpp",
         "locale": "cpp",
-        "concepts": "cpp"
+        "concepts": "cpp",
+        "__bit_reference": "cpp",
+        "bitset": "cpp",
+        "iterator": "cpp",
+        "initializer_list": "cpp",
+        "string": "cpp",
+        "string_view": "cpp"
     }
 }

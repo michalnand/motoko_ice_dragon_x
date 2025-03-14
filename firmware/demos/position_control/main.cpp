@@ -71,7 +71,7 @@ int main()
         float angle    = position_control.get_angle()*180.0/PI;
 
 
-        position_control.set_single_point(req_distance, req_angle);
+        position_control.set_desired(req_distance, req_angle);
 
         terminal << "### json\n";
         terminal << "{\"data\" : [ ";   
