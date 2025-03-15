@@ -33,70 +33,49 @@ void PositionControl::init()
     g_position_control_ptr = this;
 
     steps = 0;
-    
+
+   
     /*
     float k[] = {
-        0.005961399, 0.0, 0.059124652, 0.0, 
-        0.0, 1.0792116, 0.0, 7.8914046 };
+        0.004603517, 0.0, 0.047634, 0.0, 
+        0.0, 0.38443515, 0.0, 0.6943304 };
 
     float ki[] = {
-            9.801003e-05, 0.0, 0.0, 0.0, 
-            0.0, 0.04217059, 0.0, 0.0 };
+        3.213074e-05, 0.0, 0.0, 0.0, 
+        0.0, 0.003268575, 0.0, 0.0 };
     */
 
+    /*
     float k[] = {
-		0.005961399, 0.0, 0.059124652, 0.0, 
-		0.0, 1.0792116, 0.0, 7.8914046 };
+		0.0070337835, 0.0, 0.067990825, 0.0, 
+		0.0, 0.4941195, 0.0, 0.8762817 };
 
     float ki[] = {
-		9.801003e-05, 0.0, 0.0, 0.0, 
-		0.0, 0.04217059, 0.0, 0.0 };
+		0.000102285114, 0.0, 0.0, 0.0, 
+		0.0, 0.010422436, 0.0, 0.0 };
+    */
+
+    
+
+    float k[] = {
+		0.0036761067, 0.0, 0.03920686, 0.0, 
+		0.0, 0.34483215, 0.0, 0.62740767 };
+
+    float ki[] = {
+		1.01324e-05, 0.0, 0.0, 0.0, 
+		0.0, 0.001030422, 0.0, 0.0 };
+    
 
     controller.init(k, ki, 1.0);
     
-
-
-
-    /*
-    float a[] = {
-		1.0, 0.0, 1.0, 0.0, 
-		0.0, 1.0, 0.0, 1.0, 
-		0.0, 0.0, 0.9189645, 0.0, 
-		0.0, 0.0, 0.0, 0.92 };
-
-    float b[] = {
-            0.0, 0.0, 
-            0.0, 0.0, 
-            0.679863, 0.0, 
-            0.0, 0.014874454 };
-
-    float c[] = {
-            1.0, 0.0, 0.0, 0.0, 
-            0.0, 1.0, 0.0, 0.0, 
-            0.0, 0.0, 1.0, 0.0, 
-            0.0, 0.0, 0.0, 1.0 };
-
-    float k[] = {
-            0.005961399, 0.0, 0.059124652, 0.0, 
-            0.0, 1.0792116, 0.0, 7.8914046 };
-
-    float ki[] = {
-            9.801003e-05, 0.0, 0.0, 0.0, 
-            0.0, 0.04217059, 0.0, 0.0 };
-
-    float f[] = {
-            0.3603361, 0.0, 0.13288806, 0.0, 
-            0.0, 0.36056542, 0.0, 0.1332538, 
-            0.06644403, 0.0, 0.13166018, 0.0, 
-            0.0, 0.0666269, 0.0, 0.13192691 };
-
-    controller.init(a, b, k, ki, f, 1.0);
-    */
 
     this->distance_prev = 0.0;
     this->distance      = 0.0;
     this->angle_prev    = 0.0;
     this->angle         = 0.0;
+
+    this->u_forward     = 0.0;
+    this->u_turn        = 0.0;
 
 
     timer_init();        
@@ -114,11 +93,12 @@ void PositionControl::set_desired(float distance, float angle)
 
 void PositionControl::callback()
 {   
+    /*
     //estimate current state 
     float right_position = motor_control.get_right_position_smooth();
     float left_position  = motor_control.get_left_position_smooth();
-
     
+
     this->distance_prev = this->distance;   
     this->distance      = 0.25*(right_position + left_position)*WHEEL_DIAMETER;
 
@@ -131,18 +111,45 @@ void PositionControl::callback()
     controller.x[1] = this->angle;     
     controller.x[2] = (this->distance  - this->distance_prev);
     controller.x[3] = (this->angle     - this->angle_prev);
+    */
 
+    //estimate current state 
+    float right_position = motor_control.get_right_position_smooth();
+    float left_position  = motor_control.get_left_position_smooth();
+    
+    //float right_velocity = (motor_control.get_right_velocity_smooth()*MOTOR_CONTROL_DT)/POSITION_CONTROL_DT;
+    //float left_velocity  = (motor_control.get_left_velocity_smooth()*MOTOR_CONTROL_DT)/POSITION_CONTROL_DT;
+    
+    float right_velocity = motor_control.get_right_velocity_smooth()*MOTOR_CONTROL_DT*0.000001f;   
+    float left_velocity  = motor_control.get_left_velocity_smooth()*MOTOR_CONTROL_DT*0.000001f;
+    
+
+    this->distance      = 0.25*(right_position + left_position)*WHEEL_DIAMETER;
+    this->angle         = 0.5*(right_position - left_position)*WHEEL_DIAMETER / WHEEL_BRACE;
+
+    float velocity      = 0.25*(right_velocity + left_velocity)*WHEEL_DIAMETER;
+    float angular_rate  = 0.5*(right_velocity - left_velocity)*WHEEL_DIAMETER / WHEEL_BRACE;
+
+    
+    // update current state 
+    controller.x[0] = this->distance;
+    controller.x[1] = this->angle;     
+    controller.x[2] = velocity;
+    controller.x[3] = angular_rate;
 
 
     // compute controller output
     controller.step();    
 
     // send to motors
-    float u_forward  = controller.u[0];
+    float u_forward  = 0*controller.u[0];
     float u_turn     = controller.u[1];    
 
-    float u_right = u_forward + u_turn;
-    float u_left  = u_forward - u_turn;
+    float u_right   = u_forward + u_turn;
+    float u_left    = u_forward - u_turn;
+
+    this->u_forward = u_forward;
+    this->u_turn    = u_turn;
 
     float max_rpm = 2000;
 
@@ -171,6 +178,17 @@ float PositionControl::get_velocity()
 float PositionControl::get_angular_velocity()
 {
     return controller.x[3];
+}
+
+
+float PositionControl::get_u_forward()
+{
+    return this->u_forward;
+}
+
+float PositionControl::get_u_turn()
+{
+    return this->u_turn;
 }
 
 

@@ -52,8 +52,9 @@ class MotorControl
         // wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
         float get_left_velocity();  
 
-        //return kalman filtered velocity
+        //return more filtered position and velocity
         float get_left_position_smooth();
+        float get_left_velocity_smooth();
 
 
         // raw right encoder steps reading
@@ -65,8 +66,9 @@ class MotorControl
         // wheel angular velocity, 2PI is equal to one full forward rotation per second, -2PI for backward
         float get_right_velocity();
 
-        //return kalman filtered velocity
+        //return more filtered position and velocity
         float get_right_position_smooth();
+        float get_right_velocity_smooth();
 
     public:
         // called by timer interrupt, for closed loop control handling
@@ -85,25 +87,20 @@ class MotorControl
         float left_req_velocity, right_req_velocity;
 
 
-        AS5600T<11, 10, 2, TGPIOC, TGPIOC> left_encoder;
         AS5600T<5, 12, 2,  TGPIOB, TGPIOC> right_encoder;
+        AS5600T<11, 10, 2, TGPIOC, TGPIOC> left_encoder;
 
-        //MotionKalman left_kf;   
-        //MotionKalman right_kf;    
-
-        MotionFilterEMA left_kf;    
-        MotionFilterEMA right_kf;
+      
+        MotionFilterEMA right_filter, left_filter;    
+        MotionFilterEMA right_filter_smooth, left_filter_smooth;    
         
         //motor PWM control
-        PWMLeftThreePhase     left_pwm;
         PWMRightThreePhase    right_pwm;
+        PWMLeftThreePhase     left_pwm;
 
-        //single input, single output motor speed controller
-        //LQRSingle left_controller;
-        //LQRSingle right_controller;   
-
-        LQGSingle left_controller;
         LQGSingle right_controller;   
+        LQGSingle left_controller;
+
 
     public:
         uint32_t steps;

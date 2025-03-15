@@ -26,24 +26,21 @@ void MotionKalman::step(float position_measurement)
 
 
 
-void MotionFilterEMA::init(float k0, float k1, float k2, float dt)
+void MotionFilterEMA::init(float k0, float k1, float dt)
 {
     this->k0 = k0;
     this->k1 = k1;
-    this->k2 = k2;
     
     this->dt = dt;
     
-    this->position_hat          = 0.0;
-    this->velocity_hat          = 0.0;
-    this->position_hat_smooth   = 0.0;      
+    this->position_hat = 0.0;
+    this->velocity_hat = 0.0;
 }
 
 void MotionFilterEMA::step(float position_measurement)  
 {
     float position_hat_new          = (1.0 - this->k0)*this->position_hat        + this->k0*position_measurement;
     float velocity_hat_new          = (1.0 - this->k1)*this->velocity_hat        + this->k1*(position_hat_new - this->position_hat)/this->dt;
-    this->position_hat_smooth       = (1.0 - this->k2)*this->position_hat_smooth + this->k2*position_measurement;
 
     this->position_hat              = position_hat_new;
     this->velocity_hat              = velocity_hat_new;

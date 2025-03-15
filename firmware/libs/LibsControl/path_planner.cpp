@@ -6,11 +6,11 @@ void PathPlanner::init()
     
     this->dt = POSITION_CONTROL_DT*0.000001f;
     
-    this->v_max     = 1.0f;
-    this->w_max     = 1.0f;
+    this->v_max     = 1000.0;
+    this->w_max     = 3600.0*PI/180.0;
 
-    this->a_max     = 1.0f;
-    this->o_max     = 1.0f;            
+    this->a_max     = 10000.0;
+    this->o_max     = 10000.0;            
 }
         
 /*
@@ -33,7 +33,8 @@ void PathPlanner::line_following(float desired_velocity, float desired_angle)
     float v_new = v + delta_v;
     
     // Compute the new reference position using trapezoidal integration.
-    float x_ref = x + 0.5 * (v + v_new) * dt;
+    //float x_ref = x + 0.5 * (v + v_new) * dt;
+    float x_ref = x + v_new * dt;
 
     // send to controller
     position_contol.set_desired(x_ref, desired_angle);
@@ -45,10 +46,10 @@ void PathPlanner::line_following(float desired_velocity, float desired_angle)
 void PathPlanner::point_following(float x_d, float a_d)
 {
     float x = position_contol.get_distance();
-    float v = position_contol.get_velocity();
+    float v = position_contol.get_velocity()/dt;
 
     float a = position_contol.get_angle();
-    float w = position_contol.get_angular_velocity();
+    float w = position_contol.get_angular_velocity()/dt;
 
     // Compute required velocity and angular rate to reach the desired state
     float v_req = (x_d - x) / dt; 
@@ -59,17 +60,30 @@ void PathPlanner::point_following(float x_d, float a_d)
     w_req = clip(w_req, -w_max, w_max);
 
     // Compute acceleration and angular acceleration limits
-    float delta_v = clip(v_req - v, -a_max * dt, a_max * dt);
-    float delta_w = clip(w_req - w, -o_max * dt, o_max * dt);
+    //float delta_v = clip(v_req - v, -a_max * dt, a_max * dt);
+    //float delta_w = clip(w_req - w, -o_max * dt, o_max * dt);
+
+    float delta_v = v_req - v;
+    float delta_w = w_req - w;  
 
     // Update velocity and angular rate
     float v_new = v + delta_v;
     float w_new = w + delta_w;
 
     // Compute new reference position and angle using trapezoidal integration
-    float x_ref = x + 0.5 * (v + v_new) * dt;
-    float a_ref = a + 0.5 * (w + w_new) * dt;
+    //float x_ref = x + 0.5 * (v + v_new) * dt;
+    //float a_ref = a + 0.5 * (w + w_new) * dt;
+
+    float x_ref = x + v_new*dt; 
+    float a_ref = a + w_new*dt;
 
     // send to controller
     position_contol.set_desired(x_ref, a_ref);
+}
+
+
+void PathPlanner::direct_control(float x_d, float a_d)
+{
+    // send to controller
+    position_contol.set_desired(x_d, a_d);
 }

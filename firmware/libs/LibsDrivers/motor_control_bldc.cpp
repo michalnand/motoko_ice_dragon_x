@@ -72,10 +72,15 @@ void MotorControl::init()
     
     float k0 = 0.3;
     float k1 = 1.0;  
-    float k2 = 0.3;        
+    
+    float k2 = 0.3;             
+    float k3 = 0.3;         
 
-    left_kf.init(k0, k1, k2,  0.000001*MOTOR_CONTROL_DT);
-    right_kf.init(k0, k1, k2, 0.000001*MOTOR_CONTROL_DT);
+    left_filter.init(k0, k1, 0.000001*MOTOR_CONTROL_DT);
+    right_filter.init(k0, k1, 0.000001*MOTOR_CONTROL_DT);
+
+    left_filter_smooth.init(k2, k3, 0.000001*MOTOR_CONTROL_DT);
+    right_filter_smooth.init(k2, k3, 0.000001*MOTOR_CONTROL_DT);
 
     // set motors to zero position
     set_torque_from_rotation(500, true, 0, 0);
@@ -177,19 +182,24 @@ int32_t MotorControl::get_left_encoder()
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_left_position()
 {
-    //return -left_kf.position_hat;
-    return -left_kf.position_hat;
+    //return -left_filter.position_hat;
+    return -left_filter.position_hat;
 }
 
 // wheel angular velocity in rad/s, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_left_velocity()
 {
-    return -left_kf.velocity_hat;
+    return -left_filter.velocity_hat;
 }
 
 float MotorControl::get_left_position_smooth()
 {
-    return -left_kf.position_hat_smooth;
+    return -left_filter_smooth.position_hat;    
+}
+
+float MotorControl::get_left_velocity_smooth()
+{
+    return -left_filter_smooth.velocity_hat;    
 }
 
 
@@ -202,18 +212,23 @@ int32_t MotorControl::get_right_encoder()
 // wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
 float MotorControl::get_right_position()
 {
-    return right_kf.position_hat;
+    return right_filter.position_hat;
 }
 
 // wheel angular velocity in rad/s, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_right_velocity()    
 {
-    return right_kf.velocity_hat;
+    return right_filter.velocity_hat;
 }        
     
 float MotorControl::get_right_position_smooth()
 {
-    return right_kf.position_hat_smooth;
+    return right_filter_smooth.position_hat;    
+}
+
+float MotorControl::get_right_velocity_smooth()
+{
+    return right_filter_smooth.velocity_hat;    
 }
 
 
@@ -223,11 +238,16 @@ void MotorControl::callback()
     left_encoder.update();          
     right_encoder.update();  
     
-  
-    left_kf.step((2.0f*PI*left_encoder.position)/ENCODER_RESOLUTION);  
-    right_kf.step((2.0f*PI*right_encoder.position)/ENCODER_RESOLUTION);
+
+    float enc_left  = (2.0f*PI*left_encoder.position)/ENCODER_RESOLUTION;
+    float enc_right = (2.0f*PI*right_encoder.position)/ENCODER_RESOLUTION;
+    
+    left_filter.step(enc_left);  
+    right_filter.step(enc_right);
+
+    left_filter_smooth.step(enc_left);  
+    right_filter_smooth.step(enc_right);
              
-   
 
     if (this->left_ol_mode)
     {

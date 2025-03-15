@@ -14,7 +14,7 @@
 
 
 class PositionControl
-{
+{   
     public:
         void init();
         void set_desired(float distance, float angle);
@@ -24,6 +24,9 @@ class PositionControl
 
         float get_velocity();
         float get_angular_velocity();
+
+        float get_u_forward();
+        float get_u_turn();
 
         
     public:
@@ -41,6 +44,8 @@ class PositionControl
         float distance;
         float angle_prev;
         float angle;
+
+        float u_forward,  u_turn;
 
     public:
         uint32_t steps;

@@ -19,6 +19,9 @@ class PathPlanner
         */
         void point_following(float x_d, float a_d);
         
+
+        void direct_control(float x_d, float a_d);
+
     public:
         PositionControl position_contol;
 
