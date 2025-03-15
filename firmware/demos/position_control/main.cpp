@@ -17,7 +17,6 @@ int main()
 
     PathPlanner path_planner;
 
-    
     path_planner.init();
 
 
@@ -49,6 +48,8 @@ int main()
     }
     */
 
+    /*
+    // position control demo 
     float angle = 0.0;
     while (true)    
     {                
@@ -74,34 +75,55 @@ int main()
         }
 
         timer.delay_ms(300);
-    
     }
+    */
 
+    
 
+    float velocities[] = {0.0, 2000.0, -2000.0, 0.0};
 
-    /*
-    uint32_t steps = 0;         
-    while (true)        
+    while (true)
     {
-        uint32_t time_start = timer.get_time();
-
-        uint32_t idx = (steps/1000)%2;  
+        uint32_t idx = (steps/1000)%4;       
         
-        float distance  = distances[idx];
-        float angle     = angles[idx]*PI/180.0;
-        path_planner.point_following(distance, angle);
-        
-        uint32_t time_stop = timer.get_time();
+        float v_req = velocities[idx];
 
-        uint32_t dt = time_stop - time_start;   
+        path_planner.line_following(v_req, 0.0);
 
-        uint32_t sleep_time = min<uint32_t>(4 - dt, 4);
+        if ((steps%50) == 0)
+        {
+            terminal << v_req << " " << path_planner.position_control.get_velocity() << "\n";
+        }   
 
-        timer.delay_ms(sleep_time);
+        timer.delay_ms(4); 
 
         steps++;
     }
-    */
+    
+
+    //float distances[] = {0.0, 60.0, 200.0, 500.0};
+    //float angles[]    = {0.0, 0.0,  0.0,   0.0};
+
+    float distances[] = {0.0, 200.0, 500.0, 0.0};
+    float angles[]    = {0.0, 0.0, 0.0, 0.0};
+
+
+    while (true)
+    {
+        uint32_t idx = (steps/400)%4;      
+
+        float d_req = distances[idx];
+        float a_req = angles[idx];  
+
+        path_planner.point_following(d_req, a_req*PI/180.0f);
+
+
+        terminal << d_req << " " << path_planner.position_control.get_distance() << "\n";
+
+        timer.delay_ms(4); 
+
+        steps++;
+    }
 
     return 0;
 }

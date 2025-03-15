@@ -61,22 +61,26 @@ void PositionControl::init()
 		0.0036761067, 0.0, 0.03920686, 0.0, 
 		0.0, 0.34483215, 0.0, 0.62740767 };
 
+    /*
     float ki[] = {
 		1.01324e-05, 0.0, 0.0, 0.0, 
 		0.0, 0.001030422, 0.0, 0.0 };
-    
+    */
+
+    float ki[] = {
+		0.0, 0.0, 0.0, 0.0, 
+		0.0, 0.0, 0.0, 0.0 };
 
     controller.init(k, ki, 1.0);
     
 
-    this->distance_prev = 0.0;
     this->distance      = 0.0;
-    this->angle_prev    = 0.0;
     this->angle         = 0.0;
+    this->velocity      = 0.0;
+    this->angular_rate  = 0.0;
 
     this->u_forward     = 0.0;
     this->u_turn        = 0.0;
-
 
     timer_init();        
 }
@@ -93,56 +97,32 @@ void PositionControl::set_desired(float distance, float angle)
 
 void PositionControl::callback()
 {   
-    /*
-    //estimate current state 
+    // load current state 
     float right_position = motor_control.get_right_position_smooth();
     float left_position  = motor_control.get_left_position_smooth();
     
-
-    this->distance_prev = this->distance;   
-    this->distance      = 0.25*(right_position + left_position)*WHEEL_DIAMETER;
-
-    this->angle_prev    = this->angle;
-    this->angle         = 0.5*(right_position - left_position)*WHEEL_DIAMETER / WHEEL_BRACE;
-
+    float right_velocity = motor_control.get_right_velocity_smooth();
+    float left_velocity  = motor_control.get_left_velocity_smooth();
     
-    // update current state 
-    controller.x[0] = this->distance;
-    controller.x[1] = this->angle;     
-    controller.x[2] = (this->distance  - this->distance_prev);
-    controller.x[3] = (this->angle     - this->angle_prev);
-    */
-
     //estimate current state 
-    float right_position = motor_control.get_right_position_smooth();
-    float left_position  = motor_control.get_left_position_smooth();
-    
-    //float right_velocity = (motor_control.get_right_velocity_smooth()*MOTOR_CONTROL_DT)/POSITION_CONTROL_DT;
-    //float left_velocity  = (motor_control.get_left_velocity_smooth()*MOTOR_CONTROL_DT)/POSITION_CONTROL_DT;
-    
-    float right_velocity = motor_control.get_right_velocity_smooth()*MOTOR_CONTROL_DT*0.000001f;   
-    float left_velocity  = motor_control.get_left_velocity_smooth()*MOTOR_CONTROL_DT*0.000001f;
-    
-
     this->distance      = 0.25*(right_position + left_position)*WHEEL_DIAMETER;
     this->angle         = 0.5*(right_position - left_position)*WHEEL_DIAMETER / WHEEL_BRACE;
 
-    float velocity      = 0.25*(right_velocity + left_velocity)*WHEEL_DIAMETER;
-    float angular_rate  = 0.5*(right_velocity - left_velocity)*WHEEL_DIAMETER / WHEEL_BRACE;
+    this->velocity      = 0.25*(right_velocity + left_velocity)*WHEEL_DIAMETER;
+    this->angular_rate  = 0.5*(right_velocity - left_velocity)*WHEEL_DIAMETER / WHEEL_BRACE;
 
-    
-    // update current state 
+    // update current state     
     controller.x[0] = this->distance;
-    controller.x[1] = this->angle;     
-    controller.x[2] = velocity;
-    controller.x[3] = angular_rate;
+    controller.x[1] = this->angle;      
+    controller.x[2] = this->velocity*0.000001f*MOTOR_CONTROL_DT;
+    controller.x[3] = this->angle*0.000001f*MOTOR_CONTROL_DT;
 
 
     // compute controller output
     controller.step();    
 
-    // send to motors
-    float u_forward  = 0*controller.u[0];
+    // send to motors   
+    float u_forward  = controller.u[0];
     float u_turn     = controller.u[1];    
 
     float u_right   = u_forward + u_turn;
@@ -162,22 +142,22 @@ void PositionControl::callback()
 
 float PositionControl::get_distance()
 {
-    return controller.x[0];
+    return this->distance;
 }
 
 float PositionControl::get_angle()
 {
-    return controller.x[1];
+    return this->angle;
 }
 
 float PositionControl::get_velocity()
 {
-    return controller.x[2];
+    return this->velocity;
 }
 
 float PositionControl::get_angular_velocity()
 {
-    return controller.x[3];
+    return this->angular_rate;
 }
 
 
@@ -189,6 +169,16 @@ float PositionControl::get_u_forward()
 float PositionControl::get_u_turn()
 {
     return this->u_turn;
+}
+
+int  PositionControl::get_forward_saturation()
+{
+    return controller.saturation[0];
+}
+
+int  PositionControl::get_turn_saturation()
+{
+    return controller.saturation[1];
 }
 
 

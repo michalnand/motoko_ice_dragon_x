@@ -28,6 +28,9 @@ class PositionControl
         float get_u_forward();
         float get_u_turn();
 
+        int get_forward_saturation();
+        int get_turn_saturation();
+
         
     public:
         void callback();
@@ -39,11 +42,11 @@ class PositionControl
         LQR<4, 2> controller;   
         //LQG<4, 2> controller;   
 
-    public:
-        float distance_prev;
+    private:
         float distance;
-        float angle_prev;
         float angle;
+        float velocity;
+        float angular_rate;
 
         float u_forward,  u_turn;
 

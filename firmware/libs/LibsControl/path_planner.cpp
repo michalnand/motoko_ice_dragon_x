@@ -1,26 +1,67 @@
 #include "path_planner.h"
+#include <drivers.h>
+
 
 void PathPlanner::init()
 {
-    position_contol.init();
+    position_control.init();
+   
     
-    this->dt = POSITION_CONTROL_DT*0.000001f;
-    
-    this->v_max     = 1000.0;
-    this->w_max     = 3600.0*PI/180.0;
+    this->v_max     = 2700.0;
+    this->w_max     = 20.0*360.0*PI/180.0;
 
-    this->a_max     = 10000.0;
-    this->o_max     = 10000.0;            
+    // forward acceleration G-force, mm/s^2
+    this->a_max     = 1.0*9.81*1000.0;
+
+
+    this->o_max     = 10000.0;   
+    
+    this->ux = 0.0;
+    
+    this->time_now  = timer.get_time();
+    this->time_prev = this->time_now;
 }
-        
+   
+
+
 /*
     move robot forward, with desired velocity and turns by desired angle
 */
 void PathPlanner::line_following(float desired_velocity, float desired_angle)
 {
+    float dt = _get_dt();
+
     // obtain current state
-    float x = position_contol.get_distance();
-    float v = position_contol.get_velocity();
+    float x = position_control.get_distance();
+    float v = position_control.get_velocity();
+
+      
+    float acc_req = desired_velocity - v;
+    acc_req = clip(acc_req, -4*a_max*dt, a_max*dt);
+
+
+    //antiwindup
+    //get_forward_saturation : returns 0 if none, +1 if upper limit, -1 if lower limit
+    int saturation = position_control.get_forward_saturation();
+
+    if ((acc_req > 0 && saturation <= 0) || (acc_req < 0 && saturation >= 0))
+    {
+        ux = ux + 4.0*acc_req;
+    }   
+    
+    float x_ref = x + ux*dt;   
+
+    // send to controller
+    position_control.set_desired(x_ref, desired_angle);
+} 
+
+
+/*
+void PathPlanner::line_following(float desired_velocity, float desired_angle)
+{
+    // obtain current state
+    float x = position_control.get_distance();
+    float v = position_control.get_velocity();
 
     // compute the required change in velocity.
     float delta_v_req = desired_velocity - v;
@@ -37,19 +78,23 @@ void PathPlanner::line_following(float desired_velocity, float desired_angle)
     float x_ref = x + v_new * dt;
 
     // send to controller
-    position_contol.set_desired(x_ref, desired_angle);
+    position_control.set_desired(x_ref, desired_angle);
 }   
+*/
 
 /*
     move robot to desired distance and set angle
 */
+/*
 void PathPlanner::point_following(float x_d, float a_d)
 {
-    float x = position_contol.get_distance();
-    float v = position_contol.get_velocity()/dt;
+    float dt = _get_dt();
 
-    float a = position_contol.get_angle();
-    float w = position_contol.get_angular_velocity()/dt;
+    float x = position_control.get_distance();
+    float v = position_control.get_velocity()/dt;
+
+    float a = position_control.get_angle();
+    float w = position_control.get_angular_velocity()/dt;
 
     // Compute required velocity and angular rate to reach the desired state
     float v_req = (x_d - x) / dt; 
@@ -78,12 +123,51 @@ void PathPlanner::point_following(float x_d, float a_d)
     float a_ref = a + w_new*dt;
 
     // send to controller
-    position_contol.set_desired(x_ref, a_ref);
+    position_control.set_desired(x_ref, a_ref);
+}
+*/
+
+
+void PathPlanner::point_following(float x_d, float a_d)
+{
+    float dt = _get_dt();
+
+    float x = position_control.get_distance();
+    float v = position_control.get_velocity();
+
+    float a = position_control.get_angle(); 
+    float w = position_control.get_angular_velocity();
+
+    // required velocity
+    float v_req = (x_d - x) / dt; 
+
+    // limit velocity change by maximum acceleration
+    float delta_v = clip(v_req - v, -a_max*dt, a_max*dt);
+
+    // limit velocity value by maximum velocity
+    float v_new = clip(v + delta_v, -v_max, v_max);  
+
+    // compute requred distance
+    float x_ref = x + v_new*dt; 
+
+    // send to controller
+    position_control.set_desired(x_ref, a_d);
 }
 
 
 void PathPlanner::direct_control(float x_d, float a_d)
 {
     // send to controller
-    position_contol.set_desired(x_d, a_d);
+    position_control.set_desired(x_d, a_d);
+}
+
+
+float PathPlanner::_get_dt()
+{
+    this->time_prev = this->time_now;
+    this->time_now  = timer.get_time(); 
+
+    float dt = max(0.001f*(this->time_now - this->time_prev), 0.001f);
+
+    return dt;
 }

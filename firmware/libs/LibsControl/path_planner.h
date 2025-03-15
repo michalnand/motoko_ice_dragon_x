@@ -22,13 +22,20 @@ class PathPlanner
 
         void direct_control(float x_d, float a_d);
 
+    private:
+        float _get_dt();
+
+
     public:
-        PositionControl position_contol;
+        PositionControl position_control;
 
     private:
-        float dt;
+        uint32_t time_now, time_prev;
+
         float v_max, w_max;
         float a_max, o_max;
+        
+        float ux;
 };
 
 #endif

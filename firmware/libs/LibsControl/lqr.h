@@ -20,6 +20,7 @@ class LQR
             this->x.init();
             this->xr.init();
             this->u.init();
+            this->saturation.init();
               
             this->k.from_array(k);
             this->ki.from_array(ki);
@@ -33,21 +34,31 @@ class LQR
         { 
             // integral action  
             auto error = this->xr - this->x; 
-            auto integral_action_new = this->integral_action + this->ki*error;
 
             //LQR controll law  
-            //auto u_new = this->k*this->x*(-1.0) + this->integral_action;    
-            auto u_new = this->k*error + this->integral_action;    
+            auto u_new = this->k*error ;
 
             //antiwindup with back calculating integration
             this->u = u_new.clip(-antiwindup, antiwindup);
-            this->integral_action = integral_action_new - (u_new - this->u);
-            
-            /*
-            auto error = this->xr - this->x;
-            auto u_new = this->k*error;    
-            this->u = u_new.clip(-antiwindup, antiwindup);
-            */
+
+            for (unsigned int i = 0; i < system_inputs; i++)
+            {
+                float d = u_new[i] - this->u[i];
+
+                if (d > 0.0001) 
+                {
+                    this->saturation[i] = 1;
+                }
+                else if (d < -0.0001)
+                {   
+                    this->saturation[i] = -1;
+                }
+                else
+                {
+                    this->saturation[i] = 0;
+                }
+            }
+
         } 
 
         void reset_integral_action(int idx = -1)
@@ -63,11 +74,13 @@ class LQR
         }
 
 
+
     public:
         //inputs and outputs
         Matrix<float, system_order, 1> x;
         Matrix<float, system_order, 1> xr;
         Matrix<float, system_inputs, 1>  u; 
+        Matrix<int, system_inputs, 1>  saturation; 
 
     private:
         float antiwindup;

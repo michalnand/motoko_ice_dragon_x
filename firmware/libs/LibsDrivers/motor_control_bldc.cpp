@@ -76,11 +76,11 @@ void MotorControl::init()
     float k2 = 0.3;             
     float k3 = 0.3;         
 
-    left_filter.init(k0, k1, 0.000001*MOTOR_CONTROL_DT);
-    right_filter.init(k0, k1, 0.000001*MOTOR_CONTROL_DT);
+    left_filter.init(k0, k1); //, 0.000001*MOTOR_CONTROL_DT);
+    right_filter.init(k0, k1); //,, 0.000001*MOTOR_CONTROL_DT); 
 
-    left_filter_smooth.init(k2, k3, 0.000001*MOTOR_CONTROL_DT);
-    right_filter_smooth.init(k2, k3, 0.000001*MOTOR_CONTROL_DT);
+    left_filter_smooth.init(k2, k3); //, 0.000001*MOTOR_CONTROL_DT);
+    right_filter_smooth.init(k2, k3); //, 0.000001*MOTOR_CONTROL_DT);
 
     // set motors to zero position
     set_torque_from_rotation(500, true, 0, 0);
@@ -189,7 +189,7 @@ float MotorControl::get_left_position()
 // wheel angular velocity in rad/s, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_left_velocity()
 {
-    return -left_filter.velocity_hat;
+    return -left_filter.velocity_hat/(MOTOR_CONTROL_DT*0.000001f);
 }
 
 float MotorControl::get_left_position_smooth()
@@ -199,7 +199,7 @@ float MotorControl::get_left_position_smooth()
 
 float MotorControl::get_left_velocity_smooth()
 {
-    return -left_filter_smooth.velocity_hat;    
+    return -left_filter_smooth.velocity_hat/(MOTOR_CONTROL_DT*0.000001f);    
 }
 
 
@@ -218,7 +218,7 @@ float MotorControl::get_right_position()
 // wheel angular velocity in rad/s, 2PI is equal to one full forward rotation per second, -2PI for backward
 float MotorControl::get_right_velocity()    
 {
-    return right_filter.velocity_hat;
+    return right_filter.velocity_hat/(MOTOR_CONTROL_DT*0.000001f);
 }        
     
 float MotorControl::get_right_position_smooth()
@@ -228,7 +228,7 @@ float MotorControl::get_right_position_smooth()
 
 float MotorControl::get_right_velocity_smooth()
 {
-    return right_filter_smooth.velocity_hat;    
+    return right_filter_smooth.velocity_hat/(MOTOR_CONTROL_DT*0.000001f);    
 }
 
 
@@ -265,7 +265,7 @@ void MotorControl::callback()
     else
     {
         this->right_torque = right_controller.step(this->right_req_velocity, this->get_right_velocity());
-    }    
+    }       
 
     float left_torque  = this->left_torque;
     float right_torque = this->right_torque;

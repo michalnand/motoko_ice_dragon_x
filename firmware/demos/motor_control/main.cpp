@@ -10,16 +10,30 @@ int main()
     // wait for key press
     int key_result = button();
 
+    while (true)        
+    {   
+        float speed_rpm = 500;
+        motor_control.set_left_velocity(speed_rpm*(2.0*PI)/60.0);
+        motor_control.set_right_velocity(speed_rpm*(2.0*PI)/60.0);
+        timer.delay_ms(1000);   
+
+        float left_rpm  =  motor_control.get_left_velocity_smooth()*60.0/(2.0*PI);
+        float right_rpm =  motor_control.get_right_velocity_smooth()*60.0/(2.0*PI);
+        
+        terminal << left_rpm << " " << right_rpm << "\n";
+    }
+
 
     float speed_max = 2000;
     float speed     = 0;
+    
 
     while (true)        
     {   
         motor_control.set_left_velocity(10*(2.0*PI)/60.0);
         motor_control.set_right_velocity(10*(2.0*PI)/60.0);
-        timer.delay_ms(5000);   
-
+        timer.delay_ms(5000);  
+        
         motor_control.set_left_velocity(60*(2.0*PI)/60.0);
         motor_control.set_right_velocity(60*(2.0*PI)/60.0);
         timer.delay_ms(5000);   
