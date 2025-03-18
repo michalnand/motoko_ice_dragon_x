@@ -2,6 +2,7 @@ LibsPath 		= ../../
 LibsCommonPATH 	= $(LibsPath)/libs/LibsCommon
 LibsDevicePATH 	= $(LibsPath)/libs/LibsDevice
 LibsDriversPATH = $(LibsPath)/libs/LibsDrivers
+LibsControlPATH = $(LibsPath)/libs/LibsControl
 
 AppPATH 		= ./
 
@@ -20,17 +21,20 @@ INC+= -I $(LibsDevicePATH)/device/
 INC+= -I $(LibsDevicePATH)/CMSIS/ 
 INC+= -I $(LibsDevicePATH)/STM32F7xx_StdPeriph_Driver/inc
 INC+= -I $(LibsDriversPATH)/
+INC+= -I $(LibsControlPATH)/	
 INC+= -I $(AppPATH)
 
 C_SRCS = $(shell find  $(LibsCommonPATH) -name 	'*.c')
 C_SRCS+= $(shell find  $(LibsDevicePATH) -name 	'*.c')
 C_SRCS+= $(shell find  $(LibsDriversPATH) -name '*.c')
+C_SRCS+= $(shell find  $(LibsControlPATH) -name '*.c')
 C_SRCS+= $(shell find  $(AppPATH) -name '*.c')
 
 
 CXX_SRCS+= $(shell find $(LibsCommonPATH) -name '*.cpp')
 CXX_SRCS+= $(shell find $(LibsDevicePATH) -name '*.cpp')
 CXX_SRCS+= $(shell find $(LibsDriversPATH) -name '*.cpp')
+CXX_SRCS+= $(shell find $(LibsControlPATH) -name '*.cpp')
 CXX_SRCS+= $(shell find $(AppPATH) -name '*.cpp')
 
 

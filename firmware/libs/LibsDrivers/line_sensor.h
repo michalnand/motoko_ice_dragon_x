@@ -16,10 +16,10 @@
  
 
 //brace from first to last sesor in mm
-#define SENSORS_BRACE                  ((float)69.5)
+#define SENSORS_BRACE                  ((float)70.0)
 
 //sensors distance from wheel axis in mm
-#define SENSORS_DISTANCE                  ((float)49.0)
+#define SENSORS_DISTANCE                  ((float)48.0)
     
 
 #define LINE_SENSOR_COUNT   ((unsigned int)8)

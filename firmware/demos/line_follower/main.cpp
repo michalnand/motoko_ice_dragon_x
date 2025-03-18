@@ -1,5 +1,17 @@
 #include <drivers.h>
-#include <pid.h>
+
+#include <path_planner.h>
+
+
+float estimate_turn_radius(float sensor_reading, float eps)
+{
+  float x = SENSORS_DISTANCE;
+  float y = 0.5*SENSORS_BRACE*abs(sensor_reading);
+
+  float r = (y*y + x*x)/(2.0*y + eps);
+
+  return r;
+}
 
 int main()
 {
@@ -7,65 +19,36 @@ int main()
   
     terminal << "\n\n\n"; 
     terminal << "machine ready\n";
+    terminal << "system clock " << SystemCoreClock/1000000 << "MHz\n";
 
     // wait for key press
     int key_result = button();
 
-    // constant forward speed
-    float max_speed     = 0.4;
+    PathPlanner path_planner;
 
-    // controller parameters
-    float kp = 0.5;         
-    float ki = 0.01;                
-    float kd = 2.5;          
+    path_planner.init();
 
-    float antiwindup = 1.0;  
+    
 
-    PID controller(kp, ki, kd, antiwindup);
+   
+    float velocity = 500.0;     
 
-    uint32_t steps = 0;
-    while (true) 
+    float r_min = 80.0;
+    float r_max = 10000.0;
+
+    path_planner.position_control.lf_mode = true;
+    
+    while (true)
     {
-        // required value
-        float xr = 0.0;
+        float position = line_sensor.right_position;    
 
-        // observed value
-        float x  = line_sensor.left_position;
-        
-        // controller step
-        float turn = controller.step(xr, x);          
+        float radius  = estimate_turn_radius(position, 1.0/r_max);
+        radius = -sgn(position)*clip(radius, r_min, r_max);      
 
-        // from turn and max speed compute remanining speed
-        float curr_speed = clip(max_speed - abs(turn), 0.0, max_speed);
-
-        float u_right = curr_speed + turn;
-        float u_left  = curr_speed - turn;
-
-        u_right = clip(u_right, 0.0, 1.0);
-        u_left  = clip(u_left, 0.0, 1.0);
-
-        // send turning command to motors
-        // scale from -1, 1 into max velocity range
-        //motor_control.set_right_velocity(u_right*MOTOR_CONTROL_MAX_VELOCITY);
-        //motor_control.set_left_velocity(u_left*MOTOR_CONTROL_MAX_VELOCITY);
-
-        motor_control.set_right_torque(u_right);
-        motor_control.set_left_torque(u_left);  
-
-        // discrete dt delay
+        path_planner.set_circle_motion(5.0*radius, velocity);
         timer.delay_ms(4);
-
-        if ((steps%100) == 0)
-        {
-            terminal << x << "\n";
-            terminal << turn << " " << curr_speed << "\n";
-            terminal << u_left << " " << u_right << "\n";
-            terminal << "\n\n";
-        }
-
-        steps++;
     }
-
+    
     return 0;
 }
   

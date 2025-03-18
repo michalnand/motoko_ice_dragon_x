@@ -34,50 +34,46 @@ void PositionControl::init()
 
     steps = 0;
 
-   
     /*
+    // q = [ 1.0, 1.0, 0.0, 0.0]
+    // r = [10.0**5, 10.0]
     float k[] = {
-        0.004603517, 0.0, 0.047634, 0.0, 
-        0.0, 0.38443515, 0.0, 0.6943304 };
+            0.0031256222, 0.0, 0.03428018, 0.0, 
+            0.0, 0.3073647, 0.0, 0.57149106 };
 
-    float ki[] = {
-        3.213074e-05, 0.0, 0.0, 0.0, 
-        0.0, 0.003268575, 0.0, 0.0 };
+    controller.init(k, 1.0);
     */
 
+
+    // q = [ 1.0, 1.0, 0.0, 0.0]
+    // r = [10.0**6, 10.0]
+    float k[] = {
+		0.0009960027, 0.0, 0.011780507, 0.0, 
+		0.0, 0.3073647, 0.0, 0.57149106 };
+    
+    controller.init(k, 1.0);
+
     /*
     float k[] = {
-		0.0070337835, 0.0, 0.067990825, 0.0, 
-		0.0, 0.4941195, 0.0, 0.8762817 };
+		9.801003e-05, 0.0, 0.0011702038, 0.0, 
+		0.0, 0.09085617, 0.0, 0.17096679 };
 
-    float ki[] = {
-		0.000102285114, 0.0, 0.0, 0.0, 
-		0.0, 0.010422436, 0.0, 0.0 };
-    */
+    float ku[] = {
+            0.04019666, 0.0, 
+            0.0, 0.19127911 };
 
     
-
-    float k[] = {
-		0.0036761067, 0.0, 0.03920686, 0.0, 
-		0.0, 0.34483215, 0.0, 0.62740767 };
-
-    /*
-    float ki[] = {
-		1.01324e-05, 0.0, 0.0, 0.0, 
-		0.0, 0.001030422, 0.0, 0.0 };
+    controller.init(k, ku, 1.0, 1.0);
     */
-
-    float ki[] = {
-		0.0, 0.0, 0.0, 0.0, 
-		0.0, 0.0, 0.0, 0.0 };
-
-    controller.init(k, ki, 1.0);
-    
 
     this->distance      = 0.0;
     this->angle         = 0.0;
     this->velocity      = 0.0;
     this->angular_rate  = 0.0;
+
+    this->line_angle_prev = 0.0;
+    this->line_angle      = 0.0;
+    this->lf_mode         = false;
 
     this->u_forward     = 0.0;
     this->u_turn        = 0.0;
@@ -111,11 +107,23 @@ void PositionControl::callback()
     this->velocity      = 0.25*(right_velocity + left_velocity)*WHEEL_DIAMETER;
     this->angular_rate  = 0.5*(right_velocity - left_velocity)*WHEEL_DIAMETER / WHEEL_BRACE;
 
+    this->line_angle_prev   = this->line_angle;
+    this->line_angle        = line_sensor.left_angle;
+
+
     // update current state     
     controller.x[0] = this->distance;
     controller.x[1] = this->angle;      
     controller.x[2] = this->velocity*0.000001f*MOTOR_CONTROL_DT;
-    controller.x[3] = this->angle*0.000001f*MOTOR_CONTROL_DT;
+
+    if (this->lf_mode)  
+    {
+        controller.x[3] = this->line_angle - this->line_angle_prev;
+    }
+    else
+    {
+        controller.x[3] = this->angular_rate*0.000001f*MOTOR_CONTROL_DT;
+    }
 
 
     // compute controller output
@@ -123,7 +131,7 @@ void PositionControl::callback()
 
     // send to motors   
     float u_forward  = controller.u[0];
-    float u_turn     = controller.u[1];    
+    float u_turn     = controller.u[1];      
 
     float u_right   = u_forward + u_turn;
     float u_left    = u_forward - u_turn;

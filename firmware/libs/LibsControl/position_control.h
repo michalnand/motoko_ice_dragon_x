@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "lqr.h"
-#include "lqg.h"
+#include "lqri.h"   
 
 // 4000us period = 250Hz loop
 #define POSITION_CONTROL_DT     ((uint32_t)4000)
@@ -40,7 +40,8 @@ class PositionControl
     
     private:
         LQR<4, 2> controller;   
-        //LQG<4, 2> controller;   
+        //LQRI<4, 2> controller;   
+        
 
     private:
         float distance;
@@ -49,6 +50,12 @@ class PositionControl
         float angular_rate;
 
         float u_forward,  u_turn;
+
+    private:
+        float line_angle, line_angle_prev;
+    
+    public:
+        bool  lf_mode;
 
     public:
         uint32_t steps;
