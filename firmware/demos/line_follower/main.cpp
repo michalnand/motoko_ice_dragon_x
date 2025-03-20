@@ -30,23 +30,23 @@ int main()
 
     
 
-   
+
     float velocity = 500.0;     
 
     float r_min = 80.0;
-    float r_max = 10000.0;
+    float r_max = 10000.0;  
 
     path_planner.position_control.lf_mode = true;
     
     while (true)
     {
-        float position = line_sensor.right_position;    
+      float position = line_sensor.right_position;    
 
-        float radius  = estimate_turn_radius(position, 1.0/r_max);
-        radius = -sgn(position)*clip(radius, r_min, r_max);      
-
-        path_planner.set_circle_motion(5.0*radius, velocity);
-        timer.delay_ms(4);
+      float radius  = estimate_turn_radius(position, 1.0/r_max);
+      radius = -sgn(position)*clip(1.5*radius, r_min, r_max);      
+      
+      path_planner.set_circle_motion(radius, velocity);
+      timer.delay_ms(4);  
     }
     
     return 0;

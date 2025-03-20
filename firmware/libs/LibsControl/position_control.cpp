@@ -36,35 +36,24 @@ void PositionControl::init()
 
     /*
     // q = [ 1.0, 1.0, 0.0, 0.0]
-    // r = [10.0**5, 10.0]
-    float k[] = {
-            0.0031256222, 0.0, 0.03428018, 0.0, 
-            0.0, 0.3073647, 0.0, 0.57149106 };
-
-    controller.init(k, 1.0);
-    */
-
-
-    // q = [ 1.0, 1.0, 0.0, 0.0]
     // r = [10.0**6, 10.0]
     float k[] = {
 		0.0009960027, 0.0, 0.011780507, 0.0, 
 		0.0, 0.3073647, 0.0, 0.57149106 };
     
     controller.init(k, 1.0);
-
-    /*
-    float k[] = {
-		9.801003e-05, 0.0, 0.0011702038, 0.0, 
-		0.0, 0.09085617, 0.0, 0.17096679 };
-
-    float ku[] = {
-            0.04019666, 0.0, 
-            0.0, 0.19127911 };
-
-    
-    controller.init(k, ku, 1.0, 1.0);
     */
+    
+    // q = [ 1.0, 1.0, 0.0, 0.0]
+    // r = [10.0**5, 10.0]
+    float k[] = {
+		0.0031256222, 0.0, 0.03428018, 0.0, 
+		0.0, 0.3073647, 0.0, 0.57149106 };
+    
+    controller.init(k, 1.0);
+
+
+
 
     this->distance      = 0.0;
     this->angle         = 0.0;
@@ -116,9 +105,9 @@ void PositionControl::callback()
     controller.x[1] = this->angle;      
     controller.x[2] = this->velocity*0.000001f*MOTOR_CONTROL_DT;
 
-    if (this->lf_mode)  
+    if (this->lf_mode)      
     {
-        controller.x[3] = this->line_angle - this->line_angle_prev;
+        controller.x[3] = 4.0*(this->line_angle - this->line_angle_prev);
     }
     else
     {
