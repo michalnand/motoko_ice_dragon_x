@@ -44,6 +44,7 @@ class MPC
             }
         }
 
+        /*
         void step() 
         { 
             // analytical mpc
@@ -53,6 +54,20 @@ class MPC
             // integration
             auto u_new  = this->u + du;
 
+            // antiwindup
+            this->u     = u_new.clip(-antiwindup, antiwindup);
+            
+            // set saturation flags is any
+            this->_detect_saturation(u_new, this->u);
+        } 
+        */
+
+        void step() 
+        { 
+            // analytical mpc
+            auto s      = this->xr - this->phi*x;
+            auto u_new   = this->sigma*s;    
+            
             // antiwindup
             this->u     = u_new.clip(-antiwindup, antiwindup);
             
