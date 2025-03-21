@@ -44,6 +44,7 @@ void PositionControl::init()
     controller.init(k, 1.0);
     */
     
+    /*
     // q = [ 1.0, 1.0, 0.0, 0.0]
     // r = [10.0**5, 10.0]
     float k[] = {
@@ -51,7 +52,9 @@ void PositionControl::init()
 		0.0, 0.3073647, 0.0, 0.57149106 };
     
     controller.init(k, 1.0);
+    */
 
+    controller.init(phi, omega, sigma, 1.0);
 
 
 
@@ -72,10 +75,22 @@ void PositionControl::init()
 
 void PositionControl::set_desired(float distance, float angle)
 {
+    /*
     controller.xr[0] = distance;
     controller.xr[1] = angle;
     controller.xr[2] = 0;
     controller.xr[3] = 0;
+    */
+
+    controller.set_constant_xr(0, distance);
+    controller.set_constant_xr(1, angle);
+
+}
+
+void PositionControl::set_desired_trajectory(uint32_t step, float distance, float angle)
+{
+    controller.set_xr(step, 0, distance);
+    controller.set_xr(step, 1, angle);
 }
 
 

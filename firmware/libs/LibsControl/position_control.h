@@ -4,7 +4,9 @@
 #include <stdint.h>
 
 #include "lqr.h"
-#include "lqri.h"   
+#include "mpc.h"  
+#include "mpc_config.h"  
+
 
 // 4000us period = 250Hz loop
 #define POSITION_CONTROL_DT     ((uint32_t)4000)
@@ -18,6 +20,7 @@ class PositionControl
     public:
         void init();
         void set_desired(float distance, float angle);
+        void set_desired_trajectory(uint32_t step, float distance, float angle);
 
         float get_distance();
         float get_angle();
@@ -39,8 +42,8 @@ class PositionControl
         void timer_init();
     
     private:
-        LQR<4, 2> controller;   
-        //LQRI<4, 2> controller;   
+        //LQR<4, 2> controller;   
+        MPC<4, 2, MPC_PREDCTION_HORIZON> controller;   
         
 
     private:
