@@ -3,13 +3,13 @@
 void LineFollowing::init()
 {
     this->speed_min = 400.0;     
-    this->speed_max = 1000.0;         
+    this->speed_max = 1200.0;         
 
     this->r_min = 80.0;
-    this->r_max = 10000.0;      
+    this->r_max = 10000.0;        
 
 
-    this->q_penalty = 4.0;      
+    this->q_penalty = 2.0;      
     this->qr_max    = 8.0;      
     this->qr_min    = 1.5;  
 
