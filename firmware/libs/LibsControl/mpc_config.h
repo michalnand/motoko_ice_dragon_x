@@ -6,8 +6,9 @@
 #define MPC_SYSTEM_ORDER      ((uint32_t)4)
 #define MPC_SYSTEM_INPUTS     ((uint32_t)2)
 #define MPC_PREDCTION_HORIZON ((uint32_t)32)
+#define MPC_CONTROL_HORIZON   ((uint32_t)8)
 
-
+	
 
 const float phi[] = {
 		1.0, 0.0, 1.0, 0.0, 

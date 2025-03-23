@@ -23,7 +23,7 @@ void TIM7_IRQHandler(void)
 
 #ifdef __cplusplus
 }
-#endif  
+#endif      
 
 
 
@@ -120,14 +120,16 @@ void PositionControl::callback()
     controller.x[1] = this->angle;      
     controller.x[2] = this->velocity*0.000001f*MOTOR_CONTROL_DT;
 
-    if (this->lf_mode)      
+    
+    if (this->lf_mode)                 
     {
-        controller.x[3] = 4.0*(this->line_angle - this->line_angle_prev);
+        controller.x[3] = 0.5*(this->line_angle - this->line_angle_prev);
     }
     else
     {
         controller.x[3] = this->angular_rate*0.000001f*MOTOR_CONTROL_DT;
     }
+  
 
 
     // compute controller output

@@ -155,26 +155,29 @@ void LineSensor::process()
     //compute line position arround strongest sensors
     float k = 1.0/((LINE_SENSOR_COUNT/2)*LINE_SENSOR_STEP);
 
+    float left_position_tmp  = left_position;
+    float right_position_tmp = right_position;
+
    
     if (left_valid)
     {
-        left_position  = k*integrate(left_idx);
-        right_position = left_position;
+        left_position_tmp  = k*integrate(left_idx);
+        right_position_tmp = left_position_tmp;
 
     }
 
     if (right_valid)
     {
-        right_position  = k*integrate(right_idx);
+        right_position_tmp  = k*integrate(right_idx);
     }   
 
   
     //solve if line lost
     if ((left_valid == false) && (right_valid == false))
     {
-        if (left_position < -0.8)
+        if (left_position_tmp < -0.8)
             line_lost_type = LINE_LOST_LEFT;
-        else if (left_position > 0.8) 
+        else if (left_position_tmp > 0.8) 
             line_lost_type = LINE_LOST_RIGHT;
         else
             line_lost_type = LINE_LOST_CENTER;
@@ -184,6 +187,12 @@ void LineSensor::process()
         line_lost_type  = LINE_LOST_NONE;
     }
     
+
+    // EMA filter   
+    k = 0.3;  
+    left_position  = (1.0 - k)*left_position  + k*left_position_tmp;
+    right_position = (1.0 - k)*right_position + k*right_position_tmp;
+
     if (abs(left_position) < abs(right_position))
     { 
         minimal_position = left_position;

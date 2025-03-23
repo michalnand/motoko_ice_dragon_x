@@ -10,7 +10,13 @@ class PathPlanner
         void init();
         
         void set_circle_motion(float radius, float speed);
+        void set_circle_motion_trajectory(float radius, float speed);
+
         void direct_control(float x_d, float a_d);
+ 
+        void enable_lf();
+        void disable_lf();
+
 
     private:
         float _get_dt();

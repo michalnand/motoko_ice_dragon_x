@@ -6,6 +6,7 @@
 #define MPC_SYSTEM_ORDER      ((uint32_t)4)
 #define MPC_SYSTEM_INPUTS     ((uint32_t)2)
 #define MPC_PREDCTION_HORIZON ((uint32_t)32)
+#define MPC_CONTROL_HORIZON   ((uint32_t)8)
 
 
 

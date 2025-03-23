@@ -17,10 +17,15 @@ int main()
     {
         led = 1;
 
+        uint32_t m_start = line_sensor.measurement_id;
+        timer.delay_ms(100);
+        uint32_t m_stop  = line_sensor.measurement_id;
+
         terminal << "line sensor\n";
         terminal << "line_lost_type  " << line_sensor.line_lost_type << "\n";
         terminal << "left_position   " << line_sensor.left_position << "\n";
         terminal << "right_position  " << line_sensor.right_position << "\n";
+        terminal << "sampling rate   " << 10*(m_stop - m_start) << " Hz\n";
         terminal << "\n\n";
 
         terminal << "ir sensor\n";
