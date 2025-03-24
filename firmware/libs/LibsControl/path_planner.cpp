@@ -8,7 +8,7 @@ void PathPlanner::init()
        
     // forward acceleration G-force, mm/s^2
     this->a_max = 2.0*9.81*1000.0;
-    this->a_min = -5.0*a_max;
+    this->a_min = -10.0*a_max;
 
     this->uv    = 0.0;
     

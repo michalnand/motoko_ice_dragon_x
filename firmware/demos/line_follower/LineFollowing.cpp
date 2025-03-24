@@ -9,7 +9,7 @@ void LineFollowing::init()
     this->r_max = 10000.0;        
 
 
-    this->q_penalty = 2.0;      
+    this->q_penalty = 3.0;      
     this->qr_max    = 8.0;      
     this->qr_min    = 1.5;  
 
