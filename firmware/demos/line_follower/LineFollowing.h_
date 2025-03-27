@@ -3,7 +3,7 @@
 
 #include <drivers.h>
 #include <path_planner.h>
-#include "QEstimator.h" 
+#include <filter.h> 
 
 class LineFollowing
 {
@@ -16,7 +16,7 @@ class LineFollowing
 
     private:
         PathPlanner path_planner;
-        QEstimator<32> q_estimator;
+        FirFilter<float, 32> quality_filter;
 
     private:
         float speed_min, speed_max;

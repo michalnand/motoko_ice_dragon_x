@@ -2,16 +2,15 @@
 
 void LineFollowing::init()
 {
-    this->speed_min = 500.0;     
-
-    this->speed_max = 1000.0;
-    //this->speed_max = 1200.0;         
+    this->speed_min = 400.0;     
+    this->speed_max = 1200.0;         
 
     this->r_min = 80.0;
-    this->r_max = 10000.0;          
+    this->r_max = 10000.0;        
 
 
-    this->qr_max    = 10.0;         
+    this->q_penalty = 3.0;      
+    this->qr_max    = 8.0;      
     this->qr_min    = 1.5;  
 
     path_planner.init();
@@ -20,7 +19,7 @@ void LineFollowing::init()
 
 int LineFollowing::main()
 {
-    q_estimator.init(1.0, 0.0, 0.0);
+    quality_filter.init(1.0);
 
 
     path_planner.enable_lf();
@@ -69,22 +68,22 @@ int LineFollowing::main()
 
 
         //main line following
-        float position = 0.4*line_sensor.right_position;    
+        float position = 0.5*line_sensor.right_position;    
 
         float radius  = estimate_turn_radius(position, 1.0/r_max);
         radius = -sgn(position)*clip(radius, r_min, r_max);   
-
-        float d = path_planner.position_control.get_distance(); 
-        q_estimator.add(d, line_sensor.right_position);
-
+        
         // estimate line straightness
-        float q = q_estimator.process();
+        quality_filter.step(abs(position));
 
-
+        float q = 1.0 - this->q_penalty*quality_filter.max();   
+        q = clip(q, 0.0, 1.0);    
+        
         //if quality is high (close to 1), increase radius - allows faster speed
         float kr = q*this->qr_max + (1.0 - q)*this->qr_min;  
+
         radius = kr*radius;
-        
+
         //if quality is high (close to 1), use higher speed
         float speed = q*this->speed_max + (1.0 - q)*this->speed_min;  
 

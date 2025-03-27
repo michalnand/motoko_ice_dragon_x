@@ -80,7 +80,7 @@ class MPC
         {
             for (unsigned int i = 0; i < system_inputs; i++)
             {
-                float d = u_raw[i] - this->u[i];
+                float d = u_raw[i] - u_sat[i];
 
                 if (d > eps) 
                 {

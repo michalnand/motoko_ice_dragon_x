@@ -4,13 +4,15 @@
 
 #include <LineFollowing.h>
 
+
 int main()
 {
-    drivers_init();
+    drivers_init(); 
   
     terminal << "\n\n\n"; 
     terminal << "machine ready\n";
     terminal << "system clock " << SystemCoreClock/1000000 << "MHz\n";
+
 
     LineFollowing robot;
     robot.init();

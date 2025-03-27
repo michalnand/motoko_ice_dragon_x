@@ -14,7 +14,7 @@ void PathPlanner::init()
     
     this->time_now  = timer.get_time();
     this->time_prev = this->time_now;
-}
+}   
    
 
 void PathPlanner::set_circle_motion(float radius, float speed)
