@@ -12,6 +12,9 @@ class PathPlanner
         void set_circle_motion(float radius, float speed);
         void set_circle_motion_trajectory(float radius, float speed);
 
+        void set_position(float req_distance, float req_angle);
+        void stop_position();
+
         void direct_control(float x_d, float a_d);
  
         void enable_lf();
@@ -21,6 +24,9 @@ class PathPlanner
     private:
         float _get_dt();
         float _smooth_speed(float desired_velocity, float dt);
+
+        float _smooth_position(float x_req, float v_max, float acc_max, float dt);
+        float _smooth_angle(float x_req, float v_max, float acc_max, float dt);
 
 
 

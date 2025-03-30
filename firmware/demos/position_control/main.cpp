@@ -23,7 +23,7 @@ int main()
     uint32_t steps = 0;
 
     
-    
+    /*
     // position control demo 
     
     while (true)    
@@ -64,30 +64,41 @@ int main()
 
         timer.delay_ms(500);
     }
-    
-    
+    */
 
     /*
-    float velocities[] = {0.0, 2000.0, -2000.0, 0.0};
+    float distances[] = {0.0, 200.0};
 
     while (true)
     {
-        uint32_t idx = (steps/1000)%4;       
+        uint32_t idx = (steps/500)%2;       
         
-        float v_req = velocities[idx];
+        float d_req = distances[idx];
 
-        path_planner.line_following(v_req, 0.0);
-
-        if ((steps%50) == 0)
-        {
-            terminal << v_req << " " << path_planner.position_control.get_velocity() << "\n";
-        }   
+        path_planner.set_position(d_req, 0.0);
 
         timer.delay_ms(4); 
 
         steps++;
     }
     */
+
+
+    float angles[] = {0.0, 90.0};
+
+    while (true)
+    {
+        uint32_t idx = (steps/500)%2;       
+        
+        float a_req = angles[idx]*PI/180.0;
+
+        path_planner.set_position(0.0, a_req);
+
+        timer.delay_ms(4); 
+
+        steps++;
+    }
+
     
 
     return 0;

@@ -7,7 +7,7 @@ void PathPlanner::init()
     position_control.init();
        
     // forward acceleration G-force, mm/s^2
-    this->a_max = 2.0*9.81*1000.0;
+    this->a_max = 1.0*9.81*1000.0;
     this->a_min = -10.0*a_max;
 
     this->uv    = 0.0;
@@ -34,6 +34,21 @@ void PathPlanner::set_circle_motion(float radius, float speed)
     float req_angle    = angle    + va;
    
     this->position_control.set_desired(req_distance, req_angle);
+}
+
+
+
+void PathPlanner::set_position(float req_distance, float req_angle)
+{
+    // obtain current state 
+    float dt        = _get_dt();    
+
+    float req_distance_ = _smooth_position(req_distance, 10000000, 0.75*a_max, dt);
+    float req_angle_    = _smooth_angle(req_angle, 10000000, 0.01*a_max, dt);
+
+    this->position_control.set_desired(req_distance_, req_angle_);  
+
+    this->uv = 0.0;
 }
 
 
@@ -86,36 +101,16 @@ void PathPlanner::set_circle_motion_trajectory(float radius, float speed)
 }
 
 
-
-
-
-/*
-void PathPlanner::point_following(float x_d, float a_d)
+void PathPlanner::stop_position()
 {
-    float dt = _get_dt();
-
+    // obtain current state
     float x = position_control.get_distance();
-    float v = position_control.get_velocity();
+    float a = position_control.get_angle();
 
-    float a = position_control.get_angle(); 
-    float w = position_control.get_angular_velocity();
-
-    // required velocity
-    float v_req = (x_d - x) / dt; 
-
-    // limit velocity change by maximum acceleration
-    float delta_v = clip(v_req - v, -a_max*dt, a_max*dt);
-
-    // limit velocity value by maximum velocity
-    float v_new = clip(v + delta_v, -v_max, v_max);  
-
-    // compute requred distance
-    float x_ref = x + v_new*dt; 
-
-    // send to controller
-    position_control.set_desired(x_ref, a_d);
+    set_position(x, a);
 }
-*/
+
+
 
 void PathPlanner::direct_control(float x_d, float a_d)
 {
@@ -163,7 +158,48 @@ float PathPlanner::_smooth_speed(float desired_velocity, float dt)
     if ((acc_req > 0 && saturation <= 0) || (acc_req < 0 && saturation >= 0))
     {
         uv = uv + 2.0*acc_req;
-    }  
+    }   
 
     return uv*dt;
+}
+
+
+float PathPlanner::_smooth_position(float x_req, float v_max, float acc_max, float dt)
+{   
+    // obtain current state
+    float x = position_control.get_distance();
+    float v = position_control.get_velocity();
+
+    float dx    = x_req - x;
+    float direction = sgn(dx);
+    
+    float v_req = dx/dt;      
+
+    float dv    = clip(v_req - v, -acc_max, acc_max);
+    float v_new = clip(v + dv, -v_max, v_max);
+
+    float x_new = x + v_new * dt;
+
+    return x_new;
+}
+
+
+
+float PathPlanner::_smooth_angle(float x_req, float v_max, float acc_max, float dt)
+{   
+    // obtain current state
+    float x = position_control.get_angle();
+    float v = position_control.get_angular_velocity();
+
+    float dx    = x_req - x;    
+    float direction = sgn(dx);
+    
+    float v_req = dx/dt;      
+
+    float dv    = clip(v_req - v, -acc_max, acc_max);
+    float v_new = clip(v + dv, -v_max, v_max);
+
+    float x_new = x + v_new * dt;
+
+    return x_new;
 }

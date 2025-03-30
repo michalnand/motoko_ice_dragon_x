@@ -11,7 +11,8 @@
 
 //sensitivity
 //#define LINE_SENSOR_THRESHOLD           ((int32_t)500)   
-#define LINE_SENSOR_THRESHOLD           ((int32_t)300)   
+//#define LINE_SENSOR_THRESHOLD           ((int32_t)300)   
+#define LINE_SENSOR_THRESHOLD           ((int32_t)200)   
 
  
 

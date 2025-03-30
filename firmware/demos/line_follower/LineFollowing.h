@@ -13,6 +13,7 @@ class LineFollowing
 
     private:
         float estimate_turn_radius(float sensor_reading, float eps);
+        void line_search(uint32_t line_lost_type);
 
     private:
         PathPlanner path_planner;

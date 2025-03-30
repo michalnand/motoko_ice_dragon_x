@@ -27,6 +27,12 @@ class QEstimator
             this->k1 = k1;
             this->k2 = k2;
         }
+        
+        void reset()
+        {
+            this->distance.init(0);
+            this->line_sensor.init(1);
+        }
 
         void add(float distance, float line_sensor, float ds = 5.0)
         {
