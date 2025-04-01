@@ -20,8 +20,8 @@ if __name__ == "__main__":
     training_dataset = LineDataset(n_samples)
 
     
-    #model = RNNGRUModel(n_inputs, n_outputs, n_hidden)
-    model = RNNBasicModel(n_inputs, n_outputs, n_hidden)
+    model = RNNGRUModel(n_inputs, n_outputs, n_hidden)
+    #model = RNNBasicModel(n_inputs, n_outputs, n_hidden)
     print(model)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
@@ -48,5 +48,5 @@ if __name__ == "__main__":
         print(n, loss, round(100.0*n/steps, 2))
 
 
-    #torch.save(model.state_dict(),  "trained/model_gru_" + str(n_hidden) + ".pt")
-    torch.save(model.state_dict(),  "trained/model_rnn_" + str(n_hidden) + ".pt")
+    torch.save(model.state_dict(),  "trained/model_gru_" + str(n_hidden) + ".pt")
+    #torch.save(model.state_dict(),  "trained/model_rnn_" + str(n_hidden) + ".pt")

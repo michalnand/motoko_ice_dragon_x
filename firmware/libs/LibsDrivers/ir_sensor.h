@@ -2,7 +2,6 @@
 #define _IR_SENSOR_H_
 
 #include <gpio.h>
-#include <biquad_filter.h>
 
 #define IR_SENSORS_COUNT        ((unsigned int)4)
 

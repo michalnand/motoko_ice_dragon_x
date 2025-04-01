@@ -9,25 +9,14 @@
 
 //cubic polynomial calibration coefficients
 
-/*
+
 //robot A
 const float ir_calibration[] = 
 {
-    -2.29540903e+01,  2.96361755e-01, -2.62612931e-04,  8.66668161e-08,
-     9.06688653e+00,  6.64371251e-02, -4.04385662e-05,  9.68716433e-09,
-    -1.52182976e+01,  9.69920014e-02, -5.52549401e-05,  1.16107679e-08,
-    -3.66428832e+00,  1.97931509e-01, -1.71666039e-04,  6.12578482e-08
-}; 
-*/
-
-
-//robot B
-const float ir_calibration[] = 
-{
-    9.80249682e+00,  9.26234367e-02, -5.90240728e-05,  1.77460804e-08,
-    1.43986983e+01,  6.88630342e-02, -3.69489076e-05,  8.81606417e-09,
-    1.09433293e+01,  6.61345111e-02, -4.17044185e-05,  1.02359695e-08,
-     1.83792407e+01,  4.68946392e-02, -2.65283530e-05,  8.01138781e-09
+    -4.03034138e+00,  2.45877538e-01, -1.85604226e-04,  4.91336062e-08,
+    2.72571251e+01,  5.72482685e-02, -2.55581094e-05,  6.17147908e-09,
+    7.90535532e+00,  1.11825243e-01, -7.09537642e-05,  1.55243437e-08,
+    -1.88747631e+01,  2.87659271e-01, -2.23295024e-04,  5.95007835e-08
 }; 
 
 
@@ -95,10 +84,10 @@ void IRSensor::callback()
             int dif = 4096 - (ir_off[i] - ir_on[i]);
 
             //compute distance from raw readings
-            //float d = calibration((float*)(ir_calibration + i*4), dif);
+            float d = calibration((float*)(ir_calibration + i*4), dif);
             
-            float d = dif;      
-
+            //float d = dif;      
+                
             //filter values
             distance[i] = (1.0 - filter_coeff)*distance[i] + filter_coeff*d;
         }
@@ -107,7 +96,7 @@ void IRSensor::callback()
 
 float IRSensor::obstacle_distance()
 {
-    return min(distance[2], distance[3]);
+    return min(distance[0], distance[3]);
 }   
 
 int IRSensor::obstacle_detected()
@@ -118,7 +107,7 @@ int IRSensor::obstacle_detected()
     {
         return 2; 
     }
-    else if (d < 150.0)
+    else if (d < 120.0)
     {
         return 1;
     }

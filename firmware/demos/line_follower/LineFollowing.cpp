@@ -16,17 +16,24 @@ void LineFollowing::init()
     this->qr_min    = 1.5;  
 
     path_planner.init();
-
-}
+} 
 
 int LineFollowing::main()
-{
+{ 
+    /*
+    while (true)
+    {
+      if (ir_sensor.obstacle_detected())
+      {
+        obstacle_avoid(); 
+      }
+    }
+    */
+    
     q_estimator.init(1.0, 0.0, 0.0);
-
-
     path_planner.enable_lf();
 
-  
+
     while (true)
     {
         /*
@@ -41,24 +48,34 @@ int LineFollowing::main()
             obstacle_avoid(); 
             position_control.enable_lf(); 
 
-            speed_min_curr = 0.0; 
-            quality_filter.init(1.0);
+            q_estimator.reset();
           }
           else
           {
             curtain_avoid();
 
-            speed_min_curr = speed_min; 
-            quality_filter.init(1.0);
+            q_estimator.reset();
           } 
 
-          split_line_detector.reset();  
+          //split_line_detector.reset();  
 
           this->obstacle_idx = (this->obstacle_idx+1)%obstacle_map.size();
         }
         */
+
+        // obstacle avoiding
+        int obstacle = ir_sensor.obstacle_detected();
+
+        if (obstacle == 2)
+        {
+            path_planner.disable_lf();
+            obstacle_avoid(); 
+            path_planner.enable_lf(); 
+
+            q_estimator.reset();
+        }
         
-        //lost line search
+        // lost line search
         while (line_sensor.line_lost_type != LINE_LOST_NONE)   
         {
           path_planner.disable_lf();
@@ -69,9 +86,8 @@ int LineFollowing::main()
           //split_line_detector.reset();
         }     
 
-
+        // main line following
         {
-          //main line following
           float position = 0.4*line_sensor.right_position;    
 
           float radius  = estimate_turn_radius(position, 1.0/r_max);
@@ -82,6 +98,12 @@ int LineFollowing::main()
 
           // estimate line straightness
           float q = q_estimator.process();
+
+          // obstacle warning, slow down
+          if (obstacle != 0)
+          {
+            q = 0.0;  
+          }
 
 
           //if quality is high (close to 1), increase radius - allows faster speed
@@ -236,81 +258,82 @@ void LineFollowing::line_search(uint32_t line_lost_type)
 
 
 
-/*
 void LineFollowing::obstacle_avoid()
 {
-  float r_min = 550; //550.0;  
+    float r_min = 550; //550.0;  
 
-  if (FAST_RUN)
-  {
-    r_min = 700.0;
-  } 
-  else  
-  {
-    r_min = 750.0;  
-  }
+    float r_max = 10000.0;
 
-  
-  float r_max = 10000.0;
-  float speed = speed_min;  
-  float d_req = 80.0;      
-  float r_turn= 160.0;    
+    float speed = speed_min;  
+    
+    float d_req = 80.0;      
 
-  float target_distance = position_control.distance - 10.0;  
-  float speed_curr = 0.0;   
-
-  while (ir_sensor.obstacle_distance() < 50.0 || position_control.distance > target_distance) 
-  {
-    speed_curr = clip(speed_curr + 1.0, 0.0, speed);
-    position_control.set(position_control.distance - speed_curr, position_control.angle);
-    timer.delay_ms(4);       
-  } 
-
-  //turn left, 90degrees 
-  float angle_target = position_control.angle + PI/2.0;
-
-  while (angle_target > position_control.angle)
-  {
-    position_control.set_circle_motion(r_turn, speed);
-    timer.delay_ms(4);   
-  } 
-
-  //turn around bostacle, circular motion
-  uint32_t state = 0;  
-  float angle_mark = position_control.angle - 0.6*PI;
-  
-  while (1)   
-  {
-    if (state == 0 && position_control.angle < angle_mark)
+    // move back until minimal distance from obstalce reached 
     {
-      state = 1;    
+      float target_distance = path_planner.position_control.get_distance() - 10.0;  
+      
+      while (ir_sensor.obstacle_distance() < 50.0 || path_planner.position_control.get_distance() > target_distance) 
+      {
+        path_planner.set_circle_motion(r_max, -speed_min);
+        timer.delay_ms(4);       
+      } 
     }
-    else if (state == 1 && line_sensor.line_lost_type == LINE_LOST_NONE)
+
+    //turn left, 90degrees 
     {
-      break; 
-    }   
+      float distance_target = path_planner.position_control.get_distance();
+      float angle_target    = path_planner.position_control.get_angle() + 90.0*PI/180.0;
 
-    float diff   = d_req - ir_sensor.get()[3];  
+      while (abs(path_planner.position_control.get_angle() - angle_target) > 0.02*PI)
+      { 
+        path_planner.set_position(distance_target, angle_target);
+        timer.delay_ms(4);   
+      } 
+    }
+    
+    //turn around obstacle, circular motion
+    {
+      uint32_t state = 0;  
+      float angle_mark = path_planner.position_control.get_angle() - 0.6*PI;
+      
+      while (1)   
+      {
+        if (state == 0 && path_planner.position_control.get_angle() < angle_mark)
+        {
+          state = 1;    
+        }
+        else if (state == 1 && line_sensor.line_lost_type == LINE_LOST_NONE)
+        {
+          break; 
+        }   
 
-    diff = clip(diff, -150.0, 150.0);               
+        float diff   = d_req - ir_sensor.get()[1];  
 
-    float r = 1.0/(abs(0.00005*diff) + 0.00000001);     
+        diff = clip(diff, -150.0, 150.0);               
 
-    r = sgn(diff)*clip(r, r_min, r_max);
+        float r = 1.0/(abs(0.00005*diff) + 0.00000001);     
 
-    position_control.set_circle_motion(r, speed);
-    timer.delay_ms(4);   
-  }
+        r = sgn(diff)*clip(r, r_min, r_max);
 
-  //turn left, 90degrees  
-  angle_target = position_control.angle + PI/2.0;
-  while (angle_target > position_control.angle)
-  {
-    position_control.set_circle_motion(r_turn, speed);
-    timer.delay_ms(4);   
-  }   
+        path_planner.set_circle_motion(r, speed);
+        timer.delay_ms(4);   
+      }
+    } 
+
+
+    //turn left, 90degrees 
+    {
+      float distance_target = path_planner.position_control.get_distance();
+      float angle_target    = path_planner.position_control.get_angle() + 90.0*PI/180.0;
+
+      while (angle_target > path_planner.position_control.get_angle())
+      {
+        path_planner.set_position(distance_target, angle_target);
+        timer.delay_ms(4);   
+      } 
+    }
 }
-*/
+
 
 float LineFollowing::estimate_turn_radius(float sensor_reading, float eps)
 {
