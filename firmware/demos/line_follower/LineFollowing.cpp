@@ -260,12 +260,10 @@ void LineFollowing::line_search(uint32_t line_lost_type)
 
 void LineFollowing::obstacle_avoid()
 {
-    float r_min = 550; //550.0;  
-
-    float r_max = 10000.0;
+    float r_max   = 10000.0;
+    float r_min   = 600.0; 
 
     float speed = speed_min;  
-    
     float d_req = 80.0;      
 
     // move back until minimal distance from obstalce reached 
@@ -291,14 +289,17 @@ void LineFollowing::obstacle_avoid()
       } 
     }
     
+
     //turn around obstacle, circular motion
     {
-      uint32_t state = 0;  
-      float angle_mark = path_planner.position_control.get_angle() - 0.6*PI;
+
+      uint32_t state = 0;   
+      float angle_start = path_planner.position_control.get_angle();
+      float angle_turn  = -90.0*PI/180.0;
       
-      while (1)   
+      while (1)      
       {
-        if (state == 0 && path_planner.position_control.get_angle() < angle_mark)
+        if (state == 0 && (path_planner.position_control.get_angle() - angle_start) < angle_turn)
         {
           state = 1;    
         }
@@ -307,19 +308,18 @@ void LineFollowing::obstacle_avoid()
           break; 
         }   
 
-        float diff   = d_req - ir_sensor.get()[1];  
+        float diff = d_req - ir_sensor.get()[1];     
+        
+        diff = clip(diff, -150.0, 150.0);                
 
-        diff = clip(diff, -150.0, 150.0);               
-
-        float r = 1.0/(abs(0.00005*diff) + 0.00000001);     
-
+        float r = 1.0/(abs(0.001*diff) + 0.000001);     
+        
         r = sgn(diff)*clip(r, r_min, r_max);
-
+        
         path_planner.set_circle_motion(r, speed);
-        timer.delay_ms(4);   
-      }
-    } 
-
+        timer.delay_ms(4);    
+      } 
+    }
 
     //turn left, 90degrees 
     {
@@ -344,3 +344,24 @@ float LineFollowing::estimate_turn_radius(float sensor_reading, float eps)
 
   return r;
 }
+
+
+void LineFollowing::obstacle_test()
+{
+  float speed  = speed_min;
+  
+
+  while (1)
+  {
+    int obstacle = ir_sensor.obstacle_detected();
+    if (obstacle == 2)
+    {
+      break;
+    }
+    
+    timer.delay_ms(4);
+  }
+
+  obstacle_avoid();
+}
+  

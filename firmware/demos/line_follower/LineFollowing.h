@@ -16,6 +16,9 @@ class LineFollowing
         void line_search(uint32_t line_lost_type);
         void obstacle_avoid();
 
+    public:
+        void obstacle_test();
+
     private:
         PathPlanner path_planner;
         QEstimator<32> q_estimator;
