@@ -119,6 +119,22 @@ class QEstimator
             return result;
         }
 
+        float get_curvature()
+        {
+            float curvature = 0.0;
+            float dist_sum  = 0.0;  
+
+            for (unsigned int i = 0; i < window_size; i++)
+            {
+                curvature+= this->line_sensor[i];
+                dist_sum+= this->distance[i];
+            }   
+
+            float result = curvature/(abs(dist_sum) + 0.0001);
+
+            return result;
+        }
+
     
     public:
         float q0, q1, q2;

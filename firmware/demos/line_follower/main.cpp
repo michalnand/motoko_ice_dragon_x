@@ -23,6 +23,7 @@ int main()
     while (true)
     {
       robot.main();
+      //robot.line_search(LINE_LOST_CENTER);
     }
 
     return 0;

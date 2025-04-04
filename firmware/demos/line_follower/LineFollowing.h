@@ -11,9 +11,9 @@ class LineFollowing
         void init();
         int main();
 
-    private:
+    public:
         float estimate_turn_radius(float sensor_reading, float eps);
-        void line_search(uint32_t line_lost_type);
+        void line_search(uint32_t line_lost_type, float curvature);
         void obstacle_avoid();
 
     public:

@@ -78,8 +78,10 @@ int LineFollowing::main()
         // lost line search
         while (line_sensor.line_lost_type != LINE_LOST_NONE)   
         {
+          float curvature = q_estimator.get_curvature();
+
           path_planner.disable_lf();
-          line_search(line_sensor.line_lost_type);
+          line_search(line_sensor.line_lost_type, curvature);
           path_planner.enable_lf();
 
           q_estimator.reset(); 
@@ -124,10 +126,10 @@ int LineFollowing::main()
 
 
 
-void LineFollowing::line_search(uint32_t line_lost_type)
+void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
 {
-  float turn_search_distance    = 70.0;
   float forward_search_distance = 80.0;
+  float turn_search_distance    = 50.0;
 
   uint32_t state = 0; 
   int      way   = 1;
@@ -141,12 +143,20 @@ void LineFollowing::line_search(uint32_t line_lost_type)
   {
     way   = -1;
     state = 0; 
-  }
+  }   
   else
   { 
-    way = 1;
+    if (curvature > 0)
+    {
+      way = 1;
+    }
+    else
+    {
+      way = -1;
+    }
+    
     state = 2;
-  }
+  } 
   
   while (1)
   {
@@ -191,9 +201,9 @@ void LineFollowing::line_search(uint32_t line_lost_type)
       float start_angle     = path_planner.position_control.get_angle();
        
       while (path_planner.position_control.get_distance() < target_distance)
-      { 
-        //path_planner.set_circle_motion(r_max, speed_min);
-        path_planner.set_position(target_distance*1.5, start_angle);
+      {   
+        path_planner.set_circle_motion(r_max, speed_min);
+        //path_planner.set_position(target_distance*1.5, start_angle);
         timer.delay_ms(4);  
 
         if (line_sensor.line_lost_type == LINE_LOST_NONE)
@@ -202,7 +212,7 @@ void LineFollowing::line_search(uint32_t line_lost_type)
         }
       }     
       
-     
+      /*
       // after traveling max distance, try to look at left or right
       float start_distance = path_planner.position_control.get_distance();
       
@@ -250,6 +260,7 @@ void LineFollowing::line_search(uint32_t line_lost_type)
           return;
         }
       }   
+      */
 
       state = 0;  
     }

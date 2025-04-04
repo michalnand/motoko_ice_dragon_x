@@ -7,8 +7,8 @@ void PathPlanner::init()
     position_control.init();
        
     // forward acceleration G-force, mm/s^2
-    this->a_max = 1.0*9.81*1000.0;
-    this->a_min = -10.0*a_max;
+    this->a_max = 2.0*9.81*1000.0;
+    this->a_min = -20.0*a_max;
 
     this->uv    = 0.0;
     
@@ -41,8 +41,8 @@ void PathPlanner::set_circle_motion(float radius, float speed)
 void PathPlanner::set_position(float req_distance, float req_angle)
 {
     // obtain current state 
-    float dt        = _get_dt();    
-
+    float dt        = _get_dt();  
+    
     float req_distance_ = _smooth_position(req_distance, 10000000, 0.75*a_max, dt);
     float req_angle_    = _smooth_angle(req_angle, 10000000, 0.01*a_max, dt);
 
@@ -149,7 +149,14 @@ float PathPlanner::_smooth_speed(float desired_velocity, float dt)
     // estimate required velocity change (acceleration)
     // note : decelerration can be much faster 
     float acc_req = desired_velocity - v;
-    acc_req = clip(acc_req, a_min*dt, a_max*dt);
+
+    float acc = a_max;
+    if (v < 100.0)
+    {
+        acc*= 0.25;
+    } 
+
+    acc_req = clip(acc_req, a_min*dt, acc*dt);
 
     //antiwindup    
     //get_forward_saturation : returns 0 if none, +1 if upper limit, -1 if lower limit
@@ -173,7 +180,12 @@ float PathPlanner::_smooth_position(float x_req, float v_max, float acc_max, flo
     float dx    = x_req - x;
     float direction = sgn(dx);
     
-    float v_req = dx/dt;      
+    float v_req = dx/dt; 
+    
+    if (v < 100.0)
+    {
+        acc_max*= 0.25;
+    }   
 
     float dv    = clip(v_req - v, -acc_max, acc_max);
     float v_new = clip(v + dv, -v_max, v_max);
