@@ -300,3 +300,27 @@ float integrate_step(float x_now, float *x)
 
     return y;
 }
+
+float fmin(float a, float b)
+{
+    if (a < b)
+    {
+        return a;
+    }
+    else
+    {
+        return b;
+    }
+}
+
+float fmax(float a, float b)
+{
+    if (a > b)
+    {
+        return a;
+    }
+    else
+    {
+        return b;
+    }
+}

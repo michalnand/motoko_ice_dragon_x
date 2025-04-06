@@ -66,12 +66,29 @@ int main()
     }
     */
 
-    /*
-    float distances[] = {0.0, 200.0};
 
-    while (true)
+    float r_req[] = {80.0, 100.0, 200.0};
+    float v_req[] = {200.0, 500.0, 800.0};
+    
+    while (true)    
     {
-        uint32_t idx = (steps/500)%2;       
+        uint32_t idx = (steps/500)%3;  
+        float v     = path_planner.position_control.get_velocity();        
+
+        path_planner.set_circle_motion(r_req[idx], v_req[idx]); 
+
+        terminal << v_req[idx] << " " << v << "\n";
+        
+        steps++;
+        timer.delay_ms(4); 
+    }
+    
+    
+    float distances[] = {0.0, 100.0, 0.0, 200.0, 0.0, 500.0};
+
+    while (true)    
+    {
+        uint32_t idx = (steps/500)%6;       
         
         float d_req = distances[idx];
 
@@ -81,9 +98,9 @@ int main()
 
         steps++;
     }
-    */
+    
 
-
+    
     float angles[] = {0.0, 90.0};
 
     while (true)
@@ -98,9 +115,10 @@ int main()
 
         steps++;
     }
-
+    
     
 
+    
     return 0;
 }
   

@@ -139,7 +139,7 @@ void LineSensor::process()
             left_valid = true; 
             break;
         }
-
+        
     //find most right sensor on line 
     unsigned int right_idx = 0;
     bool right_valid = false;

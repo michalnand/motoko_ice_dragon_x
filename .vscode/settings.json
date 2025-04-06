@@ -13,6 +13,10 @@
         "string": "cpp",
         "string_view": "cpp",
         "complex": "cpp",
-        "__availability": "cpp"
+        "__availability": "cpp",
+        "limits": "cpp",
+        "algorithm": "cpp",
+        "*.h_": "cpp",
+        "*.cpp_": "cpp"
     }
 }

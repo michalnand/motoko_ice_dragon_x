@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <matrix.h>
-
+#include <fmath.h>
 
 /*
 MPC - analytical MPC
@@ -15,7 +15,7 @@ class MPC
 {
 
     public:
-        void init(const float *phi, const float *omega, const float *sigma, float antiwindup)
+        void init(const float *phi, const float *omega, const float *sigma)
         {   
             this->x.init();
             this->xr.init();
@@ -25,8 +25,6 @@ class MPC
             this->phi.from_array((float*)phi);
             this->omega.from_array((float*)omega);
             this->sigma.from_array((float*)sigma);
-
-            this->antiwindup = antiwindup;
         }
 
         void set_xr(uint32_t step, uint32_t input, float  value)
@@ -66,14 +64,27 @@ class MPC
         { 
             // analytical mpc
             auto s      = this->xr - this->phi*x;
-            auto u_new   = this->sigma*s;    
+            auto u_new  = this->sigma*s;    
             
             // antiwindup
-            this->u     = u_new.clip(-antiwindup, antiwindup);
+            float u_forward = u_new[0];
+            float u_turn    = u_new[1];
             
+            u_turn = clip(u_turn, -1.0f, 1.0f);
+            
+            // clamp u forward
+            float max_u_forward = fmin(1.0 - u_turn, 1.0 + u_turn);
+            float min_u_forward = fmax(-1.0 - u_turn, -1.0 + u_turn);
+            
+            u_forward = clip(u_forward, min_u_forward, max_u_forward);
+
+            this->u[0] = u_forward;
+            this->u[1] = u_turn;
+
             // set saturation flags is any
             this->_detect_saturation(u_new, this->u);
         } 
+
 
     private:
         void _detect_saturation(Matrix<float, system_inputs, 1> &u_raw, Matrix<float, system_inputs, 1> &u_sat, float eps = 0.0001)
@@ -106,8 +117,6 @@ class MPC
         Matrix<int,     system_inputs, 1>                       saturation; 
 
     private:
-        float antiwindup;
-
         //controller gain
         Matrix<float, system_order*prediction_horizon, system_order>  phi;
         Matrix<float, system_order*prediction_horizon, system_inputs> omega;

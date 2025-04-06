@@ -87,8 +87,8 @@ class MotorControl
         float left_req_velocity, right_req_velocity;
 
 
-        AS5600T<5, 12, 2,  TGPIOB, TGPIOC> right_encoder;
-        AS5600T<11, 10, 2, TGPIOC, TGPIOC> left_encoder;
+        AS5600T<5, 12, 5,  TGPIOB, TGPIOC> right_encoder;
+        AS5600T<11, 10, 5, TGPIOC, TGPIOC> left_encoder;
 
       
         MotionFilterEMA right_filter, left_filter;    

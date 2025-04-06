@@ -59,4 +59,8 @@ float first_difference_4(float x_now, float *x, float dt);
 //float *x holds 3 last values
 float integrate_step(float x_now, float *x);
 
+
+float fmin(float a, float b);
+float fmax(float a, float b);
+
 #endif

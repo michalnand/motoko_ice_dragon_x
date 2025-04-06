@@ -54,7 +54,7 @@ void PositionControl::init()
     controller.init(k, 1.0);
     */
 
-    controller.init(phi, omega, sigma, 1.0);
+    controller.init(phi, omega, sigma);
 
 
 
@@ -83,8 +83,7 @@ void PositionControl::set_desired(float distance, float angle)
     */
 
     controller.set_constant_xr(0, distance);
-    controller.set_constant_xr(1, angle);
-
+    controller.set_constant_xr(1, angle);   
 }
 
 void PositionControl::set_desired_trajectory(uint32_t step, float distance, float angle)
@@ -137,13 +136,10 @@ void PositionControl::callback()
 
     // send to motors   
     float u_forward  = controller.u[0];
-    float u_turn     = controller.u[1];      
-
+    float u_turn     = controller.u[1];   
+    
     float u_right   = u_forward + u_turn;
     float u_left    = u_forward - u_turn;
-
-    this->u_forward = u_forward;
-    this->u_turn    = u_turn;
 
     float max_rpm = 2000;
 

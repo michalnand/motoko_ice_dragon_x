@@ -3,13 +3,13 @@
 
 #include <array.h>
 
-template<class DType, unsigned int size>
+template<class DType, unsigned int buffer_size>
 class FifoBuffer
 {
     public:
         void init(DType value = 0)
         {
-            for (unsigned int i = 0; i < size; i++)
+            for (unsigned int i = 0; i < buffer_size; i++)
             {
                 this->x[i] = value;
             }
@@ -17,12 +17,17 @@ class FifoBuffer
 
         void add(DType x)   
         {
-            for (int i = (int)(size-1); i > 0; i--)
+            for (int i = (int)(buffer_size-1); i > 0; i--)
             {
                 this->x[i] = this->x[i-1];
             }
 
             this->x[0] = x;
+        }
+
+        unsigned int size()
+        {
+            return buffer_size;
         }
 
         DType& operator[](unsigned int index)
@@ -36,7 +41,7 @@ class FifoBuffer
         }
 
     private:
-        Array<DType, size> x;
+        Array<DType, buffer_size> x;
 };
 
 #endif

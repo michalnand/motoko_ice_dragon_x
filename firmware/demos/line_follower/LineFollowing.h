@@ -15,18 +15,28 @@ class LineFollowing
         float estimate_turn_radius(float sensor_reading, float eps);
         void line_search(uint32_t line_lost_type, float curvature);
         void obstacle_avoid();
+        void curtain_avoid();
 
-    public:
-        void obstacle_test();
+        void led_blink(uint32_t count = 20);
+
 
     private:
         PathPlanner path_planner;
         QEstimator<32> q_estimator;
 
+
+        
+
     private:
         float speed_min, speed_max;
         float r_min,  r_max; 
         float q_penalty, qr_max, qr_min;
+
+    private:
+        uint32_t steps;
+        Gpio<TGPIOB, 2, GPIO_MODE_OUT> led;   
+        
+
 };
 
 

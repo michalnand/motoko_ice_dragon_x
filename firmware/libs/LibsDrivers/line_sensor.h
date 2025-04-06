@@ -14,7 +14,7 @@
 //#define LINE_SENSOR_THRESHOLD           ((int32_t)300)   
 #define LINE_SENSOR_THRESHOLD           ((int32_t)200)   
 
- 
+    
 
 //brace from first to last sesor in mm
 #define SENSORS_BRACE                  ((float)70.0)

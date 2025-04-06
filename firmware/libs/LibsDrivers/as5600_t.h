@@ -55,45 +55,49 @@ class AS5600T
 
             this->angle         = 0; 
 
-            //check if device responds using ACK, since sensor doesn't have WHO_AM_I ID
-            unsigned char ack = i2c_check(I2C_ADDRESS);
-            if (ack == 0)
+            int init_res = -1;
+            int cnt      = 10;
+            
+            while (init_res != 0 && cnt > 0)
             {
-                return -1;
-            }  
+                i2c_write_reg(0xff, 0x00, 0xaa);
+                i2c_write_reg(0xff, 0xaa, 0x00);
+                
+                //check if device responds using ACK, since sensor doesn't have WHO_AM_I ID
+                unsigned char ack = i2c_check(I2C_ADDRESS);
+                if (ack != 0)
+                {
+                    init_res = 0;
+                }  
 
-            
-           
-            //power on
-            //hysteresis 1 LSB 
-            //slow filter only, 8x 
-            i2c_write_reg(I2C_ADDRESS, CONF_L_ADR, (1<<2));
-            i2c_write_reg(I2C_ADDRESS, CONF_H_ADR, (1<<0)); 
+                //power on
+                //hysteresis 1 LSB 
+                //slow filter only, 8x 
+                i2c_write_reg(I2C_ADDRESS, CONF_L_ADR, (1<<2));
+                i2c_write_reg(I2C_ADDRESS, CONF_H_ADR, (1<<0)); 
 
 
-            //hysteresis 2 LSB 
-            //slow filter only, 8x 
-            //i2c_write_reg(I2C_ADDRESS, CONF_L_ADR, (1<<3));
-            //i2c_write_reg(I2C_ADDRESS, CONF_H_ADR, (1<<0)); 
-            
- 
-            this->position          = 0;
-            this->position_prev     = 0;
-            this->prev_value        = 0;
+                this->position          = 0;
+                this->position_prev     = 0;
+                this->prev_value        = 0;
 
-            //set zero angle
-            set_zero();
-            set_zero();
+                //set zero angle
+                set_zero();
+                set_zero(); 
 
-            this->read_angle();
-            this->update();
+                this->read_angle();
+                this->update();
+
+                cnt--;
+            }
 
 
             this->position          = this->angle;
             this->position_prev     = this->angle;
             this->prev_value        = 0;
             
-            return 0;
+           
+            return init_res;
         }
 
         int32_t read_angle()
