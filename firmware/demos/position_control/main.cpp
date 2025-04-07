@@ -2,7 +2,77 @@
 
 #include <path_planner.h>
 
+void motion_test(PathPlanner &path_planner)
+{
+    float turn_search_distance      = 50.0;
+    float forward_search_distance   = 80.0;
+    float r_search  = 90.0;
+    float r_max     = 10000.0;
 
+    float speed     = 500.0;
+    float acc_max   = 3.0*9.81*1000.0;
+
+    int state       = 2;
+    int way         = 1;    
+
+    
+    while (true)
+    {
+        // left or right line searching
+        if (state == 0 || state == 1)
+        {
+            //turn until line found, or distance trehold
+            float start_distance      = path_planner.position_control.get_distance();
+            float target_distance     = start_distance + turn_search_distance;
+
+            while (path_planner.position_control.get_distance() < target_distance)
+            { 
+                path_planner.set_circle_motion(way*r_search, 0.25*speed, acc_max);
+                timer.delay_ms(4);      
+
+                if (line_sensor.line_lost_type == LINE_LOST_NONE)
+                {
+                    //return;
+                } 
+            }       
+
+            while (path_planner.position_control.get_distance() > start_distance)
+            { 
+                path_planner.set_circle_motion(way*r_search, -0.25*speed, acc_max);
+                timer.delay_ms(4);    
+                
+                if (line_sensor.line_lost_type == LINE_LOST_NONE)
+                {
+                    //return;
+                }
+            }     
+
+            way*= -1;
+
+            state++;
+        }
+        // line lost in midle, center
+        // go forward, until line found or maximal distance reached
+        else
+        {          
+            float start_distance      = path_planner.position_control.get_distance();
+            float target_distance     = start_distance + forward_search_distance;
+
+            while (path_planner.position_control.get_distance() < target_distance)
+            {   
+                path_planner.set_circle_motion(r_max, speed, acc_max);
+                timer.delay_ms(4);  
+
+                if (line_sensor.line_lost_type == LINE_LOST_NONE)
+                {
+                    //return; 
+                }
+            }     
+
+            state = 0;  
+        }
+    }
+}
 
 int main()
 {
@@ -20,9 +90,16 @@ int main()
     path_planner.init();
 
 
-    uint32_t steps = 0;
+    while (1)
+    {
+        motion_test(path_planner);
+    }
 
     
+
+    uint32_t steps = 0;
+
+  
     /*
     // position control demo 
     
@@ -75,7 +152,7 @@ int main()
         uint32_t idx = (steps/500)%3;  
         float v     = path_planner.position_control.get_velocity();        
 
-        path_planner.set_circle_motion(r_req[idx], v_req[idx]); 
+        path_planner.set_circle_motion(r_req[idx], v_req[idx], 3.0*9.81*1000); 
 
         terminal << v_req[idx] << " " << v << "\n";
         

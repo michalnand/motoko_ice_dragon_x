@@ -28,7 +28,7 @@ class LineFollowing
         
 
     private:
-        float speed_min, speed_max;
+        float acc_max, speed_min, speed_max;
         float r_min,  r_max; 
         float q_penalty, qr_max, qr_min;
 

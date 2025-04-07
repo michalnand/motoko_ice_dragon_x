@@ -22,8 +22,8 @@ int main()
 
     while (true)
     {
-      //robot.main();
-      robot.line_search(LINE_LOST_CENTER, 0);
+      robot.main();
+      //robot.line_search(LINE_LOST_CENTER, 0);
     }
 
     return 0;

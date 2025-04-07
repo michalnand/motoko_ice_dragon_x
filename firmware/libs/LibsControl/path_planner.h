@@ -14,8 +14,8 @@ class PathPlanner
 
         void set_position(float distance, float angle);
 
-        void set_circle_motion(float r_req, float v_req);
-        void set_circle_motion_trajectory(float radius, float speed);
+        void set_circle_motion(float r_req, float v_req, float acc_max);
+        void set_circle_motion_trajectory(float r_req, float v_req, float acc_max);
 
         void enable_lf();
         void disable_lf();
