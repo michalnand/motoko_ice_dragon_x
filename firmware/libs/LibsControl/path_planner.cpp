@@ -7,11 +7,13 @@ void PathPlanner::init()
     position_control.init();
 
     this->acc_max   = 3*9.81*1000.0;
+    this->acc_min   = -30*9.81*1000.0;
 
     this->tau_f     = 0.2;  
     this->v_smooth  = 0.0;  
 
     this->acc_w_max = 2*9.81*1000.0;
+
     this->tau_t     = 0.05;
     this->w_smooth  = 0.0;
 
@@ -41,7 +43,7 @@ void PathPlanner::set_position(float x_req, float a_req)
     float dx    = x_req - x;
     float v_req = dx/dt;    
     
-    float v_new    = v + clip(v_req - v, -acc_max, acc_max);
+    float v_new    = v + clip(v_req - v, acc_min, acc_max);
     this->v_smooth = (1.0 - alpha_f)*this->v_smooth + alpha_f*v_new;
 
     float v_tmp    = min(abs(v_req), abs(this->v_smooth))*sgn(v_req);
@@ -67,7 +69,7 @@ void PathPlanner::set_position(float x_req, float a_req)
 }
 
 
-void PathPlanner::set_circle_motion(float r_req, float v_req, float acc_max)
+void PathPlanner::set_circle_motion(float r_req, float v_req)
 {   
     // obtain time interval
     float dt = _get_dt();
@@ -82,7 +84,7 @@ void PathPlanner::set_circle_motion(float r_req, float v_req, float acc_max)
     float acc_req = v_req - v;
 
     // accelearation limit
-    acc_req = clip(acc_req, -acc_max*dt, acc_max*dt);
+    acc_req = clip(acc_req, acc_min*dt, acc_max*dt);
 
 
     //antiwindup    
@@ -105,7 +107,7 @@ void PathPlanner::set_circle_motion(float r_req, float v_req, float acc_max)
     this->position_control.set_desired(req_x, req_angle);
 }
 
-void PathPlanner::set_circle_motion_trajectory(float r_req, float v_req, float acc_max)
+void PathPlanner::set_circle_motion_trajectory(float r_req, float v_req)
 {
     // obtain time interval
     float dt = _get_dt();
@@ -120,7 +122,7 @@ void PathPlanner::set_circle_motion_trajectory(float r_req, float v_req, float a
     float acc_req = v_req - v;
 
     // accelearation limit
-    acc_req = clip(acc_req, -acc_max*dt, acc_max*dt);
+    acc_req = clip(acc_req, acc_min*dt, acc_max*dt);
 
     //antiwindup    
     //get_forward_saturation : returns 0 if none, +1 if upper limit, -1 if lower limit

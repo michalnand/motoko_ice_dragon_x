@@ -20,7 +20,7 @@ int main()
     // wait for key press
     int key_result = button();
 
-    while (true)
+    while (true)  
     {
       robot.main();
       //robot.line_search(LINE_LOST_CENTER, 0);

@@ -8,19 +8,18 @@ void LineFollowing::init()
     //this->speed_max = 800.0;
     //this->speed_max = 1000.0;
     //this->speed_max = 1200.0;  
-    
-    this->acc_max = 3.0*9.81*1000.0;
-
+        
     this->r_min   = 80.0;
     this->r_max   = 10000.0;          
 
-
     this->qr_max  = 10.0;         
-    this->qr_min  = 1.5;  
+    this->qr_min  = 2.0;  
 
     led = 0;
     this->steps = 0;
+
     path_planner.init();
+    split_line_detector.init(30.0, 0.9);
 } 
 
 int LineFollowing::main()
@@ -78,6 +77,7 @@ int LineFollowing::main()
             path_planner.enable_lf(); 
 
             q_estimator.reset();
+            split_line_detector.reset();
         }
         
         // lost line search
@@ -90,8 +90,26 @@ int LineFollowing::main()
           path_planner.enable_lf();
 
           q_estimator.reset(); 
-          //split_line_detector.reset();
-        }     
+          split_line_detector.reset();
+        }   
+        
+        /*
+        // this detects if there is splited line on and voids robot to cycle on loop forewer
+        int split_detection = split_line_detector.step(path_planner.position_control.get_distance(), line_sensor.left_position, line_sensor.right_position);
+
+        if (split_detection != 0)   
+        {
+          float target_distance = path_planner.position_control.get_distance() + 80.0;
+
+          while (path_planner.position_control.get_distance() < target_distance)
+          { 
+            path_planner.set_circle_motion(sgn(split_detection)*r_min, speed_min);
+            timer.delay_ms(4);      
+          }       
+
+          q_estimator.reset();
+        } 
+        */
 
         // main line following
         {
@@ -120,8 +138,8 @@ int LineFollowing::main()
           //if quality is high (close to 1), use higher speed
           float speed = (1.0 - q)*this->speed_min + q*this->speed_max;  
 
-          path_planner.set_circle_motion_trajectory(radius, speed, this->acc_max);
-          //path_planner.set_circle_motion(radius, speed, this->acc_max);
+          path_planner.set_circle_motion_trajectory(radius, speed);
+          //path_planner.set_circle_motion(radius, speed);
           timer.delay_ms(4); 
         }
     }   
@@ -135,16 +153,16 @@ int LineFollowing::main()
 void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
 {
     float turn_search_distance      = 50.0;
-    float forward_search_distance   = 80.0;
+    float turn_search_distance_long = 80.0;
+    float forward_search_distance   = 70.0;
+
     float r_search  = 90.0;
     float r_max     = 10000.0;
 
     float speed     = 500.0;
-    float acc_max   = 3.0*9.81*1000.0;
 
     int state       = 2;
     int way         = 1; 
-
 
     if (line_lost_type == LINE_LOST_LEFT)
     {
@@ -176,18 +194,30 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
         // left or right line searching
         if (state == 0 || state == 1)
         {
+            // stop motors
+            float d_target  = path_planner.position_control.get_distance();
+            float a_target  = path_planner.position_control.get_angle();
+
+            while (path_planner.position_control.get_velocity() > 10.0)
+            { 
+                path_planner.set_position(d_target, a_target);
+                timer.delay_ms(4);      
+
+                led_blink();
+            }   
+
             //turn until line found, or distance trehold
             float start_distance      = path_planner.position_control.get_distance();
             float target_distance     = start_distance + turn_search_distance;
 
             while (path_planner.position_control.get_distance() < target_distance)
             { 
-                path_planner.set_circle_motion(way*r_search, 0.25*speed, acc_max);
+                path_planner.set_circle_motion(way*r_search, 0.25*speed);
                 timer.delay_ms(4);      
 
                 if (line_sensor.line_lost_type == LINE_LOST_NONE)
                 {
-                  return;
+                  return; 
                 } 
 
                 led_blink();
@@ -195,7 +225,7 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
 
             while (path_planner.position_control.get_distance() > start_distance)
             { 
-                path_planner.set_circle_motion(way*r_search, -0.25*speed, acc_max);
+                path_planner.set_circle_motion(way*r_search, -0.25*speed);
                 timer.delay_ms(4);    
                 
                 if (line_sensor.line_lost_type == LINE_LOST_NONE)
@@ -212,14 +242,14 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
         }
         // line lost in midle, center
         // go forward, until line found or maximal distance reached
-        else
+        else if (state == 2)  
         {          
             float start_distance      = path_planner.position_control.get_distance();
             float target_distance     = start_distance + forward_search_distance;
 
             while (path_planner.position_control.get_distance() < target_distance)
             {   
-                path_planner.set_circle_motion(r_max, speed, acc_max);
+                path_planner.set_circle_motion(r_max, speed);
                 timer.delay_ms(4);  
 
                 if (line_sensor.line_lost_type == LINE_LOST_NONE)
@@ -228,9 +258,52 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
                 }
 
                 led_blink();
-            }     
-
+            }       
+            
             state = 0;  
+        }
+        // wave motion to find line
+        else
+        {
+          float search_distance = 0.5*turn_search_distance;
+          while (1)
+          {
+            float start_distance      = path_planner.position_control.get_distance();
+            float target_distance     = start_distance + search_distance;
+
+            while (path_planner.position_control.get_distance() < target_distance)
+            {   
+                path_planner.set_circle_motion(r_search, 0.5*speed_min);
+                timer.delay_ms(4);  
+
+                if (line_sensor.line_lost_type == LINE_LOST_NONE)
+                {
+                  return; 
+                }   
+ 
+                led_blink();
+            }  
+
+            search_distance = turn_search_distance;
+          
+            {
+              float start_distance      = path_planner.position_control.get_distance();
+              float target_distance     = start_distance + search_distance;
+            
+              while (path_planner.position_control.get_distance() < target_distance)
+              {   
+                  path_planner.set_circle_motion(-r_search, 0.5*speed_min);
+                  timer.delay_ms(4);  
+
+                  if (line_sensor.line_lost_type == LINE_LOST_NONE)
+                  {
+                    return; 
+                  }
+
+                  led_blink();
+              }  
+            }
+          }
         }
     }
 }
@@ -240,7 +313,7 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
 void LineFollowing::obstacle_avoid()
 {
     float r_max   = 10000.0;
-    float r_min   = 620.0; 
+    float r_min   = 680.0; 
 
     float speed = speed_min;  
     float d_req = 80.0;      
@@ -251,7 +324,7 @@ void LineFollowing::obstacle_avoid()
       
       while (ir_sensor.obstacle_distance() < 50.0 || path_planner.position_control.get_distance() > target_distance) 
       {
-        path_planner.set_circle_motion(r_max, -speed_min, this->acc_max);
+        path_planner.set_circle_motion(r_max, -speed_min);
         timer.delay_ms(4);       
       } 
     }
@@ -295,7 +368,7 @@ void LineFollowing::obstacle_avoid()
         
         r = sgn(diff)*clip(r, r_min, r_max);
         
-        path_planner.set_circle_motion(r, speed, this->acc_max);
+        path_planner.set_circle_motion(r, speed);
         timer.delay_ms(4);    
       } 
     }
@@ -340,8 +413,8 @@ void LineFollowing::curtain_avoid()
     //if quality is high (close to 1), use higher speed
     float speed = q*this->speed_max + (1.0 - q)*this->speed_min;  
 
-    //path_planner.set_circle_motion_trajectory(radius, speed, this->acc_max);
-    path_planner.set_circle_motion(radius, speed, this->acc_max);
+    //path_planner.set_circle_motion_trajectory(radius, speed);
+    path_planner.set_circle_motion(radius, speed);
     timer.delay_ms(4); 
   }
 }

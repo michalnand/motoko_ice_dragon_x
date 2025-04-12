@@ -14,8 +14,8 @@ class PathPlanner
 
         void set_position(float distance, float angle);
 
-        void set_circle_motion(float r_req, float v_req, float acc_max);
-        void set_circle_motion_trajectory(float r_req, float v_req, float acc_max);
+        void set_circle_motion(float r_req, float v_req);
+        void set_circle_motion_trajectory(float r_req, float v_req);
 
         void enable_lf();
         void disable_lf();
@@ -26,11 +26,11 @@ class PathPlanner
     public:
         PositionControl position_control;
 
-    public:
+    private:
         float dt, uv;
         float time_now, time_prev;
 
-        float acc_max, tau_f, v_smooth;
+        float acc_min, acc_max, tau_f, v_smooth;
         float acc_w_max, tau_t, w_smooth;
         
 };
