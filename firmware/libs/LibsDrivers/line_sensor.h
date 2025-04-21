@@ -64,7 +64,7 @@ class LineSensor
 
 
         //this stores last valid line position <-1, 1>
-        float left_position, right_position;
+        float left_position, right_position, center_position;
 
         float minimal_position, extremal_position;
 

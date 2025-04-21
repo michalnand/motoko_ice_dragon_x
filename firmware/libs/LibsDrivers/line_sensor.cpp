@@ -51,6 +51,7 @@ void LineSensor::init()
 
     left_position = 0.0;
     right_position = 0.0;
+    center_position = 0.0;
 
     minimal_position = 0.0;
     extremal_position = 0.0; 
@@ -175,12 +176,18 @@ void LineSensor::process()
     //solve if line lost
     if ((left_valid == false) && (right_valid == false))
     {
-        if (left_position_tmp < -0.8)
+        if (left_position_tmp < -0.6)
+        {
             line_lost_type = LINE_LOST_LEFT;
-        else if (left_position_tmp > 0.8) 
+        }
+        else if (left_position_tmp > 0.6) 
+        {
             line_lost_type = LINE_LOST_RIGHT;
+        }
         else
+        {
             line_lost_type = LINE_LOST_CENTER;
+        }
     }
     else
     {
@@ -192,6 +199,8 @@ void LineSensor::process()
     k = 0.3;  
     left_position  = (1.0 - k)*left_position  + k*left_position_tmp;
     right_position = (1.0 - k)*right_position + k*right_position_tmp;
+
+    center_position = (left_position + right_position)/2.0;
 
     if (abs(left_position) < abs(right_position))
     { 

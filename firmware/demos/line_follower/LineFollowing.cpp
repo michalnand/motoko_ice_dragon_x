@@ -20,64 +20,48 @@ void LineFollowing::init()
 
     path_planner.init();
     split_line_detector.init(30.0, 0.9);
+
+
+    this->obstacle_idx = 0;
+    obstacle_map.set(true);
+
+    
+    obstacle_map[0] = true;
+    obstacle_map[1] = false;
+    obstacle_map[2] = false;
+    obstacle_map[3] = true;
+    
 } 
 
 int LineFollowing::main()
-{ 
-    /*
-    while (true)
-    {
-      if (ir_sensor.obstacle_detected())
-      {
-        obstacle_avoid(); 
-      }
-    }
-    */
-    
+{     
     q_estimator.init(1.0, 0.0, 0.0);
     path_planner.enable_lf();
 
 
     while (true)
     {
-        /*
-        int obstacle = ir_sensor.obstacle_detected();
-
-        //obstacle avoiding
-        if (obstacle == 2) 
-        {
-          if (obstacle_map[this->obstacle_idx] == true)
-          {
-            position_control.disable_lf();
-            obstacle_avoid(); 
-            position_control.enable_lf(); 
-
-            q_estimator.reset();
-          }
-          else
-          {
-            curtain_avoid();
-
-            q_estimator.reset();
-          } 
-
-          //split_line_detector.reset();  
-
-          this->obstacle_idx = (this->obstacle_idx+1)%obstacle_map.size();
-        }
-        */
-
         // obstacle avoiding
         int obstacle = ir_sensor.obstacle_detected();
 
         if (obstacle == 2)
         {
+          if (obstacle_map[this->obstacle_idx] == true)
+          {
             path_planner.disable_lf();
             obstacle_avoid(); 
             path_planner.enable_lf(); 
 
             q_estimator.reset();
             split_line_detector.reset();
+          }
+          else
+          {
+            curtain_avoid();
+            q_estimator.reset();
+          }
+
+          this->obstacle_idx = (this->obstacle_idx+1)%obstacle_map.size();
         }
         
         // lost line search
@@ -95,7 +79,7 @@ int LineFollowing::main()
         
         /*
         // this detects if there is splited line on and voids robot to cycle on loop forewer
-        int split_detection = split_line_detector.step(path_planner.position_control.get_distance(), line_sensor.left_position, line_sensor.right_position);
+        int split_detection = split_line_detector.step(path_planner.position_control.get_distance(), line_sensor.left_position, line_sensor.center_position);
 
         if (split_detection != 0)   
         {
@@ -111,16 +95,16 @@ int LineFollowing::main()
         } 
         */
 
-        // main line following
+        // main line following  
         {
-          float position = 0.4*line_sensor.right_position;    
-          //float position = line_sensor.right_position;    
+          float position = 0.4*line_sensor.center_position;    
+          //float position = line_sensor.center_position;    
 
           float radius  = estimate_turn_radius(position, 1.0/r_max);
           radius = -sgn(position)*clip(radius, r_min*0.1, r_max);    
 
           float d = path_planner.position_control.get_distance(); 
-          q_estimator.add(d, line_sensor.right_position, radius);
+          q_estimator.add(d, line_sensor.center_position, radius);
 
           // estimate line straightness
           float q = q_estimator.process();
@@ -152,8 +136,7 @@ int LineFollowing::main()
 
 void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
 {
-    float turn_search_distance      = 50.0;
-    float turn_search_distance_long = 80.0;
+    float turn_search_distance      = 40.0;
     float forward_search_distance   = 70.0;
 
     float r_search  = 90.0;
@@ -164,6 +147,7 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
     int state       = 2;
     int way         = 1; 
 
+    /*
     if (line_lost_type == LINE_LOST_LEFT)
     {
       way   = 1;
@@ -187,6 +171,32 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
       
       state = 2;
     } 
+    */
+
+    if (line_lost_type == LINE_LOST_LEFT)
+    {
+      way   = 1;
+      state = 3;
+    }
+    else if (line_lost_type == LINE_LOST_RIGHT)
+    {
+      way   = -1;
+      state = 3;  
+    }   
+    else
+    {   
+      if (curvature > 0)
+      {
+        way = 1;
+      }
+      else
+      {
+        way = -1;
+      }
+      
+      state = 2;
+    } 
+
 
   
     while (true)
@@ -228,10 +238,12 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
                 path_planner.set_circle_motion(way*r_search, -0.25*speed);
                 timer.delay_ms(4);    
                 
+                
                 if (line_sensor.line_lost_type == LINE_LOST_NONE)
                 {
                   return;
                 }
+                
 
                 led_blink();
             }     
@@ -266,6 +278,8 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
         else
         {
           float search_distance = 0.5*turn_search_distance;
+
+          
           while (1)
           {
             float start_distance      = path_planner.position_control.get_distance();
@@ -273,7 +287,7 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
 
             while (path_planner.position_control.get_distance() < target_distance)
             {   
-                path_planner.set_circle_motion(r_search, 0.5*speed_min);
+                path_planner.set_circle_motion(way*r_search, 0.5*speed_min);
                 timer.delay_ms(4);  
 
                 if (line_sensor.line_lost_type == LINE_LOST_NONE)
@@ -284,15 +298,18 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
                 led_blink();
             }  
 
+            way = -way;
+
             search_distance = turn_search_distance;
-          
+            
+            /*
             {
               float start_distance      = path_planner.position_control.get_distance();
               float target_distance     = start_distance + search_distance;
             
               while (path_planner.position_control.get_distance() < target_distance)
               {   
-                  path_planner.set_circle_motion(-r_search, 0.5*speed_min);
+                  path_planner.set_circle_motion(way*r_search, 0.5*speed_min);
                   timer.delay_ms(4);  
 
                   if (line_sensor.line_lost_type == LINE_LOST_NONE)
@@ -303,6 +320,7 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
                   led_blink();
               }  
             }
+            */
           }
         }
     }
@@ -313,10 +331,10 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
 void LineFollowing::obstacle_avoid()
 {
     float r_max   = 10000.0;
-    float r_min   = 680.0; 
+    float r_min   = 700.0; 
 
     float speed = speed_min;  
-    float d_req = 80.0;      
+    float d_req = 85.0;       
 
     // move back until minimal distance from obstalce reached 
     {
@@ -364,7 +382,7 @@ void LineFollowing::obstacle_avoid()
         
         diff = clip(diff, -150.0, 150.0);                 
 
-        float r = 1.0/(abs(0.004*diff) + 0.000001); //0.002
+        float r = 1.0/(abs(0.01*diff) + 0.000001); //0.002
         
         r = sgn(diff)*clip(r, r_min, r_max);
         
@@ -395,13 +413,13 @@ void LineFollowing::curtain_avoid()
 
   while (path_planner.position_control.get_distance() < target_distance)
   {
-    float position = 0.4*line_sensor.right_position;    
+    float position = 0.4*line_sensor.center_position;    
 
     float radius  = estimate_turn_radius(position, 1.0/r_max);
     radius = -sgn(position)*clip(radius, r_min, r_max);   
 
     float d = path_planner.position_control.get_distance(); 
-    q_estimator.add(d, line_sensor.right_position, radius);
+    q_estimator.add(d, line_sensor.center_position, radius);
 
     // estimate line straightness
     float q = q_estimator.process();

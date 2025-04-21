@@ -35,6 +35,10 @@ class LineFollowing
     private:
         uint32_t steps;
         Gpio<TGPIOB, 2, GPIO_MODE_OUT> led;   
+
+    private:
+        uint32_t obstacle_idx;
+        Array<bool, 4> obstacle_map;
         
 
 };
