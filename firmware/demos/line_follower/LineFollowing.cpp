@@ -2,12 +2,13 @@
 
 void LineFollowing::init()
 {
-    this->speed_min = 500.0;     
+    this->speed_min = 400.0;     
 
+    //this->speed_max = 400.0;
     this->speed_max = 600.0;
     //this->speed_max = 800.0;
     //this->speed_max = 1000.0;
-    //this->speed_max = 1200.0;  
+    //this->speed_max = 1200.0;   
         
     this->r_min   = 80.0;
     this->r_max   = 10000.0;          
@@ -97,7 +98,8 @@ int LineFollowing::main()
 
         // main line following  
         {
-          float position = 0.4*line_sensor.center_position;    
+          //float position = 0.4*line_sensor.center_position;    
+          float position = 0.4*line_sensor.right_position;    
           //float position = line_sensor.center_position;    
 
           float radius  = estimate_turn_radius(position, 1.0/r_max);
@@ -136,10 +138,10 @@ int LineFollowing::main()
 
 void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
 {
-    float turn_search_distance      = 40.0;
+    float turn_search_distance      = 60.0;
     float forward_search_distance   = 70.0;
 
-    float r_search  = 90.0;
+    float r_search  = 90.0; 
     float r_max     = 10000.0;
 
     float speed     = 500.0;
@@ -176,12 +178,14 @@ void LineFollowing::line_search(uint32_t line_lost_type, float curvature)
     if (line_lost_type == LINE_LOST_LEFT)
     {
       way   = 1;
-      state = 3;
+      //state = 3;
+      state = 2;
     }
     else if (line_lost_type == LINE_LOST_RIGHT)
     {
       way   = -1;
-      state = 3;  
+      //state = 3;  
+      state = 2;
     }   
     else
     {   
