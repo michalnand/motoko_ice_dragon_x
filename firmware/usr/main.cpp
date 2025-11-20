@@ -1,96 +1,55 @@
-#include "device.h"
-#include <fmath.h>
-#include <drivers.h>
-#include <tests.h>
-#include <identification.h>
-#include <uid.h>
+#include <libs_drivers.h>
 
 
 
 
-int main(void)      
-{ 
-  drivers_init();
-  
-  //main LQR controller init
-  //position_control.init();  
+int main() 
+{         
+    LibsDriversInit();
 
-  //LineFollowing line_following;
-
-  terminal << "\n\n\n"; 
-  terminal << "machine ready\n";
-
-  Gpio<TGPIOC, 4, GPIO_MODE_OUT> line_led;   //line ilumination leds
-  line_led = 1; 
-  
-
-  button();
-  
-
-  timer.delay_ms(500); 
- 
-
-  motor_control.set_right_velocity(50*2.0*PI/60.0);
-  motor_control.set_left_velocity(50*2.0*PI/60.0);
-  
-  motors_test();  
-  //encoder_sensor_test();
-  //motor_identification();
-  //gyro_stabilisation_test();
-  //encoder_sensor_test();
-  //gyro_sensor_test(); 
-  //ir_sensor_test();
-  //line_sensor_test();
-   
-  while (1)    
-  {
-    timer.delay_ms(150);
-
-    //terminal << "encoder  = " << motor_control.get_left_position() << " " << motor_control.get_right_position() << "\n";
-    terminal << "velocity = ";
-    terminal << motor_control.get_left_velocity()*(60.0f/(2.0f*PI)) << " ";
-    terminal << motor_control.get_left_velocity_fil()*(60.0f/(2.0f*PI)) << " ";
-    terminal << motor_control.get_right_velocity()*(60.0f/(2.0f*PI)) << " ";
-    terminal << motor_control.get_right_velocity_fil()*(60.0f/(2.0f*PI)) << " ";
-    terminal << "\n";
+    Gpio<'C', 4, GPIO_MODE_OUT> led;
+    led = 1; 
     
-  }
+    terminal << "\n\n\n"; 
+    terminal << "machine ready\n";
+
+    AS5600T<5, 12, 5,  'B', 'C'> right_encoder;
+    AS5600T<11, 10, 5, 'C', 'C'> left_encoder;
+    
+    right_encoder.init();
+    left_encoder.init();
 
 
+    while (1)
+    {
+        led = 1;
+        uint32_t right_angle = right_encoder.read_angle();
+        uint32_t left_angle  = left_encoder.read_angle();
 
+        terminal << right_angle << " " << left_angle << "\n";
 
-  //mcu_usage();
-  //noise_measurement();
-
-  //timer_test();
-
-  //left_motor_connect_test();
-  //right_motor_connect_test();
-
-  //ir_sensor_test();
-  //line_sensor_test();
-  //gyro_sensor_test(); 
-  //encoder_sensor_test();
-  //sensors_test();
+        led = 0;
+        timer.delay_ms(100);
+    }
+      
+    /*
+    button();
+  
+    timer.delay_ms(500);     
   
 
-  //left_motor_pwm_test();
-  //right_motor_pwm_test();
-  //encoder_sensor_test();
+    uint32_t start_time = timer.get_time();
 
-  //motor_identification();
-  //motor_driver_test();   
-  //shaper_test();
-  
-  //robot_dynamics_identification();
-
-
-  //line_following.main(); 
-  
-  //line_following.obstacle_avoid();
-  //line_following.line_search(LINE_LOST_CENTER);
-  
-  
-
-  return 0;
-} 
+    while (1)
+    {
+        uint32_t curr_time = timer.get_time() - start_time;
+        terminal << "time = " << curr_time << "\n";
+        led = 1;
+        timer.delay_ms(200);
+        led = 0;
+        timer.delay_ms(800);
+    }
+    */
+    
+    return 0;
+}
