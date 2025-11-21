@@ -1,7 +1,7 @@
 #include <libs_drivers.h>
 
 
-
+#include <tests.h>
 
 int main() 
 {         
@@ -9,7 +9,16 @@ int main()
 
     Gpio<'C', 4, GPIO_MODE_OUT> led;
     led = 1; 
+
+    button();
+
+    //adc_test();
+    //encoder_test(); 
+    gyro_test();
     
+    //motor_pwm_test();
+    
+    /*
     terminal << "\n\n\n"; 
     terminal << "machine ready\n";
 
@@ -31,7 +40,9 @@ int main()
         led = 0;
         timer.delay_ms(100);
     }
-      
+    */
+
+
     /*
     button();
   

@@ -12,7 +12,7 @@
 #MCU BOOT1 to GND and press reset
 #python3 stm32loader.py -e -w -v -b 115200 -p /dev/tty.usbserial-AM01VGIA  build.bin
 #python3 stm32loader.py -e -w -v -b 115200 -p /dev/tty.usbserial-0001  build.bin
-python3 stm32loader.py -e -w -v -b 115200 -p /dev/tty.usbserial-10  build.bin
+python3 stm32loader.py -e -w -v -b 115200 -p /dev/tty.usbserial-110  build.bin
 
 
 

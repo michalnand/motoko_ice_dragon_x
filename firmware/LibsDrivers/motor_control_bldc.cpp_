@@ -1,4 +1,9 @@
 #include <stdint.h>
+
+#define SINE_TABLE_SIZE 256
+#define SINE_VALUE_MAX 1024
+
+
 const uint16_t sineLookupTable[] = {    
     512, 525, 537, 550, 562, 575, 587, 600,
     612, 624, 636, 649, 661, 673, 684, 696,
@@ -33,3 +38,14 @@ const uint16_t sineLookupTable[] = {
     316, 328, 340, 351, 363, 375, 388, 400,
     412, 424, 437, 449, 462, 474, 487, 499
 };
+
+// angle in range 0 .. 255
+int16_t sine(uint16_t angle)
+{
+    int16_t res = sineLookupTable[angle%256];
+    res = res - 512;
+
+    return res;
+}
+
+void MotorControl::set_torque_from_rotation(int32_t torque, uint32_t rotor_angle, bool brake);

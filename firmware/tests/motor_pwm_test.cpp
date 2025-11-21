@@ -1,0 +1,31 @@
+#include <libs_drivers.h>
+
+// run both BLDC motors forward, no feedback loop, just simple three phase sine waves
+void motor_pwm_test()
+{
+    PWMLeftThreePhase  left_pwm;
+    PWMRightThreePhase right_pwm;
+
+    left_pwm.init();
+    right_pwm.init();
+
+    uint32_t phase = 0;
+
+    while (1)
+    {
+        uint32_t phase_a    = (phase + (0*SINE_TABLE_SIZE)/3)%SINE_TABLE_SIZE;
+        uint32_t phase_b    = (phase + (1*SINE_TABLE_SIZE)/3)%SINE_TABLE_SIZE;
+        uint32_t phase_c    = (phase + (2*SINE_TABLE_SIZE)/3)%SINE_TABLE_SIZE;
+
+        uint32_t pwm_a      = (PWM_PERIOD*sine_table[phase_a])/SINE_TABLE_MAX;
+        uint32_t pwm_b      = (PWM_PERIOD*sine_table[phase_b])/SINE_TABLE_MAX;
+        uint32_t pwm_c      = (PWM_PERIOD*sine_table[phase_c])/SINE_TABLE_MAX;
+
+        left_pwm.set(pwm_b, pwm_a, pwm_c);  
+        right_pwm.set(pwm_b, pwm_a, pwm_c);
+
+        phase+= 17;      
+
+        timer.delay_ms(2);
+    }
+}
