@@ -14,9 +14,12 @@ int main()
 
     //adc_test();
     //encoder_test(); 
-    gyro_test();
+    //gyro_test();
     
     //motor_pwm_test();
+
+    //line_test();
+    ir_test();
     
     /*
     terminal << "\n\n\n"; 

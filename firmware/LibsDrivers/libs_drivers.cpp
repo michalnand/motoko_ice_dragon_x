@@ -1,11 +1,14 @@
 #include "libs_drivers.h"
 
 
-
+// global drivers are instantianed here
 Terminal    terminal;
 Timer       timer;    
 
 ADC_driver  adc;
+
+LineSensor   line_sensor;
+IRSensor     ir_sensor;
 
 void LibsDriversInit()
 {
@@ -22,4 +25,7 @@ void LibsDriversInit()
     timer.init();
 
     adc.init();
+
+    line_sensor.init();
+    ir_sensor.init();
 }

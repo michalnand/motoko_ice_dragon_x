@@ -23,8 +23,6 @@
 #define ADC_IR_RIGHT                (LL_ADC_CHANNEL_10)   //PC0
 #define ADC_IR_FRONT_RIGHT          (LL_ADC_CHANNEL_11)   //PC1
 
-
-
   
 class ADC_driver
 {
@@ -43,6 +41,5 @@ class ADC_driver
 
         uint32_t measurement_id;
 };
-
 
 #endif

@@ -8,13 +8,19 @@
 #include "adc_driver.h"
 #include "gyro.h"
 
+#include "line_sensor.h"
+#include "ir_sensor.h"
+
 #include "motor_pwm.h"  
 
 
 // availible from all files
-extern Timer    timer;
-extern Terminal terminal;
-extern ADC_driver adc;
+extern Timer        timer;
+extern Terminal     terminal;
+extern ADC_driver   adc;
+
+extern LineSensor   line_sensor;
+extern IRSensor   ir_sensor;
 
 void LibsDriversInit();
 

@@ -1,44 +1,45 @@
-#include <drivers.h>
+#include <libs_drivers.h>
 #include <adc_driver.h>
 
 
 
-ADC_driver *g_adc_ptr;
-
 #ifdef __cplusplus 
 extern "C" {
 #endif
+
+ADC_driver *g_adc_driver;
  
 void ADC_IRQHandler(void)
 {
     if (LL_ADC_IsActiveFlag_EOCS(ADC1))
     {
+       
+
         LL_ADC_ClearFlag_EOCS(ADC1);
 
         // store result
-        g_adc_ptr->adc_result[g_adc_ptr->adc_current_idx] =
-            LL_ADC_REG_ReadConversionData12(ADC1);
+        g_adc_driver->adc_result[g_adc_driver->adc_current_idx] = LL_ADC_REG_ReadConversionData12(ADC1);
 
         // next channel
-        g_adc_ptr->adc_current_idx = (g_adc_ptr->adc_current_idx + 1) % ADC_CHANNELS_COUNT;
+        g_adc_driver->adc_current_idx = (g_adc_driver->adc_current_idx + 1) % ADC_CHANNELS_COUNT;
 
         // full scan finished
-        if (g_adc_ptr->adc_current_idx == 0)
+        if (g_adc_driver->adc_current_idx == 0)
         {
-            g_adc_ptr->callback();
-            g_adc_ptr->measurement_id++;
+            g_adc_driver->callback();
+            g_adc_driver->measurement_id++;
         }
 
         // configure next channel
         LL_ADC_REG_SetSequencerRanks(
             ADC1,
             LL_ADC_REG_RANK_1,
-            g_adc_ptr->adc_channels[g_adc_ptr->adc_current_idx]
+            g_adc_driver->adc_channels[g_adc_driver->adc_current_idx]
         );
 
         LL_ADC_SetChannelSamplingTime(
             ADC1,
-            g_adc_ptr->adc_channels[g_adc_ptr->adc_current_idx],
+            g_adc_driver->adc_channels[g_adc_driver->adc_current_idx],
             LL_ADC_SAMPLINGTIME_112CYCLES
         );
 
@@ -56,11 +57,13 @@ ADC_driver::ADC_driver()
 
 }
 
+
+
 void ADC_driver::init()
 {
     adc_current_idx = 0;
     measurement_id  = 0;
-    g_adc_ptr       = this;
+    g_adc_driver    = this;
 
     for (uint32_t i = 0; i < ADC_CHANNELS_COUNT; i++)
     {
@@ -132,6 +135,6 @@ uint16_t* ADC_driver::get()
  
 void ADC_driver::callback()
 {
-    //ir_sensor.callback();
-    //line_sensor.callback();
+    ir_sensor.callback();
+    line_sensor.callback();
 } 
