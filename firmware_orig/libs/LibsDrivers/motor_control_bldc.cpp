@@ -398,7 +398,7 @@ void MotorControl::set_torque_from_rotation(int32_t torque, bool brake, uint32_t
     b_pwm = clamp((int32_t)(b_pwm*PWM_PERIOD)/MOTOR_CONTROL_MAX, (int32_t)0, (int32_t)PWM_PERIOD-1);
     c_pwm = clamp((int32_t)(c_pwm*PWM_PERIOD)/MOTOR_CONTROL_MAX, (int32_t)0, (int32_t)PWM_PERIOD-1);
 
-    if (motor_id == 0)
+    if (motor_id == 0)  
     {
         left_pwm.set(b_pwm, a_pwm, c_pwm);
     }   

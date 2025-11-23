@@ -10,6 +10,9 @@ ADC_driver  adc;
 LineSensor   line_sensor;
 IRSensor     ir_sensor;
 
+
+MotorControl motor_control;
+
 void LibsDriversInit()
 {
     // low level init, cache, clock
@@ -28,4 +31,7 @@ void LibsDriversInit()
 
     line_sensor.init();
     ir_sensor.init();
+
+    // motor control init
+    motor_control.init();
 }

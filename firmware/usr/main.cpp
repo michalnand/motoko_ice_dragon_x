@@ -7,8 +7,6 @@ int main()
 {         
     LibsDriversInit();
 
-    Gpio<'C', 4, GPIO_MODE_OUT> led;
-    led = 1; 
 
     button();
 
@@ -17,9 +15,12 @@ int main()
     //gyro_test();
     
     //motor_pwm_test();
+    //motor_driver_test();    
+
+    motor_identification();
 
     //line_test();
-    ir_test();
+    //ir_test();
     
     /*
     terminal << "\n\n\n"; 

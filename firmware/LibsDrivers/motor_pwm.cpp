@@ -25,7 +25,7 @@ void PWMLeft::init()
 
     // TIM3 CONFIG  
     LL_TIM_SetPrescaler(TIM3, 0);
-    LL_TIM_SetAutoReload(TIM3, PWM_PERIOD - 1);
+    LL_TIM_SetAutoReload(TIM3, PWM_VALUE_MAX - 1);
     LL_TIM_SetCounterMode(TIM3, LL_TIM_COUNTERMODE_UP);
     LL_TIM_EnableARRPreload(TIM3);
 
@@ -49,33 +49,33 @@ void PWMLeft::init()
 
 void PWMLeft::set(int32_t pwm)
 {
-    if (pwm > ((int32_t)PWM_PERIOD-1))
+    if (pwm > ((int32_t)PWM_VALUE_MAX-1))
     {
-        pwm = ((int32_t)PWM_PERIOD-1);
+        pwm = ((int32_t)PWM_VALUE_MAX-1);
     }
 
-    if (pwm < -((int32_t)PWM_PERIOD-1))
+    if (pwm < -((int32_t)PWM_VALUE_MAX-1))
     {
-        pwm = -((int32_t)PWM_PERIOD-1);
+        pwm = -((int32_t)PWM_VALUE_MAX-1);
     }  
 
     if (pwm > 0)
     {
-        TIM3->CCR1 = PWM_PERIOD - pwm;
-        TIM3->CCR2 = PWM_PERIOD;      
+        TIM3->CCR1 = PWM_VALUE_MAX - pwm;
+        TIM3->CCR2 = PWM_VALUE_MAX;      
     }   
     else if (pwm < 0)     
     {
         pwm = -pwm;     
         
-        TIM3->CCR1 = PWM_PERIOD;      
-        TIM3->CCR2 = PWM_PERIOD - pwm;
+        TIM3->CCR1 = PWM_VALUE_MAX;      
+        TIM3->CCR2 = PWM_VALUE_MAX - pwm;
     }
     else
     {
         //brake mode
-        TIM3->CCR1 = PWM_PERIOD;
-        TIM3->CCR2 = PWM_PERIOD;
+        TIM3->CCR1 = PWM_VALUE_MAX;
+        TIM3->CCR2 = PWM_VALUE_MAX;
     }
 }
 
@@ -109,7 +109,7 @@ void PWMRight::init()
 
     // TIM4 CONFIG  
     LL_TIM_SetPrescaler(TIM4, 0);
-    LL_TIM_SetAutoReload(TIM4, PWM_PERIOD - 1);
+    LL_TIM_SetAutoReload(TIM4, PWM_VALUE_MAX - 1);
     LL_TIM_SetCounterMode(TIM4, LL_TIM_COUNTERMODE_UP);
     LL_TIM_EnableARRPreload(TIM4);
 
@@ -133,33 +133,33 @@ void PWMRight::init()
 
 void PWMRight::set(int32_t pwm)
 {
-    if (pwm > ((int32_t)PWM_PERIOD-1))
+    if (pwm > ((int32_t)PWM_VALUE_MAX-1))
     {
-        pwm = ((int32_t)PWM_PERIOD-1);
+        pwm = ((int32_t)PWM_VALUE_MAX-1);
     }
 
-    if (pwm < -((int32_t)PWM_PERIOD-1))
+    if (pwm < -((int32_t)PWM_VALUE_MAX-1))
     {
-        pwm = -((int32_t)PWM_PERIOD-1);
+        pwm = -((int32_t)PWM_VALUE_MAX-1);
     }  
 
     if (pwm > 0)
     {
-        TIM4->CCR1 = PWM_PERIOD;
-        TIM4->CCR2 = PWM_PERIOD - pwm;
+        TIM4->CCR1 = PWM_VALUE_MAX;
+        TIM4->CCR2 = PWM_VALUE_MAX - pwm;
     }   
     else if (pwm < 0)     
     {
         pwm = -pwm;     
         
-        TIM4->CCR1 = PWM_PERIOD - pwm;      
-        TIM4->CCR2 = PWM_PERIOD;
+        TIM4->CCR1 = PWM_VALUE_MAX - pwm;      
+        TIM4->CCR2 = PWM_VALUE_MAX;
     }
     else
     {
         //brake mode
-        TIM4->CCR1 = PWM_PERIOD;
-        TIM4->CCR2 = PWM_PERIOD;
+        TIM4->CCR1 = PWM_VALUE_MAX;
+        TIM4->CCR2 = PWM_VALUE_MAX;
     }
 }
 
@@ -191,7 +191,7 @@ void PWMLeftThreePhase::init()
 
     // TIM3 CONFIG  
     LL_TIM_SetPrescaler(TIM3, 0);
-    LL_TIM_SetAutoReload(TIM3, PWM_PERIOD - 1);
+    LL_TIM_SetAutoReload(TIM3, PWM_VALUE_MAX - 1);
     LL_TIM_SetCounterMode(TIM3, LL_TIM_COUNTERMODE_UP);
     LL_TIM_EnableARRPreload(TIM3);
 
@@ -261,7 +261,7 @@ void PWMRightThreePhase::init()
 
     // TIM4 CONFIG  
     LL_TIM_SetPrescaler(TIM4, 0);
-    LL_TIM_SetAutoReload(TIM4, PWM_PERIOD - 1);
+    LL_TIM_SetAutoReload(TIM4, PWM_VALUE_MAX - 1);
     LL_TIM_SetCounterMode(TIM4, LL_TIM_COUNTERMODE_UP);
     LL_TIM_EnableARRPreload(TIM4);
 

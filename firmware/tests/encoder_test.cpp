@@ -5,10 +5,10 @@
 // print readed raw reading (0 .. 4096) and accumulated angle
 void encoder_test()
 {
-    AS5600T<11, 10, 20, 'C', 'C'> left_encoder;
-    AS5600T<5, 12,  20,  'B', 'C'> right_encoder;
+    AS5600T<11, 10, 50, 'C', 'C'> left_encoder;
+    AS5600T<5, 12,  50,  'B', 'C'> right_encoder;
     
-    left_encoder.init();
+    left_encoder.init();    
     right_encoder.init();
 
     uint32_t cnt = 0;

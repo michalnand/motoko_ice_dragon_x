@@ -14,9 +14,13 @@ void gyro_test();
 
 // run both BLDC motors forward, no feedback loop, just simple three phase sine waves
 void motor_pwm_test();
-
+void motor_driver_test();
 
 void line_test();
 void ir_test();
+
+
+void motor_identification();
+
 
 #endif
