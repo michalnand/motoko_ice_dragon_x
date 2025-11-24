@@ -115,8 +115,9 @@ void ADC_driver::init()
 
     LL_ADC_EnableIT_EOCS(ADC1); 
 
-    NVIC_SetPriority(ADC_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 3, 0));
-    NVIC_EnableIRQ(ADC_IRQn);          
+    // priority = 3
+    NVIC_SetPriority(ADC_IRQn, NVIC_EncodePriority(3, 3, 0));
+    NVIC_EnableIRQ(ADC_IRQn);
 
     LL_ADC_Enable(ADC1);
     while (!LL_ADC_IsEnabled(ADC1))

@@ -59,6 +59,13 @@ void MotorControl::init()
     this->left_position         = 0.0f;
     this->right_position        = 0.0f;
 
+    this->left_req_velocity     = 0.0f;
+    this->right_req_velocity     = 0.0f;
+
+    this->left_cl_mode  = false;
+    this->right_cl_mode = false;
+
+
     
     left_pwm.init();    
     right_pwm.init();
@@ -81,20 +88,28 @@ void MotorControl::init()
 
     timer.delay_ms(100);
 
-    /*
     //optimal control init 
 
     // Q = 1, R = 4*(10**7)
+    /*
     float a =  0.98147325;
     float b =  5.60662146;
 
     float k  =  0.00491353;
     float ki =  0.00015595;
     float f  =  0.14402203;
+    */
+
+    //optimal control init 
+    float a =  0.9390764;
+    float b =  12.51632753;
+
+    float k  =  0.00213882;
+    float ki =  0.00015601;
+    float f  =  0.08275113;
 
     left_controller.init(a, b, k, ki, f, 1.0);
     right_controller.init(a, b, k, ki, f, 1.0);
-    */
 
     //init timer
     timer_init();
@@ -105,26 +120,28 @@ void MotorControl::init()
 // range : -1, 1, for min and max torque
 void MotorControl::set_left_torque(float left_torque)
 {
-    //->left_ol_mode = true;
-    this->left_torque  = left_torque;
+    this->left_cl_mode  = false;
+    this->left_torque   = left_torque;
+    
+    
+
 }
 
 // turn OFF closed loop control, and set torque directly
 // range : -1, 1, for min and max torque
 void  MotorControl::set_right_torque(float right_torque)
 {
-    //this->right_ol_mode = true;
+    this->right_cl_mode = false;
     this->right_torque  = right_torque;
 }
 
 
-/*
 // turn ON closed loop control, and set required velocity in rad/s
 // max velocity is arround 1000RPM (2PI*1000/60 [rad/s])
 void MotorControl::set_left_velocity(float left_velocity)
 {
     this->left_req_velocity  = left_velocity;
-    this->left_ol_mode       = false;
+    this->left_cl_mode       = true;    
 }
 
 // turn ON closed loop control, and set required velocity in rad/s
@@ -132,16 +149,13 @@ void MotorControl::set_left_velocity(float left_velocity)
 void MotorControl::set_right_velocity(float right_velocity)
 {
     this->right_req_velocity  = right_velocity;
-    this->right_ol_mode       = false;
+    this->right_cl_mode       = true;
 }
-*/
+
 
 // force break to both motors
 void MotorControl::halt()
 {
-    //this->set_left_velocity(0);
-    //this->set_right_velocity(0);
-
     set_torque_from_rotation(0, 0, false, 0);
     set_torque_from_rotation(0, 0, false, 1);
 }
@@ -170,66 +184,6 @@ float MotorControl::get_right_velocity()
 }   
 
 
-/*
-// read raw left encoder value
-int32_t MotorControl::get_left_encoder()
-{
-    return left_encoder.angle;
-}
-
-// wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
-float MotorControl::get_left_position()
-{
-    //return -left_filter.position_hat;
-    return -left_filter.position_hat;
-}
-
-// wheel angular velocity in rad/s, 2PI is equal to one full forward rotation per second, -2PI for backward
-float MotorControl::get_left_velocity()
-{
-    return -left_filter.velocity_hat/(MOTOR_CONTROL_DT*0.000001f);
-}
-
-float MotorControl::get_left_position_smooth()
-{
-    return -left_filter_smooth.position_hat;    
-}
-
-float MotorControl::get_left_velocity_smooth()
-{
-    return -left_filter_smooth.velocity_hat/(MOTOR_CONTROL_DT*0.000001f);    
-}
-
-
-// read raw right encoder value
-int32_t MotorControl::get_right_encoder()
-{
-    return right_encoder.angle;
-}
-
-// wheel position (angle), 2PI is equal to one full forward rotation, -2PI for backward
-float MotorControl::get_right_position()
-{
-    return right_filter.position_hat;
-}
-
-// wheel angular velocity in rad/s, 2PI is equal to one full forward rotation per second, -2PI for backward
-float MotorControl::get_right_velocity()    
-{
-    return right_filter.velocity_hat/(MOTOR_CONTROL_DT*0.000001f);
-}        
-    
-float MotorControl::get_right_position_smooth()
-{
-    return right_filter_smooth.position_hat;    
-}
-
-float MotorControl::get_right_velocity_smooth()
-{
-    return right_filter_smooth.velocity_hat/(MOTOR_CONTROL_DT*0.000001f);    
-}
-*/
-
 void MotorControl::callback()
 {
     // refresh encoders
@@ -242,56 +196,31 @@ void MotorControl::callback()
     this->left_position         = -(2.0f*PI*left_encoder.position)/ENCODER_RESOLUTION;
     this->right_position        = (2.0f*PI*right_encoder.position)/ENCODER_RESOLUTION;
 
-   
-    /*
-    if (this->left_ol_mode)
-    {
-        left_controller.reset();    
-    }
-    else
+    // LQG controller
+    if (this->left_cl_mode)
     {
         this->left_torque = left_controller.step(this->left_req_velocity, this->get_left_velocity());
     }
-
-    if (this->right_ol_mode)
+    else
     {
-        right_controller.reset();
+        left_controller.reset();
+    }
+
+     
+    if (this->right_cl_mode)
+    {
+        this->right_torque = right_controller.step(this->right_req_velocity, this->get_right_velocity());
     }
     else
     {
-        this->right_torque = right_controller.step(this->right_req_velocity, this->get_right_velocity());
-    }  
-    */     
-
-    float left_torque  = this->left_torque;
-    float right_torque = this->right_torque;
-
-    /*
-    float tc = 0.0025;
-    float tv = 0.002;   
-
-    left_torque+=  tc*sgn(this->get_left_velocity())  + tv*this->get_left_velocity();
-    right_torque+= tc*sgn(this->get_right_velocity()) + tv*this->get_right_velocity();
-    */
-
-    // cogging torque compensation 
-    /*
-    uint32_t theta;
-    float k = 0.01;          
+        right_controller.reset();
+    }
     
-    theta = (2*12*right_encoder.angle*MOTOR_POLES*SINE_TABLE_SIZE)/(2*ENCODER_RESOLUTION);
-    //theta = (2*9*right_encoder.angle*MOTOR_POLES*SINE_TABLE_SIZE)/(2*ENCODER_RESOLUTION);
-    right_torque+= -(k*sin_tab(theta))/SINE_TABLE_MAX; 
-
-    theta = (2*12*left_encoder.angle*MOTOR_POLES*SINE_TABLE_SIZE)/(2*ENCODER_RESOLUTION);
-    //theta = (2*9*left_encoder.angle*MOTOR_POLES*SINE_TABLE_SIZE)/(2*ENCODER_RESOLUTION);
-    left_torque+= -(k*sin_tab(theta))/SINE_TABLE_MAX;   
-    */      
 
     // scale -1...1 range into -MOTOR_CONTROL_MAX ... MOTOR_CONTROL_MAX
     // send torques to motors   
-    set_torque_from_rotation(-left_torque*PWM_VALUE_MAX,  left_encoder.angle,  false, 0);
-    set_torque_from_rotation(right_torque*PWM_VALUE_MAX, right_encoder.angle, false, 1);
+    set_torque_from_rotation(-this->left_torque*PWM_VALUE_MAX,  left_encoder.angle,  false, 0);
+    set_torque_from_rotation(this->right_torque*PWM_VALUE_MAX, right_encoder.angle, false, 1);
 
     this->steps++;  
 }
@@ -323,9 +252,9 @@ void MotorControl::timer_init()
     /* Enable update interrupt (UIE) */
     LL_TIM_EnableIT_UPDATE(TIM2);       
 
-    /* NVIC configuration */    
-    NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 2, 0));
-    NVIC_EnableIRQ(TIM2_IRQn);  
+    // TIM2 highest priority, p = 0
+    NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(3, 0, 0));
+    NVIC_EnableIRQ(TIM2_IRQn);
 
     /* Clear update flag */
     LL_TIM_ClearFlag_UPDATE(TIM2);

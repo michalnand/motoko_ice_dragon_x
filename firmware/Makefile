@@ -14,6 +14,7 @@ HAL_PATH		= $(STM_PATH)/STM32F7xx_HAL_Driver/
 DRIVERS_PATH	= $(STM_PATH)/drivers/
 
 PROJECT_DRIVERS_PATH = LibsDrivers/
+PROJECT_CONTROL_PATH = LibsControl/
 PROJECT_TESTS_PATH	 = tests/
 
 
@@ -41,6 +42,7 @@ INC+= -I$(HAL_PATH)/Inc/
 INC+= -I$(DRIVERS_PATH)
 
 INC+= -I$(PROJECT_DRIVERS_PATH)
+INC+= -I$(PROJECT_CONTROL_PATH)
 INC+= -I$(PROJECT_TESTS_PATH)
 
 
@@ -63,6 +65,7 @@ CXX_SRCS+= $(shell find $(COMMON_PATH) -name '*.cpp')
 CXX_SRCS+= $(shell find $(DRIVERS_PATH) -name '*.cpp')
 
 CXX_SRCS+= $(shell find $(PROJECT_DRIVERS_PATH) -name '*.cpp')
+CXX_SRCS+= $(shell find $(PROJECT_CONTROL_PATH) -name '*.cpp')
 CXX_SRCS+= $(shell find $(PROJECT_TESTS_PATH) -name '*.cpp')
 
 

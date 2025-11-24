@@ -27,8 +27,7 @@ void LibsDriversInit()
     // timer
     timer.init();
 
-    adc.init();
-
+    adc.init();    
     line_sensor.init();
     ir_sensor.init();
 

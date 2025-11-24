@@ -2,6 +2,7 @@
 #define _MOTOR_CONTROL_BLDC_H_
 
 #include <as5600_t.h>
+#include <lqg_single.h>
 
 
 class MotorControl
@@ -13,12 +14,10 @@ class MotorControl
         void set_left_torque(float left_torque);
         void set_right_torque(float right_torque);
 
-        //void set_left_velocity(float left_velocity);
-        //void set_right_velocity(float right_velocity);
+        void set_left_velocity(float left_velocity);
+        void set_right_velocity(float right_velocity);
 
         void halt();
-
-        
 
     public:
         float get_left_position();
@@ -41,13 +40,15 @@ class MotorControl
     private:
         void timer_init();
 
-    public: 
+    private: 
         AS5600T<11, 10, 5, 'C', 'C'> left_encoder;
         AS5600T<5, 12,  5,  'B', 'C'> right_encoder;
 
             
         PWMLeftThreePhase  left_pwm;
         PWMRightThreePhase right_pwm;
+
+        LQGSingle left_controller, right_controller;
 
     public:
         uint32_t steps;
@@ -58,7 +59,9 @@ class MotorControl
 
         //bool left_ol_mode, right_ol_mode;
         float left_torque, right_torque;
-        //float left_req_velocity, right_req_velocity;
+        float left_req_velocity, right_req_velocity;
+
+        bool  left_cl_mode, right_cl_mode;
 };
 
 

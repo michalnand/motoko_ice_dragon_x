@@ -17,7 +17,9 @@ int main()
     //motor_pwm_test();
     //motor_driver_test();    
 
-    motor_identification();
+    //motor_identification();
+    motor_control_test();
+    
 
     //line_test();
     //ir_test();

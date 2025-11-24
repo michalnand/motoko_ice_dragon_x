@@ -22,5 +22,7 @@ void ir_test();
 
 void motor_identification();
 
+void motor_control_test();
+
 
 #endif
