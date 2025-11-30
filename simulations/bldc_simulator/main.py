@@ -6,7 +6,7 @@ from sine_table_lib import *
 ENCODER_RESOLUTION  = 4096
 MOTOR_POLES         = 14
     
-PWM_VALUE_MAX       = 5000
+PWM_VALUE_MAX       = 1024
 
 SQRT3INV            = 591       #1/sqrt(3) = 591/1024
 
